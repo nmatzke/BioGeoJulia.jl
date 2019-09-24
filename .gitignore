@@ -1,4 +1,12 @@
+# From GitHub .gitignore default for Julia
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
 deps/deps.jl
+
+# From Example.jl
+# *.jl.cov
+# *.jl.*.cov
+# *.jl.mem
+/docs/build/
+/docs/Manifest.toml
