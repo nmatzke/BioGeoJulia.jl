@@ -1,5 +1,5 @@
-using Documenter, Example
+using Documenter, Example, BioGeoJulia
 
-makedocs(modules = [Example], sitename = "Example.jl")
+makedocs(modules = [Example, BioGeoJulia], sitename = "BioGeoJulia.jl")
 
-deploydocs(repo = "github.com/JuliaLang/Example.jl.git")
+deploydocs(repo = "github.com/nmatzke/BioGeoJulia.jl.git")
