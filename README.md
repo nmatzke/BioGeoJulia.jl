@@ -11,3 +11,9 @@ Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Jul
 [![Coverage Status](https://coveralls.io/repos/JuliaLang/BioGeoJulia.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaLang/BioGeoJulia.jl?branch=master)
 [![codecov.io](http://codecov.io/github/JuliaLang/BioGeoJulia.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaLang/BioGeoJulia.jl?branch=master)
 
+
+
+#######################################################
+# Local add instructions:
+# Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+#######################################################
