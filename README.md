@@ -15,3 +15,14 @@ Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Jul
 
 # Local add instructions:
 Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+using BioGeoJulia
+
+# Get the list of installed packages:
+x = Pkg.installed()
+list_of_installed_packages = collect(x);
+println.(list_of_installed_packages)	# Messy
+
+# Or:
+x["BioGeoJulia"]
+# v"0.0.1"
+
