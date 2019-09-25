@@ -13,7 +13,5 @@ Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Jul
 
 
 
-#######################################################
 # Local add instructions:
-# Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
-#######################################################
+Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
