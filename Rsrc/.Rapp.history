@@ -1,0 +1,2149 @@
+names(tr)
+tr2=reorder(tr,"pruningwise")
+tr2$edge
+tr$edge
+library(ape)#
+library(maps)#
+library(phytools)#
+library(mvMORPH)#
+#
+#source for tree: #
+# http://www.phytools.org/Cordoba2017/ex/6/Discrete-char-models.html#
+# takes data from #
+# https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.2008.00430.x#
+wd = "/drives/GDrive/__classes/BIOINF702/assignment34/Stefano_/bioinf_702_assignment_3_4-master/"#
+setwd(wd)#
+#
+sqData<-read.csv("brandley_table.csv")#
+sqTree<-read.nexus("squamate.tre")#
+the_tree = sqTree#
+log_birth_death <- function(birth, death, the_tree)#
+{#
+	#sources for birthdeath:#
+	#Nee, S.C. & May, Robert & Harvey, P.H.. (1994). The Reconstructed Evolutionary Process. Philosophical transactions of the Royal Society of London. Series B, Biological sciences. 344. 305-11. 10.1098/rstb.1994.0068. #
+	##
+	# https://www.researchgate.net/profile/Robert_May5/publication/15261438_The_Reconstructed_Evolutionary_Process/links/00b7d5209f7d36a2e0000000/The-Reconstructed-Evolutionary-Process.pdf #
+	# page 5, equation 21#
+	# ape | birthdeath function#
+	# birth is birth rate#
+	# death is death rate#
+	# the_tree is well, the tree that needs to be computed on.#
+	num_species <- length(the_tree$tip.label) # number of species = number of species names#
+	branching_times <- c(NA, branching.times(the_tree)) # add Not Available to beginning#
+#
+	# num_species is length(phy$tip.label), number of species in tree#
+	# branching_times is branching.times(phy), waiting times#
+	r = birth - death #relative birth rate#
+	a = death / birth # death/birth rate#
+#
+#	1 * (lfactorial(N - 1) + (N - 2) * log(r) + r * sum(x[3:N]) + #
+#				N * log(1 - a) - 2 * sum(log(exp(r * x[2:N]) - a)))#
+#				#
+#original function from ape | birthdeath function#
+#
+	log_likelihood = lfactorial(num_species -1) + (num_species - 2) * log(r) + r  * sum(branching_times[3:num_species]) + num_species*log(1 - a) - 2 * sum( log ( exp (r * branching_times[2:num_species]) - a) ) #
+	#actual log likelihood#
+ return (log_likelihood)#
+  }#
+# brownian motion#
+# #
+#
+#log_brownian(beginning_mean, rate, tree, covariance_matrix) {#
+	log_brownian <- function(beginning_mean, rate, tree, trait_values) #
+	{#
+		#source: https://lukejharmon.github.io/pcm/chapter4_fitbm/#
+		#equation 4.5#
+		# note that this function is imperfect. The source for the formula gave the likelihood, not the log likelihood. As such the function should work find for small trees, but on one large tree I tried, it gave the determinant of the covariance matrix being infinite, which results in finite/infinite = 0 likelihood, which is wrong.#
+		# as such, this should be tested on small trees#
+		#beginning_mean = mean of z at time 0 (mean of root)#
+		# rate is sigma squared is rate of change is varaince#
+		# covariance_matrix is sigma^2 [t1+t2, t1; t1, t1+t3] where t1 is parent length, t2, t3 are child length#
+		#trait_values is   x is an n*1 vector of trait values for the n tip species in the tree, with species in the same order as C#
+		# n is number of species#
+		#x is vector of trait values#
+		n = length(trait_values)#
+#		print(rate)#
+#		print(tree)#
+		#covar_matrix = covariance matrix: phylogenetic variance and covariance given length of tree branches#
+		covar_matrix = vcv(phy = tree, corr=FALSE)*rate#
+		#one_vec = n*1 column matrix made up of 1#
+		one_vec = (matrix(1:n, nrow=n, ncol=1))*0+1#
+		#, solve is inverse#
+		# t is transpose#
+		part_a = (trait_values - beginning_mean*one_vec)#
+		part_b = solve(covar_matrix)#
+#
+		part_c = t(part_a) %*% part_b%*%part_a#
+		part_c = part_c[1,1] # part c is a 1*n atrix times an n*n matrix times an n*1 matrix is a 1*1 matrix. It should be interpreted as a scalar, not a matrix, so I take the value and `convert' it to a scalar#
+		final = exp((-1/2)*part_c)/( sqrt( (2*pi)^n * det(covar_matrix) ) ) # is likelihood#
+		return(log(final)) # converts to log likelihood#
+		}#
+known_result =  birthdeath(the_tree) # testing if is tree#
+print("result from ape's ML")#
+print(known_result)#
+# this gives birth-death and death/birth for maximum likelihood, and the log likelyhood#
+#
+# calculated the birth and death rates, see if my function gives the same likelihood#
+thing = log_birth_death (.02103298, 0, the_tree)#
+print("my result, with their peramiters")#
+print(thing)
+source('/drives/GDrive/__classes/BIOINF702/assignment34/Badi_James/BINF-master/BirthDeathLikelyhood.R', chdir = TRUE)
+library(ape)#
+#
+# Takes a phylogeny and a birth rate and outputs the log likelihood of#
+# the birth rate given the tree under the yule model#
+yule.log.likely <- function(brate, phy)#
+{#
+  # The probability that a the ith birth event happened is proportional#
+  # to i*brate (except for the 1st birth event which is 1 as otherwise#
+  # would not have a tree) so for the n birth events in the tree it is:#
+  # n!*brate^(n-1). The probability no extra birth events happened #
+  # along branch j is proportional to exp(-brate*branch.length[j]) so#
+  # for all branches it is exp(-brate*sum(branch.length))#
+  # Combining then converting to log likelihood we get:#
+  return(-brate * sum(phy$edge.length) + lfactorial(phy$Nnode) #
+         + (phy$Nnode - 1) * log(brate))#
+}#
+#
+finches <- read.nexus("http://www.r-phylo.org/w/images/0/02/Geospiza.nex")#
+#
+optim_yule <- optimise(yule.log.likely, phy = finches, interval = c(0,100), #
+                       maximum = TRUE)#
+optim_bd <- optim(c(2.5,2.25), control = list(fnscale=-1),#
+                  function(p) bd.log.likelyhood.function(p[1],p[2],finches))
+shore_birds <- read.nexus("http://www.zoology.ubc.ca/prog/diversitree/doc/files/Thomas-tree.nex")#
+# shore_birds <- read.nexus("Thomas-tree.nex")#
+# It's a bit big for how slow my BiSSE runs so will take a subtree#
+sub.shore.bird <- subtrees(shore_birds)#
+# Find the biggest tree where all nodes have 2 daughters as that's the#
+# only types of trees that work with my function#
+bin_trees <- c()#
+n_tips <- c()#
+for(i in 1:length(sub.shore.bird)){#
+  if(is.binary.tree(sub.shore.bird[[i]])) {#
+    tip_n <- sub.shore.bird[[i]]$Ntip#
+    cat("The", i, "th tree is binary. No of tips:", tip_n, "\n")#
+    bin_trees <- c(bin_trees, i)#
+    n_tips <- c(n_tips, tip_n)#
+  }#
+}#
+shore.bird <- sub.shore.bird[[bin_trees[which.max(n_tips)]]]
+sex_dimorph <- read.csv("http://www.zoology.ubc.ca/prog/diversitree/doc/files/Lislevand-states.csv",#
+                        as.is = TRUE)#
+states <- sex_dimorph$dimorph#
+names(states) <- sex_dimorph$species#
+states <- states[shore.bird$tip.label]#
+names(states) <- shore.bird$tip.label#
+#
+# Convert to binary states. Count absolute difference in body length #
+# > 7.5% as sexually dimorphic. Count NA's as state 0 for now#
+states.075 <- rep(0, length(states))#
+states.075[which(abs(states) > 0.075)] <- 1#
+names(states.075) <- names(states) #
+#
+# Test#
+testBisse <- biSSE.likelyhood(0.4,0.3,0.2,0.1,0.07,0.04, shore.bird, states.075, #
+                 output.branches = TRUE)
+source('/drives/GDrive/__classes/BIOINF702/assignment34/Badi_James/BINF-master/BiSSELikelyhood.R', chdir = TRUE)
+sex_dimorph <- read.csv("http://www.zoology.ubc.ca/prog/diversitree/doc/files/Lislevand-states.csv",#
+                        as.is = TRUE)#
+states <- sex_dimorph$dimorph#
+names(states) <- sex_dimorph$species#
+states <- states[shore.bird$tip.label]#
+names(states) <- shore.bird$tip.label#
+#
+# Convert to binary states. Count absolute difference in body length #
+# > 7.5% as sexually dimorphic. Count NA's as state 0 for now#
+states.075 <- rep(0, length(states))#
+states.075[which(abs(states) > 0.075)] <- 1#
+names(states.075) <- names(states) #
+#
+# Test#
+testBisse <- biSSE.likelyhood(0.4,0.3,0.2,0.1,0.07,0.04, shore.bird, states.075, #
+                 output.branches = TRUE)
+testBisse
+optim_ve <- optim(c(0.04,0.03,0.02,0.01,0.07,0.04), control = list(fnscale=-1),#
+                  method=c("L-BFGS-B"), lower = c(0.000001,0.000001,0,0,0,0),#
+                  upper = c(1,1,1,1,1,1),#
+                  fn = function(x) biSSE.likelyhood(x[1],x[2],x[3],x[4],x[5],x[6],#
+                                                    shore.bird, states.075))#
+# Single death and transition rates#
+optim_dt <- optim(c(0.04,0.03,0.02,0.07), control = list(fnscale=-1),#
+                  method=c("L-BFGS-B"), lower = c(0.000001,0.000001,0,0),#
+                  upper = c(1,1,1,1),#
+                  fn = function(x) biSSE.likelyhood(x[1],x[2],x[3],x[3],x[4],x[4],#
+                                                    shore.bird, states.075))#
+# No death, single birth rate#
+optim_y <- optim(c(0.04,0.07,0.04), control = list(fnscale=-1), method=c("L-BFGS-B"), #
+                 lower = c(0.000001,0,0), upper = c(1,1,1),#
+                  fn = function(x) biSSE.likelyhood(x[1],x[1],0,0,x[2],x[3],#
+                                                    shore.bird, states.075))#
+# Single transition rate#
+optim_t <- optim(c(0.04,0.03,0.02,0.01,0.07), control = list(fnscale=-1),#
+                 method=c("L-BFGS-B"), lower = c(0.000001,0.000001,0,0,0),#
+                 upper = c(1,1,1,1,1),#
+                  fn = function(x) biSSE.likelyhood(x[1],x[2],x[3],x[4],x[5],x[5],#
+                                                    shore.bird, states.075))#
+# No death#
+optim_nd <- optim(c(0.04,0.03,0.07,0.04), control = list(fnscale=-1), method=c("L-BFGS-B"), #
+                 lower = c(0.000001,0,0), upper = c(1,1,1),#
+                 fn = function(x) biSSE.likelyhood(x[1],x[2],0,0,x[3],x[4],#
+                                                   shore.bird, states.075))#
+# Single death rate#
+optim_sd <- optim(c(0.04,0.03,0.02,0.01,0.07), control = list(fnscale=-1),#
+                 method=c("L-BFGS-B"), lower = c(0.000001,0.000001,0,0,0),#
+                 upper = c(1,1,1,1,1),#
+                 fn = function(x) biSSE.likelyhood(x[1],x[2],x[3],x[3],x[4],x[5],#
+                                                   shore.bird, states.075))
+19*64
+19*365
+940/4
+# Load the package (after installation, see above).#
+library(optimx)         # You need to have some version of optimx available#
+                        # as it is a BioGeoBEARS dependency; however, if you#
+                        # don't want to use optimx, and use optim() (from R core) #
+                        # you can set:#
+                        # BioGeoBEARS_run_object$use_optimx = FALSE#
+                        # ...everything should work either way -- NJM 2014-01-08#
+library(FD)       # for FD::maxent() (make sure this is up-to-date)#
+library(snow)     # (if you want to use multicore functionality; some systems/R versions prefer library(parallel), try either)#
+library(parallel)#
+library(BioGeoBEARS)#
+#
+#########################################################
+# TO GET THE OPTIMX/OPTIM FIX, AND THE UPPASS FIX, #
+# SOURCE THE REVISED FUNCTIONS WITH THESE COMMANDS#
+##
+# CRUCIAL CRUCIAL CRUCIAL: #
+# YOU HAVE TO RUN THE SOURCE COMMANDS AFTER #
+# *EVERY TIME* YOU DO library(BioGeoBEARS). THE CHANGES ARE NOT "PERMANENT", #
+# THEY HAVE TO BE MADE EACH TIME.  IF YOU ARE GOING TO BE OFFLINE, #
+# YOU CAN DOWNLOAD EACH .R FILE TO YOUR HARD DRIVE AND REFER THE source()#
+# COMMANDS TO THE FULL PATH AND FILENAME OF EACH FILE ON YOUR#
+# LOCAL SYSTEM INSTEAD.#
+#########################################################
+library(BioGeoBEARS)#
+source("http://phylo.wdfiles.com/local--files/biogeobears/cladoRcpp.R") # (needed now that traits model added; source FIRST!)#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_add_fossils_randomly_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_basics_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_calc_transition_matrices_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_classes_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_detection_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_DNA_cladogenesis_sim_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_extract_Qmat_COOmat_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_generics_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_models_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_on_multiple_trees_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_plots_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_readwrite_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_simulate_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_SSEsim_makePlots_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_SSEsim_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_stochastic_mapping_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_stratified_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_univ_model_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/calc_uppass_probs_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/calc_loglike_sp_v01.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/get_stratified_subbranch_top_downpass_likelihoods_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/runBSM_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/stochastic_map_given_inputs.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/summarize_BSM_tables_v1.R")#
+source("http://phylo.wdfiles.com/local--files/biogeobears/BioGeoBEARS_traits_v1.R") # added traits model#
+calc_loglike_sp = compiler::cmpfun(calc_loglike_sp_prebyte)    # crucial to fix bug in uppass calculations#
+calc_independent_likelihoods_on_each_branch = compiler::cmpfun(calc_independent_likelihoods_on_each_branch_prebyte)#
+    # slight speedup hopefully#
+#
+########################################################
+# Local source()-ing method -- uses BioGeoBEARS sourceall() function #
+# on a directory of .R files, so you don't have to type them out.#
+# The directories here are on my machine, you would have to make a #
+# directory, save the .R files there, and refer to them.#
+##
+# NOTE: it's best to source the "cladoRcpp.R" update first, to avoid warnings like this:#
+###
+## Note: possible error in 'rcpp_calc_anclikes_sp_COOweights_faster(Rcpp_leftprobs = tmpca_1, ': #
+##         unused arguments (m = m, m_null_range = include_null_range, jts_matrix = jts_matrix) #
+###
+##
+# TO USE: Delete or comment out the 'source("http://...")' commands above, and un-comment#
+#              the below...#
+#########################################################################
+# Un-comment (and fix directory paths) to use:#
+#library(BioGeoBEARS)#
+#source("/drives/Dropbox/_njm/__packages/cladoRcpp_setup/cladoRcpp.R")#
+#sourceall("/drives/Dropbox/_njm/__packages/BioGeoBEARS_setup/")#
+#calc_loglike_sp = compiler::cmpfun(calc_loglike_sp_prebyte)    # crucial to fix bug in uppass calculations#
+#calc_independent_likelihoods_on_each_branch = compiler::cmpfun(calc_independent_likelihoods_on_each_branch_prebyte)#
+#########################################################################
+#
+########################################################
+# SETUP: YOUR WORKING DIRECTORY#
+########################################################
+# You will need to set your working directory to match your local system#
+#
+# Note these very handy functions!#
+# Command "setwd(x)" sets your working directory#
+# Command "getwd()" gets your working directory and tells you what it is.#
+# Command "list.files()" lists the files in your working directory#
+# To get help on any command, use "?".  E.g., "?list.files"#
+#
+# Set your working directory for output files#
+# default here is your home directory ("~")#
+# Change this as you like#
+wd = np("~")#
+setwd(wd)#
+#
+# Double-check your working directory with getwd()#
+getwd()#
+#
+########################################################
+# SETUP: Extension data directory#
+########################################################
+# When R packages contain extra files, they are stored in the "extdata" directory #
+# inside the installed package.#
+##
+# BioGeoBEARS contains various example files and scripts in its extdata directory.#
+# #
+# Each computer operating system might install BioGeoBEARS in a different place, #
+# depending on your OS and settings. #
+# #
+# However, you can find the extdata directory like this:#
+extdata_dir = np(system.file("extdata", package="BioGeoBEARS"))#
+extdata_dir#
+list.files(extdata_dir)#
+#
+# "system.file" looks in the directory of a specified package (in this case BioGeoBEARS)#
+# The function "np" is just a shortcut for normalizePath(), which converts the #
+# path to the format appropriate for your system (e.g., Mac/Linux use "/", but #
+# Windows uses "\\", if memory serves).#
+#
+# Even when using your own data files, you should KEEP these commands in your #
+# script, since the plot_BioGeoBEARS_results function needs a script from the #
+# extdata directory to calculate the positions of "corners" on the plot. This cannot#
+# be made into a straight up BioGeoBEARS function because it uses C routines #
+# from the package APE which do not pass R CMD check for some reason.#
+#
+########################################################
+# SETUP: YOUR TREE FILE AND GEOGRAPHY FILE#
+########################################################
+# Example files are given below. To run your own data,#
+# make the below lines point to your own files, e.g.#
+# trfn = "/mydata/frogs/frogBGB/tree.newick"#
+# geogfn = "/mydata/frogs/frogBGB/geog.data"#
+#
+########################################################
+# Phylogeny file#
+# Notes: #
+# 1. Must be binary/bifurcating: no polytomies#
+# 2. No negative branchlengths (e.g. BEAST MCC consensus trees sometimes have negative branchlengths)#
+# 3. Be careful of very short branches, as BioGeoBEARS will interpret ultrashort branches as direct ancestors#
+# 4. You can use non-ultrametric trees, but BioGeoBEARS will interpret any tips significantly below the #
+#    top of the tree as fossils!  This is only a good idea if you actually do have fossils in your tree,#
+#    as in e.g. Wood, Matzke et al. (2013), Systematic Biology.#
+# 5. The default settings of BioGeoBEARS make sense for trees where the branchlengths are in units of #
+#    millions of years, and the tree is 1-1000 units tall. If you have a tree with a total height of#
+#    e.g. 0.00001, you will need to adjust e.g. the max values of d and e, or (simpler) multiply all#
+#    your branchlengths to get them into reasonable units.#
+# 6. DON'T USE SPACES IN SPECIES NAMES, USE E.G. "_"#
+########################################################
+# This is the example Newick file for Hawaiian Psychotria#
+# (from Ree & Smith 2008)#
+# "trfn" = "tree file name"#
+trfn = np(paste(addslash(extdata_dir), "Psychotria_5.2.newick", sep=""))#
+#
+# Look at the raw Newick file:#
+moref(trfn)#
+#
+# Look at your phylogeny:#
+tr = read.tree(trfn)#
+tr#
+plot(tr)#
+title("Example Psychotria phylogeny from Ree & Smith (2008)")#
+axisPhylo() # plots timescale#
+#
+########################################################
+# Geography file#
+# Notes:#
+# 1. This is a PHYLIP-formatted file. This means that in the #
+#    first line, #
+#    - the 1st number equals the number of rows (species)#
+#    - the 2nd number equals the number of columns (number of areas)#
+#    - after a tab, put the areas in parentheses, with spaces: (A B C D)#
+##
+# 1.5. Example first line:#
+#    10    4    (A B C D)#
+# #
+# 2. The second line, and subsequent lines:#
+#    speciesA    0110#
+#    speciesB    0111#
+#    speciesC    0001#
+#         ...#
+# #
+# 2.5a. This means a TAB between the species name and the area 0/1s#
+# 2.5b. This also means NO SPACE AND NO TAB between the area 0/1s.#
+# #
+# 3. See example files at:#
+#    http://phylo.wikidot.com/biogeobears#files#
+# #
+# 4. Make you understand what a PLAIN-TEXT EDITOR is:#
+#    http://phylo.wikidot.com/biogeobears#texteditors#
+##
+# 3. The PHYLIP format is the same format used for C++ LAGRANGE geography files.#
+##
+# 4. All names in the geography file must match names in the phylogeny file.#
+##
+# 5. DON'T USE SPACES IN SPECIES NAMES, USE E.G. "_"#
+##
+# 6. Operational taxonomic units (OTUs) should ideally be phylogenetic lineages, #
+#    i.e. genetically isolated populations.  These may or may not be identical #
+#    with species.  You would NOT want to just use specimens, as each specimen #
+#    automatically can only live in 1 area, which will typically favor DEC+J #
+#    models.  This is fine if the species/lineages really do live in single areas,#
+#    but you wouldn't want to assume this without thinking about it at least. #
+#    In summary, you should collapse multiple specimens into species/lineages if #
+#    data indicates they are the same genetic population.#
+#######################################################
+#
+# This is the example geography file for Hawaiian Psychotria#
+# (from Ree & Smith 2008)#
+geogfn = np(paste(addslash(extdata_dir), "Psychotria_geog.data", sep=""))#
+#
+# Look at the raw geography text file:#
+moref(geogfn)#
+#
+# Look at your geographic range data:#
+tipranges = getranges_from_LagrangePHYLIP(lgdata_fn=geogfn)#
+tipranges#
+#
+# Maximum range size observed:#
+max(rowSums(dfnums_to_numeric(tipranges@df)))#
+#
+# Set the maximum number of areas any species may occupy; this cannot be larger #
+# than the number of areas you set up, but it can be smaller.#
+max_range_size = 4#
+#
+#####################################################
+#####################################################
+# KEY HINT: The number of states (= number of different possible geographic ranges)#
+# depends on (a) the number of areas and (b) max_range_size.#
+# If you have more than about 500-600 states, the calculations will get REALLY slow,#
+# since the program has to exponentiate a matrix of e.g. 600x600.  Often the computer#
+# will just sit there and crunch, and never get through the calculation of the first#
+# likelihood.#
+# #
+# (this is also what is usually happening when LAGRANGE hangs: you have too many states!)#
+##
+# To check the number of states for a given number of ranges, try:#
+numstates_from_numareas(numareas=4, maxareas=4, include_null_range=TRUE)#
+numstates_from_numareas(numareas=4, maxareas=4, include_null_range=FALSE)#
+numstates_from_numareas(numareas=4, maxareas=3, include_null_range=TRUE)#
+numstates_from_numareas(numareas=4, maxareas=2, include_null_range=TRUE)#
+#
+# Large numbers of areas have problems:#
+numstates_from_numareas(numareas=10, maxareas=10, include_null_range=TRUE)#
+#
+# ...unless you limit the max_range_size:#
+numstates_from_numareas(numareas=10, maxareas=2, include_null_range=TRUE)#
+#####################################################
+#####################################################
+#
+########################################################
+########################################################
+# DEC AND DEC+J ANALYSIS#
+########################################################
+########################################################
+# NOTE: The BioGeoBEARS "DEC" model is identical with #
+# the Lagrange DEC model, and should return identical#
+# ML estimates of parameters, and the same #
+# log-likelihoods, for the same datasets.#
+##
+# Ancestral state probabilities at nodes will be slightly #
+# different, since BioGeoBEARS is reporting the #
+# ancestral state probabilities under the global ML#
+# model, and Lagrange is reporting ancestral state#
+# probabilities after re-optimizing the likelihood#
+# after fixing the state at each node. These will #
+# be similar, but not identical. See Matzke (2014),#
+# Systematic Biology, for discussion.#
+##
+# Also see Matzke (2014) for presentation of the #
+# DEC+J model.#
+########################################################
+########################################################
+#
+########################################################
+########################################################
+#
+########################################################
+# Run DEC#
+########################################################
+#
+# Intitialize a default model (DEC model)#
+BioGeoBEARS_run_object = define_BioGeoBEARS_run()#
+#
+# Give BioGeoBEARS the location of the phylogeny Newick file#
+BioGeoBEARS_run_object$trfn = trfn#
+#
+# Give BioGeoBEARS the location of the geography text file#
+BioGeoBEARS_run_object$geogfn = geogfn#
+#
+# Input the maximum range size#
+BioGeoBEARS_run_object$max_range_size = max_range_size#
+#
+BioGeoBEARS_run_object$min_branchlength = 0.000001    # Min to treat tip as a direct ancestor (no speciation event)#
+BioGeoBEARS_run_object$include_null_range = TRUE    # set to FALSE for e.g. DEC* model, DEC*+J, etc.#
+# (For DEC* and other "*" models, please cite: Massana, Kathryn A.; Beaulieu, #
+#  Jeremy M.; Matzke, Nicholas J.; O’Meara, Brian C. (2015). Non-null Effects of #
+#  the Null Range in Biogeographic Models: Exploring Parameter Estimation in the #
+#  DEC Model. bioRxiv,  http://biorxiv.org/content/early/2015/09/16/026914 )#
+# Also: search script on "include_null_range" for other places to change#
+#
+# Set up a time-stratified analysis:#
+# 1. Here, un-comment ONLY the files you want to use.#
+# 2. Also un-comment "BioGeoBEARS_run_object = section_the_tree(...", below.#
+# 3. For example files see (a) extdata_dir, #
+#  or (b) http://phylo.wikidot.com/biogeobears#files#
+#  and BioGeoBEARS Google Group posts for further hints)#
+##
+# Uncomment files you wish to use in time-stratified analyses:#
+#BioGeoBEARS_run_object$timesfn = "timeperiods.txt"#
+#BioGeoBEARS_run_object$dispersal_multipliers_fn = "manual_dispersal_multipliers.txt"#
+#BioGeoBEARS_run_object$areas_allowed_fn = "areas_allowed.txt"#
+#BioGeoBEARS_run_object$areas_adjacency_fn = "areas_adjacency.txt"#
+#BioGeoBEARS_run_object$distsfn = "distances_matrix.txt"#
+# See notes on the distances model on PhyloWiki's BioGeoBEARS updates page.#
+#
+# Speed options and multicore processing if desired#
+BioGeoBEARS_run_object$on_NaN_error = -1e50    # returns very low lnL if parameters produce NaN error (underflow check)#
+BioGeoBEARS_run_object$speedup = TRUE          # shorcuts to speed ML search; use FALSE if worried (e.g. >3 params)#
+BioGeoBEARS_run_object$use_optimx = TRUE    # if FALSE, use optim() instead of optimx()#
+BioGeoBEARS_run_object$num_cores_to_use = 1#
+# (use more cores to speed it up; this requires#
+# library(parallel) and/or library(snow). The package "parallel" #
+# is now default on Macs in R 3.0+, but apparently still #
+# has to be typed on some Windows machines. Note: apparently #
+# parallel works on Mac command-line R, but not R.app.#
+# BioGeoBEARS checks for this and resets to 1#
+# core with R.app)#
+#
+# Sparse matrix exponentiation is an option for huge numbers of ranges/states (600+)#
+# I have experimented with sparse matrix exponentiation in EXPOKIT/rexpokit,#
+# but the results are imprecise and so I haven't explored it further.#
+# In a Bayesian analysis, it might work OK, but the ML point estimates are#
+# not identical.#
+# Also, I have not implemented all functions to work with force_sparse=TRUE.#
+# Volunteers are welcome to work on it!!#
+BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathology & isn't much faster at this scale#
+#
+# This function loads the dispersal multiplier matrix etc. from the text files into the model object. Required for these to work!#
+# (It also runs some checks on these inputs for certain errors.)#
+BioGeoBEARS_run_object = readfiles_BioGeoBEARS_run(BioGeoBEARS_run_object)#
+#
+# Divide the tree up by timeperiods/strata (uncomment this for stratified analysis)#
+#BioGeoBEARS_run_object = section_the_tree(inputs=BioGeoBEARS_run_object, make_master_table=TRUE, plot_pieces=FALSE)#
+# The stratified tree is described in this table:#
+#BioGeoBEARS_run_object$master_table#
+#
+# Good default settings to get ancestral states#
+BioGeoBEARS_run_object$return_condlikes_table = TRUE#
+BioGeoBEARS_run_object$calc_TTL_loglike_from_condlikes_table = TRUE#
+BioGeoBEARS_run_object$calc_ancprobs = TRUE    # get ancestral states from optim run#
+#
+# Set up DEC model#
+# (nothing to do; defaults)#
+#
+# Look at the BioGeoBEARS_run_object; it's just a list of settings etc.#
+BioGeoBEARS_run_object#
+#
+# This contains the model object#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object#
+#
+# This table contains the parameters of the model #
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table#
+#
+# Run this to check inputs. Read the error messages if you get them!#
+check_BioGeoBEARS_run(BioGeoBEARS_run_object)#
+#
+# For a slow analysis, run once, then set runslow=FALSE to just #
+# load the saved result.#
+runslow = TRUE#
+resfn = "Psychotria_DEC_M0_unconstrained_v1.Rdata"#
+if (runslow)#
+    {#
+    res = bears_optim_run(BioGeoBEARS_run_object)#
+    res    #
+#
+    save(res, file=resfn)#
+    resDEC = res#
+    } else {#
+    # Loads to "res"#
+    load(resfn)#
+    resDEC = res#
+    }#
+#
+########################################################
+# Run DEC+J#
+########################################################
+BioGeoBEARS_run_object = define_BioGeoBEARS_run()#
+BioGeoBEARS_run_object$trfn = trfn#
+BioGeoBEARS_run_object$geogfn = geogfn#
+BioGeoBEARS_run_object$max_range_size = max_range_size#
+BioGeoBEARS_run_object$min_branchlength = 0.000001    # Min to treat tip as a direct ancestor (no speciation event)#
+BioGeoBEARS_run_object$include_null_range = TRUE    # set to FALSE for e.g. DEC* model, DEC*+J, etc.#
+# (For DEC* and other "*" models, please cite: Massana, Kathryn A.; Beaulieu, #
+#  Jeremy M.; Matzke, Nicholas J.; O’Meara, Brian C. (2015). Non-null Effects of #
+#  the Null Range in Biogeographic Models: Exploring Parameter Estimation in the #
+#  DEC Model. bioRxiv,  http://biorxiv.org/content/early/2015/09/16/026914 )#
+# Also: search script on "include_null_range" for other places to change#
+#
+# Set up a time-stratified analysis:#
+#BioGeoBEARS_run_object$timesfn = "timeperiods.txt"#
+#BioGeoBEARS_run_object$dispersal_multipliers_fn = "manual_dispersal_multipliers.txt"#
+#BioGeoBEARS_run_object$areas_allowed_fn = "areas_allowed.txt"#
+#BioGeoBEARS_run_object$areas_adjacency_fn = "areas_adjacency.txt"#
+#BioGeoBEARS_run_object$distsfn = "distances_matrix.txt"#
+# See notes on the distances model on PhyloWiki's BioGeoBEARS updates page.#
+#
+# Speed options and multicore processing if desired#
+BioGeoBEARS_run_object$on_NaN_error = -1e50    # returns very low lnL if parameters produce NaN error (underflow check)#
+BioGeoBEARS_run_object$speedup = TRUE          # shorcuts to speed ML search; use FALSE if worried (e.g. >3 params)#
+BioGeoBEARS_run_object$use_optimx = TRUE    # if FALSE, use optim() instead of optimx()#
+BioGeoBEARS_run_object$num_cores_to_use = 1#
+BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathology & isn't much faster at this scale#
+#
+# This function loads the dispersal multiplier matrix etc. from the text files into the model object. Required for these to work!#
+# (It also runs some checks on these inputs for certain errors.)#
+BioGeoBEARS_run_object = readfiles_BioGeoBEARS_run(BioGeoBEARS_run_object)#
+#
+# Divide the tree up by timeperiods/strata (uncomment this for stratified analysis)#
+#BioGeoBEARS_run_object = section_the_tree(inputs=BioGeoBEARS_run_object, make_master_table=TRUE, plot_pieces=FALSE)#
+# The stratified tree is described in this table:#
+#BioGeoBEARS_run_object$master_table#
+#
+# Good default settings to get ancestral states#
+BioGeoBEARS_run_object$return_condlikes_table = TRUE#
+BioGeoBEARS_run_object$calc_TTL_loglike_from_condlikes_table = TRUE#
+BioGeoBEARS_run_object$calc_ancprobs = TRUE    # get ancestral states from optim run#
+#
+# Set up DEC+J model#
+# Get the ML parameter values from the 2-parameter nested model#
+# (this will ensure that the 3-parameter model always does at least as good)#
+dstart = resDEC$outputs@params_table["d","est"]#
+estart = resDEC$outputs@params_table["e","est"]#
+jstart = 0.0001#
+#
+# Input starting values for d, e#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["d","init"] = dstart#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["d","est"] = dstart#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["e","init"] = estart#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["e","est"] = estart#
+#
+# Add j as a free parameter#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["j","type"] = "free"#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["j","init"] = jstart#
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["j","est"] = jstart#
+#
+check_BioGeoBEARS_run(BioGeoBEARS_run_object)#
+#
+resfn = "Psychotria_DEC+J_M0_unconstrained_v1.Rdata"#
+runslow = TRUE#
+if (runslow)#
+    {#
+    #sourceall("/Dropbox/_njm/__packages/BioGeoBEARS_setup/")#
+#
+    res = bears_optim_run(BioGeoBEARS_run_object)#
+    res    #
+#
+    save(res, file=resfn)#
+#
+    resDECj = res#
+    } else {#
+    # Loads to "res"#
+    load(resfn)#
+    resDECj = res#
+    }#
+#
+########################################################
+# PDF plots#
+########################################################
+pdffn = "Psychotria_DEC_vs_DEC+J_M0_unconstrained_v1.pdf"#
+pdf(pdffn, width=6, height=6)#
+#
+########################################################
+# Plot ancestral states - DEC#
+########################################################
+analysis_titletxt ="BioGeoBEARS DEC on Psychotria M0_unconstrained"#
+#
+# Setup#
+results_object = resDEC#
+scriptdir = np(system.file("extdata/a_scripts", package="BioGeoBEARS"))#
+#
+# States#
+res2 = plot_BioGeoBEARS_results(results_object, analysis_titletxt, addl_params=list("j"), plotwhat="text", label.offset=0.45, tipcex=0.7, statecex=0.7, splitcex=0.6, titlecex=0.8, plotsplits=TRUE, cornercoords_loc=scriptdir, include_null_range=TRUE, tr=tr, tipranges=tipranges)#
+#
+# Pie chart#
+plot_BioGeoBEARS_results(results_object, analysis_titletxt, addl_params=list("j"), plotwhat="pie", label.offset=0.45, tipcex=0.7, statecex=0.7, splitcex=0.6, titlecex=0.8, plotsplits=TRUE, cornercoords_loc=scriptdir, include_null_range=TRUE, tr=tr, tipranges=tipranges)#
+#
+########################################################
+# Plot ancestral states - DECJ#
+########################################################
+analysis_titletxt ="BioGeoBEARS DEC+J on Psychotria M0_unconstrained"#
+#
+# Setup#
+results_object = resDECj#
+scriptdir = np(system.file("extdata/a_scripts", package="BioGeoBEARS"))#
+#
+# States#
+res1 = plot_BioGeoBEARS_results(results_object, analysis_titletxt, addl_params=list("j"), plotwhat="text", label.offset=0.45, tipcex=0.7, statecex=0.7, splitcex=0.6, titlecex=0.8, plotsplits=TRUE, cornercoords_loc=scriptdir, include_null_range=TRUE, tr=tr, tipranges=tipranges)#
+#
+# Pie chart#
+plot_BioGeoBEARS_results(results_object, analysis_titletxt, addl_params=list("j"), plotwhat="pie", label.offset=0.45, tipcex=0.7, statecex=0.7, splitcex=0.6, titlecex=0.8, plotsplits=TRUE, cornercoords_loc=scriptdir, include_null_range=TRUE, tr=tr, tipranges=tipranges)#
+#
+dev.off()  # Turn off PDF#
+cmdstr = paste("open ", pdffn, sep="")#
+system(cmdstr) # Plot it
+moref(trfn)
+plot(tr)
+plot(tr)#
+title("Example Psychotria phylogeny from Ree & Smith (2008)")#
+axisPhylo() # plots timescale
+moref(geogfn)
+tipranges = getranges_from_LagrangePHYLIP(lgdata_fn=geogfn)#
+tipranges
+library(;gg)
+library(BioGeoBEARS)
+find.package(BioGeoBEARS)
+find.package("BioGeoBEARS")
+system("open /Library/Frameworks/R.framework/Versions/3.4/Resources/library/BioGeoBEARS")
+library(BioGeoBEARS)
+source('/drives/Dropbox/_njm/__packages/BioGeoBEARS_setup/2018-10-15_update/BioGeoBEARS_add_fossils_randomly_v1.R', chdir = TRUE)
+library(BioGeoBEARS)
+library(devtools)
+install_github(repo="nmatzke/BioGeoBEARS")
+remove.packages("phytools")
+remove.packages("BioGeoBEARS")
+install.packages("BioGeoBEARS")
+library(BioGeoBEARS)
+install_github(repo="nmatzke/BioGeoBEARS")
+remove.packages("ape")
+install.packages("ape")
+library(ape)
+library(BioGeoBEARS)
+remove.packages("ape")
+detach(ape)
+detach("ape")
+detatch("ape")
+remove.packages('ape')
+library(ape)
+install.packages("ape")
+library(phytools)
+library(BioGeoBEARS)
+asdf
+bears_optim_run
+library(ape)
+d=read.nexus.data(file="/drives/GDrive/__GDrive_projects/2017-08-08_Matt_Baker_flagellum_speaker/01_BLAST/startdata/Shewanella_oneidensis_MR-1_PomB_NP_717146.1_UniProt90_hits_plus_addl_cut1_aln_renamed2.fasta.nex")
+class(d)
+d[[1]]
+lapply(X=d,FUN=length)
+history()
+lapply(X=d,FUN=length)
+d
+16789-14979+1
+library(BioGeoBEARS)
+numstates_from_numareas(7)
+numstates_from_numareas(7,7,T)
+numstates_from_numareas(7,6,T)
+numstates_from_numareas(numareas=7, maxareas=6, include_null_range=T)
+numstates_from_numareas(numareas=7, maxareas=7, include_null_range=T)
+numstates_from_numareas(numareas=7, maxareas=6, include_null_range=T)
+numstates_from_numareas(numareas=7, maxareas=5, include_null_range=T)
+numstates_from_numareas(numareas=7, maxareas=4, include_null_range=T)
+numstates_from_numareas(numareas=7, maxareas=3, include_null_range=T)
+99-64
+numstates_from_numareas(numareas=7, maxareas=2, include_null_range=T)
+64-29
+numstates_from_numareas(numareas=7, maxareas=1, include_null_range=T)
+35-8
+numstates_from_numareas(numareas=7, maxareas=0, include_null_range=T)
+29-8
+library(devtools)
+install_github(repo="nmatzke/BioGeoBEARS")
+library(MultinomialCI)    # For 95% CIs on BSM counts
+install.packages("MultinomialCI")
+library(MultinomialCI)    # For 95% CIs on BSM counts
+newick_str = "(((common_chimpanzee:6,human:6):1,gorilla:7):5,orangutan:13);"#
+great_ape_phylogeny = read.tree(file="", text=newick_str)#
+great_ape_phylogeny#
+plot(great_ape_phylogeny)
+library(ape)#
+library(phytools)#
+library(phangorn)#
+#
+# A. Phylogenies: Basic terminology#
+#
+# Let's load a simple phylogeny#
+newick_str = "(((common_chimpanzee:6,human:6):1,gorilla:7):5,orangutan:13);"#
+great_ape_phylogeny = read.tree(file="", text=newick_str)#
+great_ape_phylogeny#
+plot(great_ape_phylogeny)
+plot(great_ape_phylogeny)#
+axisPhylo()#
+title("Simple phylogeny of the great apes)
+library(ape)#
+library(phytools)#
+library(phangorn)#
+#
+# A. Phylogenies: Basic terminology#
+#
+# Let's load a simple phylogeny#
+newick_str = "(((chimpanzee:6,human:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=newick_str)#
+great_ape_phylogeny#
+#
+# And plot the phylogeny#
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=2, text="Millions of years ago")#
+title("Simple phylogeny of the great apes")
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago")#
+title("Simple phylogeny of the great apes")
+library(ape)#
+library(phytools)#
+library(phangorn)#
+#
+# A. Phylogenies: Basic terminology#
+#
+# Let's load a simple phylogeny#
+newick_str = "(((chimpanzee:6,human:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=newick_str)#
+great_ape_phylogeny#
+#
+# And plot the phylogeny#
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")#
+#
+# Add the node numbers#
+nodelabels()#
+tiplabels()
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")#
+#
+# Add the node numbers to the plot#
+nodelabels()#
+tiplabels()#
+edgelabels()
+?plot.phylo
+plot(great_ape_phylogeny, type="fan")
+?plot.phylo
+plot(great_ape_phylogeny, type="cladogram")
+plot(great_ape_phylogeny, type="cladogram")#
+axisPhylo()
+plot(great_ape_phylogeny, type="c")#
+axisPhylo()
+plot(great_ape_phylogeny, type="c")#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")#
+edgelabels()
+great_ape_newick_string1 = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+#
+great_ape_newick_string2 = "(((human,chimpanzee),gorilla),orangutan);"#
+#
+# And, let's plot them both:#
+great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
+great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
+#
+# Plot 2 graphics on same page:#
+par(mfrow=c(2,1))#
+plot(great_ape_phylo1)#
+axisPhylo()#
+#
+plot(great_ape_phylo2)#
+axisPhylo()
+par(mfrow=c(2,1))#
+plot(great_ape_phylo1)#
+#
+plot(great_ape_phylo2)
+1+1#
+30/3#
+5*3#
+#
+# STORING AND RETRIEVING VARIABLES#
+# #
+# Variables can store numeric data#
+# Typing the name of the variable returns what is stored:#
+var1 = 1+1#
+var1#
+#
+# Variables can also store character data#
+var2 = "Hello, world!"#
+var2#
+#
+# LOGICAL TESTS#
+##
+# The "==" operator tests if two things are equal,#
+# and returns TRUE or FALSE#
+1 == 1#
+var1 == 1#
+var1 == 2#
+#
+# R can also do greater than, less than, not equal, etc.#
+1 < 2#
+2 > 1#
+1 != 1#
+1 != 2#
+#
+# VARIABLES STORING ARRAYS#
+# A variable can store multiple items; this is a "vector"#
+# or "array".  Let's store a list of species names:#
+var3 = c("human", "chimp", "gorilla", "orangutan")#
+var3#
+#
+# Items in an array can be accessed with square brackets: [ ]#
+var3[1]#
+var3[2]#
+var3[3]#
+var3[4]
+for (i in 1:4)#
+	{#
+	print(var3[i])#
+	}
+for (i in 1:4)#
+	{ #
+	if (var3[i] == "human")#
+		{#
+		print("match found!")#
+		} else {#
+		print("match not found!")#
+		}#
+	}
+for (i in 1:4)#
+	{ #
+	print(var3[i])#
+	if (var3[i] == "human")#
+		{#
+		print("match found!")#
+		} else {#
+		print("match not found!")#
+		}#
+	}
+print(var3)#
+print(var3[1])
+rnorm(n=1, mean=1.5, sd=0.1)#
+#
+# Do it several times#
+rnorm(n=1, mean=1.5, sd=0.1)#
+rnorm(n=1, mean=1.5, sd=0.1)#
+rnorm(n=1, mean=1.5, sd=0.1)#
+rnorm(n=1, mean=1.5, sd=0.1)#
+rnorm(n=1, mean=1.5, sd=0.1)#
+#
+# Generate 100 such numbers and store in var4#
+var4 = rnorm(n=100, mean=1.5, sd=0.1)#
+#
+# R functions can also do statistical plots#
+# Here is a histogram plot of var4#
+#
+# Looking at var4 as a list of nubmers is difficult#
+var4#
+#
+# But, looking at a histogram is easy:#
+hist(var4)
+tr = rtree(n=10, rooted=TRUE)#
+#
+# Oops, that produced an error! The "rtree" (random tree)#
+# function is part of the "ape" package. So we have to #
+# library() the ape package first:#
+#
+library(ape)#
+tr = rtree(n=10, rooted=TRUE)
+tr#
+#
+# That's a tree with 10 tips!  Let's see what it #
+# looks like, with the plot() function:#
+plot(tr)#
+#
+# Let's make a bigger tree, with 40 tips:#
+tr = rtree(n=40, rooted=TRUE)#
+plot(tr)
+library(ape)#
+library(phytools)#
+library(phangorn)#
+#
+# A. Phylogenies: Basic terminology#
+#
+# Let's load a simple phylogeny#
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=newick_str)#
+great_ape_phylogeny#
+#
+# And plot the phylogeny#
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=great_ape_newick_string)#
+great_ape_phylogeny#
+#
+# And plot the phylogeny#
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")#
+#
+# Add the node numbers to the plot#
+nodelabels()#
+tiplabels()
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")
+edgelabels()#
+#
+# Q: Which branch is longest?  How long is it?#
+#    (include the units in your answer)#
+# Q: Which branch is shortest?  How long is it?#
+#    (include the units in your answer)#
+# Q: Why are there 6 branches, and not 9 or 12?#
+#    Displaying the same tree in another way#
+#    might help you answer:#
+#
+plot(great_ape_phylogeny, type="c")#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes,\ndiagonal branch view")#
+edgelabels()
+great_ape_newick_string1 = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+#
+great_ape_newick_string2 = "(((human,chimpanzee),gorilla),orangutan);"#
+#
+# And, let's plot them both:#
+great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
+great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
+#
+# Plot 2 graphics on same page:#
+par(mfrow=c(2,1))#
+plot(great_ape_phylo1)#
+plot(great_ape_phylo2)
+vert_newick_str = "(lungfish:416,(frog:352.6457263,(((((kiwi:81.06707278,chicken:81.06707278):132.1992512,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375);#
+"#
+vert_phylo = read.tree(file="", text=vert_newick_str)#
+plot(vert_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates")
+vert_newick_str = "(lungfish:416,(frog:352.6457263,(((((kiwi:81.06707278,chicken:81.06707278):132.1992512,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375);#
+"#
+vert_phylo = read.tree(file="", text=vert_newick_str)#
+plot(vert_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates")#
+mtext(side=3, text="Ma (millions of years ago)")
+library(BioGeoBEARS)
+prt(vert_phylo)
+473-432
+vert_newick_str = "(((lungfish:416,(frog:352.6457263,(((((kiwi:81.06707278,chicken:81.06707278):132.1992512,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16,tuna:432):41,shark:471);"#
+vert_phylo = read.tree(file="", text=vert_newick_str)#
+plot(vert_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,(((((kiwi:81.06707278,chicken:81.06707278):132.1992512,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_phylo = read.tree(file="", text=vert_newick_str)#
+plot(vert_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_plusDinos_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,((((((kiwi:81.06707278,chicken:81.06707278):32.1992512,Velociraptor:25),crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_plusDinos_phylo = read.tree(file="", text=vert_plusDinos_newick_str)#
+plot(vert_plusDinos_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates,\nsome dinosaurs added")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_plusDinos_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,((((((kiwi:81.06707278,chicken:81.06707278):32.1992512,Velociraptor:25):100,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_plusDinos_phylo = read.tree(file="", text=vert_plusDinos_newick_str)#
+plot(vert_plusDinos_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates,\nsome dinosaurs added")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_plusDinos_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,(((((((kiwi:81.06707278,chicken:81.06707278):32.1992512,Velociraptor:25):25,Brontosaurus:25):50,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_plusDinos_phylo = read.tree(file="", text=vert_plusDinos_newick_str)#
+plot(vert_plusDinos_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates,\nsome dinosaurs added")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_plusDinos_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,((((((kiwi:81.06707278,chicken:81.06707278):32.1992512,Velociraptor:25):100,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_plusDinos_phylo = read.tree(file="", text=vert_plusDinos_newick_str)#
+plot(vert_plusDinos_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates,\nsome dinosaurs added")#
+mtext(side=3, text="Ma (millions of years ago)")
+?plot.phylo
+plot(vert_phylo, type="cladogram", direction="upwards")#
+axisPhylo()#
+title("Backbone cladogram of vertebrates")
+?plot.phylo
+plot(vert_phylo, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+axisPhylo()#
+title("Backbone cladogram of vertebrates")
+# Or, even more simplified:#
+tips_to_drop = c("kiwi", "chicken", "turtle", "crocodile", "wall_lizard", "anole_lizard", "Tuatara")#
+vert_phylo_subset = drop.tip(vert_phylo, tip=tips_to_drop)#
+plot(vert_phylo_subset, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates\n(subset to mislead you to think evolution is ladder-like)")
+ladderize
+ladderize()
+vert_phylo2 = ladderize(vert_phylo, right=TRUE)#
+plot(vert_phylo2, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates")
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=TRUE)#
+title("Backbone cladogram of vertebrates")
+# Show two plots#
+par(mfrow=c(2,1))#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=TRUE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=TRUE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+par(mfrow=c(2,1))#
+plot(vert_phylo2, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+par(mfrow=c(1,2))#
+plot(vert_phylo2, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="cladogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+par(mfrow=c(1,2))#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+# Show two plots#
+par(mfrow=c(1,2))#
+plot(vert_phylo, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+# Show two plots#
+par(mfrow=c(1,2))#
+plot(vert_phylo_subset, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo_subset2 = ladderize(vert_phylo_subset, right=FALSE)#
+plot(vert_phylo_subset2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+par(mfrow=c(2,1))#
+plot(vert_phylo_subset, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo_subset2 = ladderize(vert_phylo_subset, right=FALSE)#
+plot(vert_phylo_subset2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")
+pdffn = "compare_2_vert_cladograms.pdf"#
+pdf(file=pdffn, width=6, height=12)#
+#
+# Show 2 plots#
+par(mfrow=c(2,1))#
+plot(vert_phylo, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")#
+#
+# Stop writing PDF, open to screen#
+dev.off()#
+cmdstr = paste0("open ", pdffn)#
+system(cmdstr)
+pdffn = "compare_2_vert_cladograms.pdf"#
+pdf(file=pdffn, width=6, height=9)#
+#
+# Show 2 plots#
+par(mfrow=c(2,1))#
+plot(vert_phylo, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")#
+#
+# Stop writing PDF, open to screen#
+dev.off()#
+cmdstr = paste0("open ", pdffn)#
+system(cmdstr)
+pdffn = "compare_2_vert_cladograms.pdf"#
+pdf(file=pdffn, width=6, height=9)#
+#
+# Show 2 plots#
+par(mfrow=c(2,1))#
+plot(vert_phylo, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Display #1: Backbone cladogram of vertebrates,\n(mammals at the right)")#
+#
+vert_phylo2 = ladderize(vert_phylo, right=FALSE)#
+plot(vert_phylo2, type="phylogram", direction="upwards", use.edge.length=FALSE)#
+title("Display #2: Backbone cladogram of vertebrates,\n(most-recent divergences at the right)")#
+#
+# Stop writing PDF, open to screen#
+dev.off()#
+cmdstr = paste0("open ", pdffn)#
+system(cmdstr)
+vert_plusDinos_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,((((((((kiwi:81.06707278,chicken:81.06707278):30,Archaeoptyryx:5):2.1992512,Velociraptor:25):25,Brontosaurus:25):50,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_plusDinos_phylo = read.tree(file="", text=vert_plusDinos_newick_str)#
+plot(vert_plusDinos_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates,\nsome dinosaurs added")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_plusDinos_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,((((((((kiwi:81.06707278,chicken:81.06707278):30,Archaeoptyryx:5):12.1992512,Velociraptor:30):15,Brontosaurus:25):50,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_plusDinos_phylo = read.tree(file="", text=vert_plusDinos_newick_str)#
+plot(vert_plusDinos_phylo)#
+axisPhylo()#
+title("Backbone phylogeny of vertebrates,\nsome dinosaurs added")#
+mtext(side=3, text="Ma (millions of years ago)")
+vert_plusDinos_phylo
+cat(vert_plusDinos_phylo$tip.label)
+cat(vert_plusDinos_phylo$tip.label, sep="\n"))
+cat(vert_plusDinos_phylo$tip.label, sep="\n")
+write(tetrapod_feathered_flight_nexus_format = '#
+#NEXUS#
+#
+BEGIN DATA;#
+    DIMENSIONS  NTAX=18 NCHAR=1;#
+    FORMAT DATATYPE = STANDARD GAP = - MISSING = ? SYMBOLS = "0 1";#
+    MATRIX#
+	shark			0#
+	tuna			0#
+	lungfish		0#
+	frog			0#
+	kiwi			0#
+	seagull			1#
+	Archaeoptyryx	1#
+	Velociraptor	0#
+	Brontosaurus	0#
+	crocodile		0#
+	turtle			0#
+	wall_lizard		0#
+	snake			0#
+	anole_lizard	0#
+	Tuatara			0#
+	platypus		0#
+	opossum			0#
+	human			0#
+    ;#
+END;#
+'#
+#
+# Write to a temporary file#
+write(x=tetrapod_feathered_flight_nexus_format, file="tmp_nexus.nexus")#
+getwd()#
+)
+tetrapod_feathered_flight_nexus_format = '#
+#NEXUS#
+#
+BEGIN DATA;#
+    DIMENSIONS  NTAX=18 NCHAR=1;#
+    FORMAT DATATYPE = STANDARD GAP = - MISSING = ? SYMBOLS = "0 1";#
+    MATRIX#
+	shark			0#
+	tuna			0#
+	lungfish		0#
+	frog			0#
+	kiwi			0#
+	seagull			1#
+	Archaeoptyryx	1#
+	Velociraptor	0#
+	Brontosaurus	0#
+	crocodile		0#
+	turtle			0#
+	wall_lizard		0#
+	snake			0#
+	anole_lizard	0#
+	Tuatara			0#
+	platypus		0#
+	opossum			0#
+	human			0#
+    ;#
+END;#
+'#
+#
+# Write to a temporary file#
+write(x=tetrapod_feathered_flight_nexus_format, file="tmp_nexus.nexus")#
+getwd()
+tetrapod_feathered_flight_nexus_format = '#NEXUS#
+#
+BEGIN DATA;#
+    DIMENSIONS  NTAX=18 NCHAR=1;#
+    FORMAT DATATYPE = STANDARD GAP = - MISSING = ? SYMBOLS = "0 1";#
+    MATRIX#
+	shark			0#
+	tuna			0#
+	lungfish		0#
+	frog			0#
+	kiwi			0#
+	seagull			1#
+	Archaeoptyryx	1#
+	Velociraptor	0#
+	Brontosaurus	0#
+	crocodile		0#
+	turtle			0#
+	wall_lizard		0#
+	snake			0#
+	anole_lizard	0#
+	Tuatara			0#
+	platypus		0#
+	opossum			0#
+	human			0#
+    ;#
+END;#
+'#
+#
+# Write to a temporary file#
+datafn = "tmp_tetrapod_feathered_flight1.nexus"#
+write(x=tetrapod_feathered_flight_nexus_format, file=datafn)#
+#
+feathered_flight_ndf = read.nexus.data(file=datafn)#
+state_names = c("no feathered flight", "feathered flight")#
+data_levels = c(0, 1)#
+feathered_flight = phyDat(feathered_flight_ndf, type = "USER", levels=data_levels)#
+feathered_flight
+1+1#
+30/3#
+5*3#
+#
+# STORING AND RETRIEVING VARIABLES#
+# #
+# Variables can store numeric data#
+# Typing the name of the variable returns what is stored:#
+var1 = 1+1#
+var1#
+#
+# Variables can also store character data#
+var2 = "Hello, world!"#
+var2#
+#
+# LOGICAL TESTS#
+##
+# The "==" operator tests if two things are equal,#
+# and returns TRUE or FALSE#
+1 == 1#
+var1 == 1#
+var1 == 2#
+#
+# R can also do greater than, less than, not equal, etc.#
+1 < 2#
+2 > 1#
+1 != 1#
+1 != 2#
+#
+# VARIABLES STORING ARRAYS#
+# A variable can store multiple items; this is a "vector"#
+# or "array".  Let's store a list of species names:#
+var3 = c("human", "chimp", "gorilla", "orangutan")#
+var3#
+#
+# Items in an array can be accessed with square brackets: [ ]#
+var3[1]#
+var3[2]#
+var3[3]#
+var3[4]#
+#
+# FOR-LOOPS#
+# A "for-loop" can be used to loop through an array, for#
+# example to print or to search for a match:#
+#
+# ( copy-and-paste from "for" to "}" )#
+# Print each item in var3:#
+for (i in 1:4)#
+    {#
+    print(var3[i])#
+    }#
+#
+# PRINT ONLY MATCHES, WITH IF-ELSE STATEMENT#
+# * "If-else" statements allow the code to#
+#   perform an action, *if* a particular#
+#   TRUE/FALSE statement is true. #
+##
+# * Here, the variable "i" iterates through#
+#   1, 2, 3, and 4.  For each i, var3 is #
+#   checked to see if it equals "human". #
+#   If so, it prints "match found". If not,#
+#   it prints "match not found".#
+##
+# * If-else statements allow more complex #
+#   analyses.#
+##
+# ( copy-and-paste from "for" to the last "}" )#
+for (i in 1:4)#
+    { #
+    print(var3[i])#
+    if (var3[i] == "human")#
+        {#
+        print("match found!")#
+        } else {#
+        print("match not found!")#
+        }#
+    }#
+#
+# FUNCTIONS#
+##
+# Functions are pre-written code that takes an input#
+# and produces an output.  All functions end with #
+# round brackets -- "(" and ")" -- which is where#
+# the inputs go.#
+# #
+# We saw an example already, with the print() #
+# function:#
+print(var3)#
+print(var3[1])#
+#
+# Many R functions are statistical. For example,#
+# random number generation:#
+#
+# Draw a random number from a normal distribution#
+# with a mean of 1.0, standard deviation of 0.1#
+rnorm(n=1, mean=1.0, sd=0.1)#
+#
+# Do it several times#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+#
+# Generate 100 such numbers and store in var4#
+var4 = rnorm(n=100, mean=1.0, sd=0.1)#
+#
+# R functions can also do statistical plots#
+# Here is a histogram plot of var4#
+#
+# Looking at var4 as a list of nubmers is difficult#
+var4#
+#
+# But, looking at a histogram is easy:#
+hist(var4)#
+#
+# Repeat the histogram with 10,000 samples from #
+# a normal distribution. Does this look#
+# closer to the theoretical expectation for#
+# a normal distribution (a "bell curve")?#
+var5 = rnorm(n=10000, mean=1.0, sd=0.1)#
+hist(var5)#
+#
+# LIBRARY-ING R PACKAGES, TO ACCESS MORE FUNCTIONS#
+# #
+# R packages store functions for specific scientific#
+# purposes.  For example, just like R can generate#
+# random numbers, R can generate random phylogenetic#
+# trees, with the "rtree()" function:#
+#
+# Paste into R:#
+tr = rtree(n=10, rooted=TRUE)#
+#
+# Oops, that produced an error! The "rtree" (random tree)#
+# function is part of the "ape" package. So we have to #
+# library() the ape package first:#
+#
+library(ape)#
+tr = rtree(n=10, rooted=TRUE)#
+#
+# No error that time, since we did "library(ape)".#
+# Type "tr" to see what is in the variable "tr":#
+tr#
+#
+# That's a tree with 10 tips!  Let's see what it #
+# looks like, with the plot() function:#
+plot(tr)#
+#
+# Let's make a bigger tree, with 40 tips:#
+tr = rtree(n=40, rooted=TRUE)#
+plot(tr)
+library(ape)#
+library(phytools)#
+library(phangorn)
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=great_ape_newick_string)#
+great_ape_phylogeny#
+#
+# And plot the phylogeny#
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")#
+#
+# Add the node numbers to the plot#
+nodelabels()#
+tiplabels()
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")#
+#
+# Add the branch numbers to the plot#
+edgelabels()
+plot(great_ape_phylogeny, type="c")#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes,\ndiagonal branch view")#
+edgelabels()
+great_ape_newick_string1 = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+#
+great_ape_newick_string2 = "(((human,chimpanzee),gorilla),orangutan);"#
+#
+# And, let's plot them both:#
+great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
+great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
+#
+# Plot 2 graphics on same page:#
+dev.off()   # (closes previous graphics windows)#
+par(mfrow=c(2,1))#
+plot(great_ape_phylo1)#
+plot(great_ape_phylo2)
+1+1#
+30/3#
+5*3
+var1 = 1+1#
+var1#
+#
+# Variables can also store character data#
+var2 = "Hello, world!"#
+var2
+1 == 1#
+var1 == 1#
+var1 == 2
+1 < 2#
+2 > 1#
+1 != 1#
+1 != 2
+var3 = c("human", "chimp", "gorilla", "orangutan")#
+var3
+var3[1]#
+var3[2]#
+var3[3]#
+var3[4]
+for (i in 1:4)#
+    {#
+    print(var3[i])#
+    }
+for (i in 1:4)#
+    { #
+    print(var3[i])#
+    if (var3[i] == "human")#
+        {#
+        print("match found!")#
+        } else {#
+        print("match not found!")#
+        }#
+    }
+print(var3)#
+print(var3[1])
+rnorm(n=1, mean=1.0, sd=0.1)#
+#
+# Do it several times#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)#
+rnorm(n=1, mean=1.0, sd=0.1)
+var4 = rnorm(n=100, mean=1.0, sd=0.1)
+var4
+var4#
+#
+# But, looking at a histogram is easy:#
+hist(var4)
+var5 = rnorm(n=10000, mean=1.0, sd=0.1)#
+hist(var5)
+tr = rtree(n=10, rooted=TRUE)
+library(ape)
+tr = rtree(n=10, rooted=TRUE)
+tr
+plot(tr)
+title("This is a randomly-generated phylogenetic tree, with 10 tips.")
+plot(tr)#
+#
+# Let's add a title#
+title("This is a randomly-generated phylogenetic tree, with 10 tips.")
+tr = rtree(n=40, rooted=TRUE)#
+plot(tr)#
+title("This is a randomly-generated phylogenetic tree, with 40 tips.")
+library(ape)#
+library(phytools)#
+library(phangorn)
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=great_ape_newick_string)#
+great_ape_phylogeny
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes")
+great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
+great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
+#
+# Plot 2 graphics on same page:#
+dev.off()   # (closes previous graphics windows)#
+#
+# Plot into a PDF#
+pdffn = "compare_2_great_ape_phylogenies.pdf"#
+pdf(file=pdffn, width=8.5, height=11)#
+#
+par(mfrow=c(2,1))#
+plot(great_ape_phylo1)#
+title("Tree from great_ape_newick_string1")#
+#
+plot(great_ape_phylo2)#
+title("Tree from great_ape_newick_string2")#
+#
+dev.off()#
+cmdstr = paste0("open ", pdffn)#
+system(cmdstr)
+getwd()
+plot(great_ape_phylogeny, type="c")#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Simple phylogeny of the great apes,\ndiagonal branch view")#
+edgelabels()#
+#
+# Cladograms versus Phylograms#
+# Let's compare 2 versions of the great ape phylogeny:#
+#
+great_ape_newick_string1 = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+#
+great_ape_newick_string2 = "(((human,chimpanzee),gorilla),orangutan);"#
+#
+# And, let's plot them both:#
+great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
+great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
+#
+# Plot 2 graphics on same page:#
+dev.off()   # (closes previous graphics windows)#
+#
+# Plot into a PDF#
+pdffn = "compare_2_great_ape_phylogenies.pdf"#
+pdf(file=pdffn, width=8.5, height=11)#
+#
+par(mfrow=c(2,1))#
+plot(great_ape_phylo1)#
+title("Tree from great_ape_newick_string1")#
+#
+plot(great_ape_phylo2)#
+title("Tree from great_ape_newick_string2")#
+#
+dev.off()#
+cmdstr = paste0("open ", pdffn)#
+system(cmdstr)
+dev.off()   # (closes previous graphics windows)#
+vert_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,(((((kiwi:81.06707278,seagull:81.06707278):132.1992512,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
+vert_phylo = read.tree(file="", text=vert_newick_str)#
+plot(vert_phylo)#
+axisPhylo()#
+title("Lab Figure 1: Backbone phylogeny of vertebrates")#
+mtext(side=1, text="Ma (millions of years ago)", line=3)
+library(ape)
+?birthdeath
+library(gtools)
+?gtools
+?trim
+?odd
+OS.type
+.Platform
+.Platform$OS.type
+getwd()
+library(ape)#
+library(phangorn)#
+#
+# Also, to have R automatically open the PDFs, run this#
+if (.Platform$OS.type == "windows")#
+	{#
+	cmd_prefix = paste0("start chrome ", getwd())#
+	} else {#
+	cmd_prefix = "open "#
+	}#
+# A. Phylogenies: Basic terminology#
+#
+########################################################
+# START CODE CHUNK #1#
+########################################################
+#
+# Let's load a simple phylogeny#
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
+great_ape_phylogeny = read.tree(file="", text=great_ape_newick_string)#
+great_ape_phylogeny#
+#
+# And plot the phylogeny to a PDF#
+#
+# Open the PDF for writing#
+pdffn = "chunk01_Fig1_ape_phylo.pdf"#
+pdf(file=pdffn, width=6, height=6)#
+#
+# Send the plot to the PDF#
+plot(great_ape_phylogeny)#
+axisPhylo()#
+mtext(side=1, text="Millions of years ago", line=2)#
+title("Chunk 1, Fig.1: Simple phylogeny of the great apes")#
+#
+# Close the writing of the PDF, open for viewing#
+dev.off()#
+cmdstr = paste0(cmd_prefix, pdffn)#
+system(cmdstr)
+cmdstr
+?expand.grid
+expand.grid(height = seq(60, 80, 5), weight = seq(100, 300, 50),#
+            sex = c("Male","Female"))
+library(BioGeoBEARS)
+prt()
+# Example hominin tree with 2 fossils#
+library(ape)#
+#
+trstr = "(((((Hsapiens:0.4,Hneander:0.4):4.6,Ardi:0.4):1.0,Pan:6.0):1.0,Gorilla:7.0):6.0,Pongo:13.0);"#
+tr = read.tree(file="", text=trstr)#
+#
+pdffn = "Node_numbers_v1.pdf"#
+pdf(pdffn, height=11, width=11)#
+#
+####################################################
+# Plot APE/BioGeoBEARS node numbers#
+####################################################
+ntips = length(tr$tip.label)#
+Rnodenums = (ntips+1):(ntips+tr$Nnode)#
+tipnums = 1:ntips#
+plot(tr, label.offset=0.25, cex=1.25)#
+axisPhylo()#
+tiplabels(cex=1.5)#
+nodelabels(text=Rnodenums, node=Rnodenums, cex=1.5)#
+title("APE/BioGeoBEARS node numbers")#
+#
+# END PDF#
+dev.off()#
+cmdstr = paste("open ", pdffn, sep="")#
+system(cmdstr)#
+########################################################
+# Print a "tree table" with the #
+# BioGeoBEARS function prt()#
+########################################################
+#
+# Install BioGeoBEARS from GitHub#
+# https://github.com/nmatzke/BioGeoBEARS#
+#
+library(devtools)#
+devtools::install_github(repo="nmatzke/BioGeoBEARS")#
+#
+library(BioGeoBEARS)#
+#
+# Print the "tree table"#
+trtable = prt(tr, printflag=FALSE)#
+trtable
+library(BioGeoBEARS)
+trtable = prt(tr, printflag=FALSE)
+tr
+install.packages("ape")
+library(ape)
+library(BioGeoBEARS)
+library(ape)#
+#
+trstr = "(((((Hsapiens:0.4,Hneander:0.4):4.6,Ardi:0.4):1.0,Pan:6.0):1.0,Gorilla:7.0):6.0,Pongo:13.0);"#
+tr = read.tree(file="", text=trstr)#
+#
+pdffn = "Node_numbers_v1.pdf"#
+pdf(pdffn, height=11, width=11)#
+#
+####################################################
+# Plot APE/BioGeoBEARS node numbers#
+####################################################
+ntips = length(tr$tip.label)#
+Rnodenums = (ntips+1):(ntips+tr$Nnode)#
+tipnums = 1:ntips#
+plot(tr, label.offset=0.25, cex=1.25)#
+axisPhylo()#
+tiplabels(cex=1.5)#
+nodelabels(text=Rnodenums, node=Rnodenums, cex=1.5)#
+title("APE/BioGeoBEARS node numbers")#
+#
+# END PDF#
+dev.off()#
+cmdstr = paste("open ", pdffn, sep="")#
+system(cmdstr)#
+########################################################
+# Print a "tree table" with the #
+# BioGeoBEARS function prt()#
+########################################################
+#
+# Install BioGeoBEARS from GitHub#
+# https://github.com/nmatzke/BioGeoBEARS#
+#
+# install.packages("rexpokit")#
+# install.packages("cladoRcpp")#
+library(devtools)#
+# devtools::install_github(repo="nmatzke/BioGeoBEARS")#
+#
+library(BioGeoBEARS)#
+#
+# Print the "tree table"#
+trtable = prt(tr, printflag=FALSE)#
+trtable
+ace
+tr2 <- reorder(tr, "postorder")#
+#
+# Compare the edge matrices#
+tr$edge#
+tr2$edge#
+#
+nb.node = length(tr$tip.label + tr2$Nnode)  # The number of tip+internal nodes#
+for (i in seq(from = 1, by = 2, length.out = nb.node))#
+	{#
+	j <- i + 1L#
+	anc <- tr2$edge[i,1]#
+    des1 <- tr2$edge[i,2]#
+    des2 <- tr2$edge[j,2]#
+	txt = paste0("Ancestral node=", anc, "; Left descendant node=", des1, ", Right descendant node=", des2)#
+	cat("\n", txt, sep="")#
+	}#
+cat("\n\n")
+tr2 <- reorder(tr, "postorder")#
+#
+# Compare the edge matrices#
+tr$edge#
+tr2$edge#
+#
+nb.node = length(tr$tip.label) + tr2$Nnode  # The number of tip+internal nodes#
+for (i in seq(from = 1, by = 2, length.out = nb.node))#
+	{#
+	j <- i + 1L#
+	anc <- tr2$edge[i,1]#
+    des1 <- tr2$edge[i,2]#
+    des2 <- tr2$edge[j,2]#
+	txt = paste0("Ancestral node=", anc, "; Left descendant node=", des1, ", Right descendant node=", des2)#
+	cat("\n", txt, sep="")#
+	}#
+cat("\n\n")
+ace
+tr2 <- reorder(tr, "postorder")#
+#
+# Compare the edge matrices#
+tr$edge#
+tr2$edge#
+#
+nb.node = tr2$Nnode  # The number of internal nodes#
+for (i in seq(from = 1, by = 2, length.out = nb.node))#
+	{#
+	j <- i + 1L#
+	anc <- tr2$edge[i,1]#
+    des1 <- tr2$edge[i,2]#
+    des2 <- tr2$edge[j,2]#
+	txt = paste0("Ancestral node=", anc, "; Left descendant node=", des1, ", Right descendant node=", des2)#
+	cat("\n", txt, sep="")#
+	}#
+cat("\n\n")
+birthrates = seq(from=0, to=5, by=0.05)#
+deathrates = seq(from=0, to=5, by=0.05)#
+BDrates = expand.grid(birthrates, deathrates)
+dim(BDrates)
+birthrates = seq(from=0, to=10, by=0.05)#
+deathrates = seq(from=0, to=10, by=0.05)#
+BDrates = expand.grid(birthrates, deathrates)#
+dim(BDrates)
+head(BDrates)
+ace
+p = c(1, rep(mean(x), #
+                  nb.node)
+?ace
+library(diversitree)
+data(bird.orders)#
+set.seed(1)#
+x <- structure(rnorm(length(bird.orders$tip.label)), names = bird.orders$tip.label)
+x
+fit1 <- find.mle(make.bm(bird.orders, x), 0.1)
+lik.pruning <- make.bm(bird.orders, x, control = list(method = "pruning"))#
+fit2 <- find.mle(lik.pruning, 0.1)
+lik.pruning
+names(lik.pruning)
+fitContinuous
+library(geiger)
+fitContinuous
+? fitContinuous
+fitContinuous
+bm.lik
+library(phytools)
+fastBM
+simBM
+phytools::: simBM
+BMlk
+phytools::: BMlk
+(2^14)*(2^14)
+########################################################
+# Compare ClaSSE and BiSSE calculations#
+##
+# E.g.:#
+# diversitree versus plain-R#
+# diversitree versus BioGeoBEARS+Yule+BFs#
+# #
+########################################################
+#
+library(ape)#
+library(diversitree)#
+library(rexpokit)#
+library(cladoRcpp)#
+library(BioGeoBEARS)#
+#
+source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")  # utility functions from diversitree#
+source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_pureR_v1.R") # simple implementations in plain-R#
+# Load simple example tree#
+wd = "/GitHub/BioGeoJulia.jl/Rsrc/"#
+setwd(wd)#
+trfn = "tree_small.newick"#
+tr = read.tree(trfn)#
+#
+trstr = "((chimp:1,human:1):1,gorilla:2);"#
+#
+# Run a BiSSE model from diversitree#
+#
+# Setup#
+states = c(2,2,2,3)		# Tip states#
+names(states) = tr$tip.label#
+states#
+#
+sampling.f = c(1,1,1,1)		# Proportion of species in each state; for 2 states#
+											# (Let's assume we have all species)#
+k = length(sampling.f)#
+#
+# Create the BiSSE likelihood function. #
+# (strict=FALSE means that some states in the state space can be absent from the tips)#
+classe_4states = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f, strict=FALSE)#
+#
+# Input some parameters#
+birthRate = 0.222222#
+deathRate = 0.0#
+d_val = 0.1#
+e_val = 0.02#
+j_val = 0.0#
+#
+# The names of the parameters:#
+param_names = argnames(classe_4states)#
+param_names#
+#
+# Most parameters will be zero#
+classe_params = rep(0, times=length(param_names))#
+names(classe_params) = param_names#
+# This is basically a DEC model for 4 states#
+#
+# All extinction rates are the same (state-independent)#
+# Here, deathRate is 0 for all states#
+classe_params[grepl(pattern="lambda", x=param_names)] = birthRate#
+classe_params[grepl(pattern="mu", x=param_names)] = deathRate#
+classe_params[grepl(pattern="q", x=param_names)] = 0#
+classe_params[param_names == "q21"] = e#
+classe_params[param_names == "q31"] = e#
+classe_params[param_names == "q24"] = d#
+classe_params[param_names == "q34"] = d#
+classe_params[param_names == "q42"] = e#
+classe_params[param_names == "q43"] = e#
+classe_params#
+# The birthRate (lambda) is state-independent.  However, #
+# only certain cladogenesis scenarios are allowed under DEC.#
+##
+# Disallowed cladogenesis scenarios have a rate of 0.#
+##
+# If there is more than one cladogenesis scenario conditional #
+# on a certain ancestor, DEC assigns each a weight of 1, and #
+# then divides by the sum of the weights. I.e., if there are#
+# six possible cladogenetic range-inheritance events, they #
+# each get a conditional probability of 1/6.#
+# #
+# To translate to ClaSSE, if the speciation rate for a lineage #
+# in a certain state is lambda, then the rate of each individual #
+# allowed scenario would be lambda * 1/6#
+# #
+y_val = (3-j_val)/3#
+total_of_weights = y_val + j_val + j_val#
+yprob = y_val / total_of_weights#
+jprob = j_val / total_of_weights#
+# Specifying the nonzero lambdas#
+# Null range cannot speciate (doesn't seem to matter anyway,#
+# as "null" cannot be an ancestor anyway)#
+classe_params[param_names=="lambda111"] = birthRate#
+#
+# Narrow sympatry (ancestor A or B; rangesize of 1 area)#
+classe_params[param_names=="lambda222"] = yprob * birthRate#
+classe_params[param_names=="lambda333"] = yprob * birthRate#
+#
+# Jump dispersal speciation#
+classe_params[param_names=="lambda223"] = jprob * birthRate#
+classe_params[param_names=="lambda323"] = jprob * birthRate#
+#
+# Subset sympatry for state AB#
+classe_params[param_names=="lambda424"] = 1/6 * birthRate#
+classe_params[param_names=="lambda434"] = 1/6 * birthRate#
+#
+# Vicariance for state AB#
+classe_params[param_names=="lambda423"] = 1/6 * birthRate#
+#
+classe_params_DEC = classe_params
+dput(classe_4states)#
+#
+classe_4states_default <- function(pars, condition.surv=TRUE, root=ROOT.OBS, root.p=NULL, intermediates=FALSE) #
+	{#
+	## Note that this uses MuSSE's cache...#
+	pars2 <- f.pars(pars)#
+	ans <- all.branches(pars2, intermediates)#
+	ans$branchLnL = sum(ans$lq)#
+	rootfunc.classe(ans, pars, condition.surv, root, root.p, intermediates)#
+	}#
+# Do the BiSSE calculation, under many different assumptions#
+res1 = classe_4states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
+res2 = classe_4states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
+root_probs = c(0.25,0.25,0.25,0.25)#
+res3 = classe_4states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
+root_probs = c(0.1, 0.1, 0.1, 0.7)#
+res4 = classe_4states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
+root_probs = c(0, 0, 0, 1)#
+res5 = classe_4states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
+#
+res1t = classe_4states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
+res2t = classe_4states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
+root_probs = c(0.25,0.25,0.25,0.25)#
+res3t = classe_4states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
+root_probs = c(0.1, 0.1, 0.1, 0.7)#
+res4t = classe_4states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
+root_probs = c(0, 0, 0, 1)#
+res5t = classe_4states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
+#
+# get_classe_LnLs returns the total log-likelihood, and #
+# the total of the branch likelihoods#
+LnLs1 = get_classe_LnLs(res1)#
+LnLs2 = get_classe_LnLs(res2)#
+LnLs3 = get_classe_LnLs(res3)#
+LnLs4 = get_classe_LnLs(res4)#
+LnLs5 = get_classe_LnLs(res5)#
+LnLs1t = get_classe_LnLs(res1t)#
+LnLs2t = get_classe_LnLs(res2t)#
+LnLs3t = get_classe_LnLs(res3t)#
+LnLs4t = get_classe_LnLs(res4t)#
+LnLs5t = get_classe_LnLs(res5t)#
+#
+LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t), stringsAsFactors=FALSE)#
+names(LnLst) = c("ttl_LnL", "branch_LnL")#
+Ldiff = exp((LnLst$ttl_LnL - log(0.5)) - LnLst$branch_LnL)#
+LnLst2 = cbind(LnLst, Ldiff)#
+cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
+# Key parts of the calculation#
+lq = t(attr(res2, "intermediates")$lq)			# Branch likelihoods#
+vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root#
+nstates = length(vals) / 2#
+E_indices = 1:nstates#
+d_root_orig = vals[-E_indices]							# Original D likelihoods at root#
+#
+# If root=ROOT.OBS, root.p=NULL, condition.surv=FALSE#
+root.p = d_root_orig/sum(d_root_orig)#
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE#
+root.p = rep(1/nstates, times=nstates)#
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE#
+root.p = c(0.25,0.25,0.25,0.25)#
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=FALSE#
+root.p = c(0.1, 0.1, 0.1, 0.7)#
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE#
+root.p = c(0, 0, 0, 1)#
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
+loglik
+# If root=ROOT.OBS, root.p=NULL, condition.surv=TRUE#
+root.p = d_root_orig/sum(d_root_orig)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+#
+# BiSSE#
+#d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+#
+# MuSSE/ClaSSE#
+pars = classe_params#
+nsum <- k * (k + 1)/2#
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))#
+i <- seq_len(k)#
+e.root <- vals[i]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.FLAT, root.p=NULL, condition.surv=TRUE#
+root.p = rep(1/nstates, times=nstates)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE#
+root.p = c(0.25,0.25,0.25,0.25)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=TRUE#
+root.p = c(0.1, 0.1, 0.1, 0.7)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE#
+root.p = c(0, 0, 0, 1)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik
+root.p = rep(1/nstates, times=nstates)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik#
+#
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE#
+root.p = c(0.25,0.25,0.25,0.25)#
+lambda <- classe_params[E_indices]#
+e.root <- vals[E_indices]#
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)#
+loglik = log(sum(root.p * d.root)) + sum(lq)#
+loglik
