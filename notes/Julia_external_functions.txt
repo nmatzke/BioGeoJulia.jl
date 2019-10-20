@@ -1,0 +1,33 @@
+Hi all! I have been working with Julia's ODE tools and I find them amazing! I have a quick, possibly dumb question, however: Let's say my ODE has a rate parameter that should vary in time as a deterministic function of an external, empirical time series (e.g. a temperature curve from weather data). I think this would require something like a subfunction that (a) knows the absolute value of time-after-start-point, and (b) looks up the relevant temperature on the (smoothed) temperature curve. Is this kind of thing possible? Cheers and thanks!
+
+BridgingBot @GitterIRCbot Aug 22 12:31
+[slack] <yingbo_ma> Would
+
+function foo(u, p, t)
+    ... p(t)
+end
+work?
+
+
+BridgingBot @GitterIRCbot Aug 22 12:40
+[slack] <chrisrackauckas> @nmatzke mix @yingbo_ma’s answer with https://github.com/PumasAI/DataInterpolations.jl
+
+
+
+Pkg.add("DataInterpolations") # for LinearInterpolation
+using DataInterpolations
+
+u = rand(5)
+t = 0:4
+interp = LinearInterpolation(u,t);
+
+interp.u
+interp.t  # times corresponding to the u points
+
+interp(3.5) # Gives the linear interpolation value at t=3.5
+interp(3.1) # Gives the linear interpolation value at t=3.5
+interp(3.2) # Gives the linear interpolation value at t=3.5
+interp(3.3) # Gives the linear interpolation value at t=3.5
+interp(3.0) # Gives the linear interpolation value at t=3.5
+interp[3]
+

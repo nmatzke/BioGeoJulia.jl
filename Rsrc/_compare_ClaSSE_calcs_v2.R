@@ -43,9 +43,9 @@ classe_4states = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f,
 
 # Input some parameters
 birthRate = 0.222222
-deathRate = 0.0
+deathRate = 0.1
 d_val = 0.1
-e_val = 0.02
+e_val = 0.01
 j_val = 0.0
 
 # The names of the parameters:
@@ -64,12 +64,14 @@ names(classe_params) = param_names
 #classe_params[grepl(pattern="lambda", x=param_names)] = birthRate
 classe_params[grepl(pattern="mu", x=param_names)] = deathRate
 classe_params[grepl(pattern="q", x=param_names)] = 0
-# classe_params[param_names == "q21"] = e
-# classe_params[param_names == "q31"] = e
-# classe_params[param_names == "q24"] = d
-# classe_params[param_names == "q34"] = d
-# classe_params[param_names == "q42"] = e
-# classe_params[param_names == "q43"] = e
+
+# For DEC
+classe_params[param_names == "q21"] = e_val
+classe_params[param_names == "q31"] = e_val
+classe_params[param_names == "q24"] = d_val
+classe_params[param_names == "q34"] = d_val
+classe_params[param_names == "q42"] = e_val
+classe_params[param_names == "q43"] = e_val
 classe_params
 
 
@@ -328,6 +330,12 @@ base = t(attr(res2, "intermediates")$base)
 base
 
 
+
+# Get Es,Ds matrix
+Dindexes = (nstates+1):(nstates*2)
+EsDs_branch_bottoms = base
+EsDs_branch_bottoms[,Dindexes] = EsDs_branch_bottoms[,Dindexes] * exp(attr(res2, "intermediates")$lq)
+EsDs_branch_bottoms[1,]
 
 
 # Yay! Figured it out!
