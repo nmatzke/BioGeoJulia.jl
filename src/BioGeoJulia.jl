@@ -1,6 +1,9 @@
 module BioGeoJulia
 export hello_BioGeoJulia, add_one_BioGeoJulia
 
+# Include other .jl files
+include("BGJ_Example.jl")
+
 """
     hello(who::String)
 

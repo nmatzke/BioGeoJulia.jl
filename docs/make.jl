@@ -1,5 +1,5 @@
-using Documenter, BGJ_Example, BioGeoJulia
+using Documenter, BioGeoJulia
 
-makedocs(modules = [BGJ_Example, BioGeoJulia], sitename = "BioGeoJulia.jl")
+makedocs(modules = [BioGeoJulia], sitename = "BioGeoJulia.jl")
 
 deploydocs(repo = "github.com/nmatzke/BioGeoJulia.jl.git")
