@@ -1,4 +1,4 @@
-module Example
+module BGJ_Example
 export hello, domath
 
 """

@@ -1,4 +1,4 @@
-using Test, Example, BioGeoJulia
+using Test, BGJ_Example, BioGeoJulia
 
 @test hello("Julia") == "Hello, Julia"
 @test domath(2.0) ≈ 7.0
