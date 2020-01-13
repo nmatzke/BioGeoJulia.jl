@@ -4,6 +4,7 @@ using Test, BioGeoJulia, Combinatorics, DataFrames
 using BioGeoJulia.Example
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
+using BioGeoJulia.PhyDFutils
 
 @testset "Example" begin
 	@test hello("Julia") == "Hello, Julia"
@@ -48,6 +49,10 @@ end
 	states_list_answer = eval(Meta.parse(tmpstr))
 	states_list = areas_list_to_states_list(area_nums, 3, true)
 	@test states_list == states_list_answer
+end
+
+@testset "TrUtils" begin
+#	@test prt
 end
 
 @testset "TreePass" begin
