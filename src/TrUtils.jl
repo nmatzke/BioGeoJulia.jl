@@ -2,36 +2,7 @@ module TrUtils
 using DataFrames
 #using RCall
 
-export getwd
-export setwd
-export recursive_find
-export include_jls
-export source
-export seq
-export Rchoose
-export Rcbind
-export Rrbind
-export paste
-export paste0
-export type
-export class
-export slashslash
-export addslash
-export df_to_Rdata
-export Reval
-export Rdput
-export Rnames
-export saveopen
-export Rnrow
-export Rncol
-export Rsize
-export Rorder
-export headLR
-export flat2
-export single_element_array_to_scalar
-export headf
-export moref
-export scr2str
+export getwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
 
 # R-like utilities, and other short functions
 
