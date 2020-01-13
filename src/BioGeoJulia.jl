@@ -3,7 +3,7 @@ export hello_BioGeoJulia, add_one_BioGeoJulia
 
 # List each BioGeoJulia code file here
 include("Example.jl")			# default examples
-include("TrUtils")			# basic utility functions for trees, prt() tree tables (DFs), etc.
+include("TrUtils.jl")			# basic utility functions for trees, prt() tree tables (DFs), etc.
 include("StateSpace.jl")	# set up lists of areas and states (geographic ranges)
 include("TreePass.jl")		# downpass and uppass through the phylogeny; prt() etc.
 
