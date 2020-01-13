@@ -1,6 +1,6 @@
 module StateSpace
 using Combinatorics  # for e.g. combinations()
-export numstates_from_numareas, areas_list_to_states_list
+export numstates_from_numareas, areas_list_to_states_list, setup_DEC_DEmat
 
 
 """
@@ -218,6 +218,116 @@ function areas_list_to_states_list(area_nums=collect(1:3), maxareas=3, include_n
 	
 	return states_list
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################
+# Set up models
+#######################################################
+
+
+# Set up a sparse Qmat for the DEC model
+# It will contain references to the parameters
+# dmat: a numareas x numareas matrix of "d" values (range-expansion dispersal)
+# e_list: a numareas array of "e" values (range-contraction, extirpation, "local extinction")
+# amat: a numareas x numareas matrix of "a" values
+# mult_mat: a numareas x numareas matrix of dispersal multipliers
+# e_mult: a numareas list of extirpation multipliers
+# exclude_zeros if true, exclude from the matrix 
+
+"""
+amat = reshape(collect(1:9), (3,3))
+states_list=areas_list_to_states_list()
+"""
+
+function setup_DEC_DEmat(states_list, dmat, e_list, amat; exclude_zeros=true)
+	numstates = length(states_list)
+	area_nums = sort(unique(flat2(states_list)))
+	numareas = length(area_nums)
+	
+	# Initialize empty arrays
+	Qarray_ivals = Array{Int64}
+	Qarray_jvals = Array{Int64}
+	#Qij_vals = []  # 0-element Array{Any,1}  # This is populated by calculating through the others
+	base_vals = []  # base rates -- d, e, a
+	mod_vals = []  # base modifiers -- e.g., "2" for AB -> ABC
+	mult_vals = [] # multipliers from mult_mat, e_mult (ie modification by distance, area, etc.)
+	event_type_vals = Array{String}
+	for i in 1:numstates
+		for j in 1:numstates
+			starting_state = states_list[i]
+			ending_state = states_list[j]
+			size_i = length(starting_state)
+			size_j = length(ending_state)
+			
+			# "a" events -- anagenetic transitions between single-area states
+			# Only use a's, if a>0, or 0 a's are desired
+			# Do "amat[i,j][]" instead of "amat[i,j]" in case it's a Ref()
+			if (starting_state != ending_state) && (size_i == 1) && (size_j == 1) # single-areas, not null
+				starting_areanum = starting_state[] # only works with length 1
+				ending_areanum = ending_state[]     # only works with length 1
+				if (amat[starting_areanum, ending_areanum][] > 0) || (exclude_zeros == false)
+					# Add to arrays
+					push!(event_type_vals, "a")
+					push!(Qarray_ivals, i)
+					push!(Qarray_jvals, j)
+					push!(base_vals, amat[starting_areanum,ending_areanum])
+					push!(mod_vals, 1)
+					push!(mult_vals, 1)
+					continue
+				end
+			end # ending if a[] > 0
+		
+		# "d" events -- anagenetic range-expansion events
+		# Is the ending range 1 area more than the starting range?
+		if (starting_state != ending_state) && ((size_i+1) == size_j) && (size_i != 0) # state i is 1 smaller; not null
+			starting_areanums = starting_state
+			ending_areanums = ending_state
+			end_areanums_not_found_in_start_areas = setdiff(ending_areanums, starting_areanums)
+			if length(end_areanums_not_found_in_start_areas) == 1
+				# Add to arrays
+				push!(event_type_vals, "d")
+				push!(Qarray_ivals, i)
+				push!(Qarray_jvals, j)
+				
+				# Add up the d events
+				tmp_d_sum = 0.0
+				for k in 1:size_i
+					tmp_d_sum = tmp_d_sum + dmat[starting_areanums[k], ending_areanums[end_areanums_not_found_in_start_areas]][]
+				end
+	
+				push!(base_vals, tmp_d_sum)
+				push!(mod_vals, size_i)
+				push!(mult_vals, 1)
+				continue
+			end
+
+			
+		end
+		
+		# "e" events
+		
+		end
+	end
+
+end
+
+
+
+
 
 
 

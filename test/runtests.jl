@@ -1,9 +1,9 @@
 using Test, BioGeoJulia, DataFrames
 
-using Dates # for e.g. Dates.now(), DateTime
-using PhyloNetworks        # most maintained, emphasize; for HybridNetwork
-using Distributed  # for e.g. @spawn
-using Combinatorics  # for e.g. combinations()
+using Dates									# for e.g. Dates.now(), DateTime
+using PhyloNetworks					# most maintained, emphasize; for HybridNetwork
+using Distributed						# for e.g. @spawn
+using Combinatorics					# for e.g. combinations()
 
 
 # List each BioGeoJulia code file prefix here
@@ -11,6 +11,7 @@ using BioGeoJulia.Example
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.TrUtils
+using BioGeoJulia.SSEs
 
 @testset "Example" begin
 	@test hello("Julia") == "Hello, Julia"

@@ -86,6 +86,7 @@ include("/drives/Dropbox/_njm/__julia/julia4Rppl_v3.jl")
 using BioGeoJulia.TrUtils
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
+using BioGeoJulia.SSEs
 
 
 numstates_from_numareas(3,3,false)
@@ -104,8 +105,9 @@ states_list = areas_list_to_states_list(area_nums, 3, true)
 areas_list_to_states_list()
 
 
-using PhyloNetworks
 using Random					# for MersenneTwister()
+using Dates						# for e.g. DateTime, Dates.now()
+using PhyloNetworks
 #using PhyloPlots
 
 
