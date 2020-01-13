@@ -1,4 +1,4 @@
-module PhyDFutils
+module TrUtils
 using DataFrames
 #using RCall
 

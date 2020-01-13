@@ -9,6 +9,7 @@
 cd("/GitHub/BioGeoJulia.jl")
 Pkg.activate(".")
 Pkg.add("Combinatorics")
+Pkg.add("DataFrames")  # for DataFrame
 
 # BioSequences before PhyloNetworks
 # https://github.com/BioJulia/BioSequences.jl
@@ -79,7 +80,10 @@ Pkg.test("BioGeoJulia")
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v3.jl")
 
 # Try some functions
+using BioGeoJulia.TrUtils
 using BioGeoJulia.StateSpace
+using BioGeoJulia.TreePass
+
 numstates_from_numareas(3,3,false)
 numstates_from_numareas(3,3,true)
 numstates_from_numareas(10,1,false)
@@ -97,9 +101,13 @@ areas_list_to_states_list()
 
 
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
 tr
+
+rootnodenum = tr.root
+trdf = prt(tr, rootnodenum)
+trdf
