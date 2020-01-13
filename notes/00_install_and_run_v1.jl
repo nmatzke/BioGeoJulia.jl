@@ -4,6 +4,7 @@
 #######################################################
 import Pkg
 using Pkg
+Pkg.rm("BioGeoJulia")
 Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
 using BioGeoJulia
 
@@ -11,8 +12,17 @@ using BioGeoJulia
 Pkg.test("BioGeoJulia")
 
 # Re-run the tests directory
+# First, push and commit to GitHub, then:
+Pkg.rm("BioGeoJulia")
 Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
 using BioGeoJulia
+Pkg.test("BioGeoJulia")
+
+# Source some handy functions
+include("/drives/Dropbox/_njm/__julia/julia4Rppl_v3.jl")
+
+
+include("/drives/Dropbox/_njm/__julia/julia4Rppl_v3.jl")
 Pkg.test("BioGeoJulia")
 
 
