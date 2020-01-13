@@ -13,7 +13,6 @@ Pkg.test("BioGeoJulia")
 
 # Re-run the tests directory
 # First, commit to Master (quick), then:
-Pkg.rm("BioGeoJulia")
 Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
 using BioGeoJulia
 Pkg.test("BioGeoJulia")

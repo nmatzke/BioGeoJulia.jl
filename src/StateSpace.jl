@@ -1,4 +1,5 @@
 module StateSpace
+using Combinatorics  # for e.g. combinations()
 export numstates_from_numareas, areas_list_to_states_list
 
 
@@ -108,6 +109,85 @@ states_list = areas_list_to_states_list(area_nums, 3, true)
 areas_list_to_states_list()
 """
 
+
+"""
+	areas_list_to_states_list(area_nums[, maxareas, include_null_range])
+
+Provides the list of possible states (e.g., geographic ranges) in the state space. The 
+inputs are:
+
+* `area_nums` - The list of areas. Each area is described with a number. This is done
+with the `collect` function, e.g. collect(1:3).
+
+* `maxareas` - The maximum number of areas occupied per geographic range. See
+`numstates_from_numareas` for a discussion of how the state space grows (rapidly!) 
+with `numareas` and `maxareas`.
+
+* `include_null_range` - if set to `true`, allows the "all absent" range (e.g. 000). 
+If set to `false`, this range is disallowed, decreasing the size of the state space by 1.
+
+NOTE: The size of the state space is a fundamental constraint on the computational speed
+of likelihood calculations for biogeographical models using matrix exponentiation, ODEs 
+(ordinary differential equations), etc. Researchers must think carefully about how large 
+of a state space they require to test their hypotheses, and whether their analysis will 
+run fast enough (or at all!).  If `numareas`=20 and `maxareas`=20, the size of the state
+space is 1,048,576. Trying to calculate likelihoods for such a huge state space will likely
+just fill up computer memory and then crash the program.
+
+Researchers (and reviewers and editors!) should clearly recognize that any computational
+inference is inherently a compromise between a very complex reality, and the memory and 
+speed limitations of computers. Different people might reach different conclusions about
+where exactly this compromise should end up. I tend to think that running somewhat simpler and 
+faster models, thus allowing more time to run variant models, model checks, etc., is more 
+valuable than setting up the most complex model you can think of, devoting months of 
+computing time to it, and then either (a) losing all of that work when it crashes, or (b)
+treating the output as gospel because you don't have the time or money available to do
+anything else.
+
+
+# Examples
+```julia-repl
+julia> area_nums = collect(1:3)
+3-element Array{Int64,1}:
+ 1
+ 2
+ 3
+
+julia> states_list = areas_list_to_states_list(area_nums, 1, false)
+3-element Array{Array{Any,1},1}:
+ [1]
+ [2]
+ [3]
+
+julia> states_list = areas_list_to_states_list(area_nums, 1, true)
+4-element Array{Array{Any,1},1}:
+ [] 
+ [1]
+ [2]
+ [3]
+
+julia> states_list = areas_list_to_states_list(area_nums, 3, false)
+7-element Array{Array{Any,1},1}:
+ [1]      
+ [2]      
+ [3]      
+ [1, 2]   
+ [1, 3]   
+ [2, 3]   
+ [1, 2, 3]
+
+julia> states_list = areas_list_to_states_list(area_nums, 3, true)
+8-element Array{Array{Any,1},1}:
+ []       
+ [1]      
+ [2]      
+ [3]      
+ [1, 2]   
+ [1, 3]   
+ [2, 3]   
+ [1, 2, 3]
+```
+"""
 function areas_list_to_states_list(area_nums=collect(1:3), maxareas=3, include_null_range=false)
 	
 	# Initialize the states_list to the correct size
@@ -129,7 +209,7 @@ function areas_list_to_states_list(area_nums=collect(1:3), maxareas=3, include_n
 	
 	# Fill in the states_list
 	for k in 1:maxareas
-		tmp_states_list = collect(combinations(area_nums, k))
+		tmp_states_list = collect(Combinatorics.combinations(area_nums, k))
 		for j in 1:length(tmp_states_list)
 			state_num = state_num + 1
 			states_list[state_num] = tmp_states_list[j]
