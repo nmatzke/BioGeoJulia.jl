@@ -1,4 +1,4 @@
-using Test, BioGeoJulia, Combinatorics
+using Test, BioGeoJulia, Combinatorics, DataFrames
 
 # List each BioGeoJulia code file prefix here
 using BioGeoJulia.Example
