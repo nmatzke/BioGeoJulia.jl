@@ -23,6 +23,6 @@ end
 	@test numstates_from_numareas(10,3,false) == 175
 	@test numstates_from_numareas(10,10,false) == 1023
 	@test numstates_from_numareas(10,10,true) == 1024
-	@test numstates_from_numareas(10,10,true) == 1048576
+	@test numstates_from_numareas(20,20,true) == 1048576
 end
 
