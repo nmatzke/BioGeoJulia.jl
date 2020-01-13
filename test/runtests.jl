@@ -78,3 +78,8 @@ end
 	trdf = prt(tr, rootnodenum)
 	@test trdf[!, :node_age] == node_ages_in_prt
 end
+
+
+@testset "SSEs" begin
+
+end
