@@ -1,4 +1,4 @@
-using Test, BioGeoJulia, Combinatorics, DataFrames
+using Test, BioGeoJulia, Combinatorics, DataFrames, PhyloNetworks
 
 # List each BioGeoJulia code file prefix here
 using BioGeoJulia.Example
@@ -52,9 +52,22 @@ end
 end
 
 @testset "TrUtils" begin
-#	@test prt
+	tmpstr = "HybridNetwork"
+	answer = eval(Meta.parse(tmpstr))
+	great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+	tr = readTopology(great_ape_newick_string)
+	@test type(tr) == answer
 end
 
 @testset "TreePass" begin
-#	@test prt
+	# Test if the printed tree table from prt()
+	# gets the node ages correct
+	tmpstr = "[0.0, 0.0, 6.0, 0.0, 7.0, 0.0, 12.0]"
+	node_ages_in_prt = eval(Meta.parse(tmpstr))
+	
+	great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+	tr = readTopology(great_ape_newick_string)
+	rootnodenum = tr.root
+	trdf = prt(tr, rootnodenum)
+	@test trdf[!, :node_age] == node_ages_in_prt
 end
