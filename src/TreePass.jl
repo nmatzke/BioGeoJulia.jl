@@ -832,8 +832,8 @@ function get_NodeIndex_df_by_tree_edges(tr; indexNum_table)
 	edge_df
 
 	# Every edge has only 2 nodes. 
-	for i in 1:length(edge)
-		one_edge = edge[i]
+	for i in 1:length(tr.edge)
+		one_edge = tr.edge[i]
 		anc_dec_PNnumbers = get_NodeIndexes_from_edge(one_edge)
 	
 		# Use a named keyword argument, indexNum_table, to provide the translation from PNnumber to node index
