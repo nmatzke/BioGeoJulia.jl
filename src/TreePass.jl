@@ -523,8 +523,8 @@ function prt(tr, rootnodenum, get_taxa_by_node=true)
 	nodeType = collect(repeat([""], numnodes))
 	
 	edge_df = get_NodeIndex_df_by_tree_edges(tr, indexNum_table=indexNum_table)
-	edge_df_rownums = collect(1:TrUtils.Rnrow(edge_df))
-	for i in 1:TrUtils.Rnrow(trdf)
+	edge_df_rownums = collect(1:Rnrow(edge_df))
+	for i in 1:Rnrow(trdf)
 		nodeIndex = trdf[i,:nodeIndex]
 		TF = edge_df[:,:edge_decNodeIndex] .== nodeIndex
 		if (sum(TF) > 0)
@@ -562,7 +562,7 @@ function prt(tr, rootnodenum, get_taxa_by_node=true)
 			nodeType[i] = "tip"
 			nodeName[i] = tr.node[nodeIndex].name
 		end
-	end # END for i in 1:TrUtils.Rnrow(trdf)
+	end # END for i in 1:Rnrow(trdf)
 	
 	# Add the fields
 	trdf[!,:brlen] = brlen
@@ -633,7 +633,7 @@ function get_taxa_descending_from_each_node(tr, trdf; downpass_edgematrix=get_LR
 	# downpass_edgematrix = get_LR_downpass_edgematrix(tr)
 	
 	# Step through the downpass_edgematrix, in pairs
-	edgematrix_rows_to_visit = collect(1:2:TrUtils.Rnrow(downpass_edgematrix))
+	edgematrix_rows_to_visit = collect(1:2:Rnrow(downpass_edgematrix))
 	for (iter,i) in enumerate(edgematrix_rows_to_visit)
 		j = i+1
 		nodeIndex_left = downpass_edgematrix[i,2]
