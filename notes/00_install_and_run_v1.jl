@@ -12,6 +12,7 @@ Pkg.add("Combinatorics")
 Pkg.add("DataFrames")		# for DataFrame
 Pkg.add("Dates"	)				# for e.g. Dates.now(), DateTime
 Pkg.add("Distributed")  # for e.g. @spawn
+Pkg.add("Random")  # for MersenneTwister()
 
 # BioSequences before PhyloNetworks
 # https://github.com/BioJulia/BioSequences.jl
@@ -104,6 +105,7 @@ areas_list_to_states_list()
 
 
 using PhyloNetworks
+using Random					# for MersenneTwister()
 #using PhyloPlots
 
 
@@ -114,3 +116,37 @@ tr
 rootnodenum = tr.root
 trdf = prt(tr, rootnodenum)
 trdf
+
+
+# Downpass
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+global res = construct_Res(tr);
+current_nodeIndex = res.root_nodeIndex
+
+res.likes_at_each_nodeIndex_branchTop
+res.likes_at_each_nodeIndex_branchBot
+res.thread_for_each_nodeOp
+res.thread_for_each_branchOp
+res.node_state
+
+countloop_num_iterations = 10000000
+y = countloop(countloop_num_iterations, 1)
+@time y = countloop(countloop_num_iterations, 1)
+
+
+# First time: compilation
+# iterative_downpass! -- "!" means the function modifies its arguments
+
+start_compilation = Dates.now()
+calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
+end_compilation = Dates.now()
+compilation_time = (end_compilation-start_compilation).value / 1000
+
+
+
+
+
+
+
+
