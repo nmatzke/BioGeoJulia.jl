@@ -9,7 +9,9 @@
 cd("/GitHub/BioGeoJulia.jl")
 Pkg.activate(".")
 Pkg.add("Combinatorics")
-Pkg.add("DataFrames")  # for DataFrame
+Pkg.add("DataFrames")		# for DataFrame
+Pkg.add("Dates"	)				# for e.g. Dates.now(), DateTime
+Pkg.add("Distributed")  # for e.g. @spawn
 
 # BioSequences before PhyloNetworks
 # https://github.com/BioJulia/BioSequences.jl
