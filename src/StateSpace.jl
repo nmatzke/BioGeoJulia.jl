@@ -138,3 +138,7 @@ function areas_list_to_states_list(area_nums=collect(1:3), maxareas=3, include_n
 	
 	return states_list
 end
+
+
+
+end # Ends the module command

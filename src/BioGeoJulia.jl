@@ -24,4 +24,4 @@ Return `x + 1`.
 """
 add_one_BioGeoJulia(x::Number) = x + 1
 
-end # Ends the module or export command?
+end # Ends the module command
