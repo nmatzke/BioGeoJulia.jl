@@ -84,6 +84,7 @@ using BioGeoJulia.TrUtils
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 
+
 numstates_from_numareas(3,3,false)
 numstates_from_numareas(3,3,true)
 numstates_from_numareas(10,1,false)

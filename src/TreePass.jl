@@ -2,7 +2,7 @@ module TreePass
 using BioGeoJulia.TrUtils 
 using DataFrames
 using PhyloNetworks  # for e.g. readTopology()
-export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages
+export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, Res, construct_Res, count_nodes_finished, nodeOp, branchOp, countloop, iterative_downpass, iterative_downpass_nonparallel
 
 
 
@@ -905,6 +905,535 @@ function get_node_ages(tr)
 	node_age = tree_height .- cumulative_height_at_each_node
 	return node_age
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################
+# Parallel operations on binary trees
+#######################################################
+# Threaded downpass that spawns new processes when the 2 nodes above are done.
+
+
+# Results structure
+struct Res
+	# The states can be 
+	# "not_ready" (value at branch top NOT available)
+	# "ready_for_nodeOp" (values at branches above are ready)
+	# "ready_for_branchOp" (value at branch top available)
+	# "calculating" (value at branch bottom being calculated)
+	# "done" (value at branch bottom available)
+	node_state::Array{String}
+	node_Lparent_state::Array{String}
+	node_Rparent_state::Array{String}
+	
+	# Tree structure
+	root_nodeIndex::Int64
+	num_nodes::Int64
+	uppass_edgematrix::Array{Int64}
+	likes_at_each_nodeIndex_branchTop::Array{Float64}
+	likes_at_each_nodeIndex_branchBot::Array{Float64}
+	thread_for_each_nodeOp::Array{Int64}
+	thread_for_each_branchOp::Array{Int64}
+	
+	# Calculation stats
+	calc_spawn_start::Array{DateTime}
+	calc_start_time::Array{DateTime}
+	calc_end_time::Array{DateTime}
+	calc_duration::Array{Float64}
+	calctime_iterations::Array{Float64}
+end
+
+# Construct a default, simple results structure
+function construct_Res()
+	node_state = ["ready_for_branchOp", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready"]
+	node_Lparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
+	node_Rparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
+	root_nodeIndex = 7
+	num_nodes = 7
+	uppass_edgematrix = [7 6; 7 5; 5 4; 5 3; 3 2; 3 1]
+	likes_at_each_nodeIndex_branchTop = [1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0]
+	likes_at_each_nodeIndex_branchBot = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+	thread_for_each_nodeOp = collect(repeat([0], 7))
+	thread_for_each_branchOp = collect(repeat([0], 7))
+
+	calc_spawn_start = collect(repeat([Dates.now()], 7))
+	calc_start_time = collect(repeat([Dates.now()], 7))
+	calc_end_time = collect(repeat([Dates.now()], 7))
+	calc_duration = collect(repeat([0.0], 7))
+
+	calctime_iterations = [0.0, 0.0]
+
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, num_nodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	return res
+end
+
+
+
+"""
+# Load a simple tree, see a simple list of nodeIndexes
+using DataFrames
+using PhyloNetworks
+include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
+
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr.root
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+"""
+function construct_Res(tr::HybridNetwork)
+	root_nodeIndex = tr.root
+	num_nodes = tr.numNodes
+	uppass_edgematrix = get_LR_uppass_edgematrix(tr)
+	
+	# Give tip nodeIndexes their nodeNodex as the "likelihood"
+	indexNum_table = get_nodeIndex_PNnumber(tr)
+	tipsTF = indexNum_table[:,2] .> 0
+	tipLikes = indexNum_table[tipsTF,2] * 1.0
+	likes_at_each_nodeIndex_branchTop = collect(repeat([0.0], num_nodes))
+	likes_at_each_nodeIndex_branchTop[tipsTF] = tipLikes
+	
+	# Fill in the node_states
+	node_state = collect(repeat(["not_ready"], num_nodes))
+	node_state[tipsTF] .= "ready_for_branchOp"
+	node_Lparent_state = collect(repeat(["not_ready"], num_nodes))
+	node_Rparent_state = collect(repeat(["not_ready"], num_nodes))
+	node_Lparent_state[tipsTF] .= "NA"
+	node_Rparent_state[tipsTF] .= "NA"
+	
+	# Initialize with zeros for the other items
+	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], num_nodes))
+	thread_for_each_nodeOp = collect(repeat([0], num_nodes))
+	thread_for_each_branchOp = collect(repeat([0], num_nodes))
+	
+	calc_spawn_start = collect(repeat([Dates.now()], num_nodes))
+	calc_start_time = collect(repeat([Dates.now()], num_nodes))
+	calc_end_time = collect(repeat([Dates.now()], num_nodes))
+	calc_duration = collect(repeat([0.0], num_nodes))
+
+	calctime_iterations = [0.0, 0.0]
+	number_of_whileLoop_iterations = [0]	
+
+	# Initialize res object
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, num_nodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	return res
+end
+
+# Convert this res object to a DataFrame
+#function res_to_df(res)
+#	
+#end
+
+function count_nodes_finished(node_state)
+	sum(node_state .== "done")
+end
+
+
+# Combine likelihoods from above
+function nodeOp(current_nodeIndex, res)
+	res.node_state[current_nodeIndex] = "calculating_nodeOp"
+	uppass_edgematrix = res.uppass_edgematrix
+	
+	# Record the thread, for kicks
+	tmp_threadID = Threads.threadid()
+	res.thread_for_each_nodeOp[current_nodeIndex] = tmp_threadID
+	TF = uppass_edgematrix[:,1] .== current_nodeIndex
+	if (sum(TF) == 2)
+		# Get likelihoods from above (iterates up to tips)
+		parent_nodeIndexes = uppass_edgematrix[TF,2]
+		tmp1 = res.likes_at_each_nodeIndex_branchTop[parent_nodeIndexes[1]]
+		tmp2 = res.likes_at_each_nodeIndex_branchTop[parent_nodeIndexes[2]]
+
+		# Check that data are actually available
+		if (sum(tmp1) == 0.0)
+			txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(tmp1) == 0.0, indicating data at parent nodes actually not available."], "")
+			res.node_state[current_nodeIndex] = txt
+			print("\n")
+			print(txt)
+			print("\n")
+			return(error(txt))
+		end
+
+		if (sum(tmp2) == 0.0)
+			txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(tmp2) == 0.0, indicating data at parent nodes actually not available."], "")
+			res.node_state[current_nodeIndex] = txt
+			print("\n")
+			print(txt)
+			print("\n")
+			return(error(txt))
+		end
+
+		nodeData_at_top = tmp1 + tmp2
+		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
+		
+		# Check if it's the root node
+		if (current_nodeIndex == res.root_nodeIndex)
+			res.node_state[current_nodeIndex] = "done"
+		else
+			res.node_state[current_nodeIndex] = "ready_for_branchOp"
+		end
+		return()
+	elseif (sum(TF) == 0)
+	  # If a tip
+	  txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't be run on a tip node."], "")
+	  print("\n")
+	  print(txt)
+	  print("\n")
+		return(error(txt))
+	else
+	  txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(TF) should be 0 or 2"], "")
+	  print("\n")
+	  print(txt)
+	  print("\n")
+		return(error(txt))
+	end
+	txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't get here."], "")
+	print("\n")
+	print(txt)
+	print("\n")
+	return(error(txt))
+end
+
+# Calculate down a branch
+# This function can read from res, but writing to res is VERY BAD as 
+# it created conflicts apparently when there were more @spawns than cores
+# Do all the writing to res in the while() loop
+function branchOp(current_nodeIndex, res; num_iterations=10000000)
+	calc_start_time = Dates.now()
+	spawned_nodeIndex = current_nodeIndex
+	tmp_threadID = Threads.threadid()
+	
+	# Example slow operation
+	y = countloop(num_iterations, current_nodeIndex)
+
+	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+	nodeData_at_bottom = nodeData_at_top / 2.0
+
+	return(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time)
+end
+
+
+
+
+
+function countloop(num_iterations, current_nodeIndex)
+	x = 0.0
+	random_number_generator = MersenneTwister(current_nodeIndex);
+
+	for i in 1:num_iterations
+	   x = x + (randn(random_number_generator, 1)[1] / num_iterations)
+	end
+	return(x)
+end
+
+
+
+"""
+Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
+"""
+function iterative_downpass!(res; max_iterations=10^10, num_iterations=10000000)
+
+	# Check number of threads
+	numthreads = Threads.nthreads()
+	parallel_TF = numthreads > 1
+	if (parallel_TF == false)
+		txt = "Error in iterative_downpass!(): This function probably requires multiple threads operating to consistently compile. Try starting julia with e.g. 'JULIA_NUM_THREADS=8 julia'."
+		error(txt)
+	end
+
+	diagnostics = collect(repeat([Dates.now()], 3))
+	diagnostics[1] = Dates.now()
+	
+	# Setup
+	current_nodeIndex = res.root_nodeIndex
+	tasks = Any[]
+	tasks_fetched_TF = Bool[]
+	are_we_done = false
+
+	iteration_number = 0
+	while(are_we_done == false)
+		iteration_number = iteration_number+1
+		# As long as all the nodes are not done,
+		# check for "ready" nodes
+		# When they finish, change to "done"
+		indexes_ready = findall(res.node_state .== "ready_for_branchOp")
+		for current_nodeIndex in indexes_ready
+			# Before spawning, do some checks
+			res.node_state[current_nodeIndex] = "calculating_branchOp"
+			# Check for root; no calculation on root branch for now
+			if current_nodeIndex == res.root_nodeIndex
+				res.node_state[current_nodeIndex] = "done"
+				return()
+			end
+
+			# Spawn a branch operation, and a true-false of whether they are fetched
+			res.calc_spawn_start[current_nodeIndex] = Dates.now()
+			push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
+			push!(tasks_fetched_TF, false)
+		end
+	
+		# Check which jobs are done, fetch them, and update status of that node
+		num_tasks = length(tasks)
+		for i in 1:num_tasks
+			if (tasks_fetched_TF[i] == false)
+				if (istaskdone(tasks[i]) == true)
+					# Get the results
+					calc_end_time = Dates.now()
+					(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = fetch(tasks[i])
+					
+					# Store run information
+					res.calc_start_time[spawned_nodeIndex] = calc_start_time
+					res.calc_end_time[spawned_nodeIndex] = calc_end_time
+					res.calc_duration[spawned_nodeIndex] = (calc_end_time - calc_start_time).value / 1000.0
+					tasks_fetched_TF[i] = true
+					
+					# Record information
+					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
+					# Get the ancestor nodeIndex
+					uppass_edgematrix = res.uppass_edgematrix
+					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex
+					parent_nodeIndex = uppass_edgematrix[TF,1][1]
+
+					# Get the left daughter nodeIndex (1st in the uppass_edgematrix)
+					edge_rows_TF = uppass_edgematrix[:,1] .== parent_nodeIndex
+					left_nodeIndex = uppass_edgematrix[edge_rows_TF,2][1]
+					right_nodeIndex = uppass_edgematrix[edge_rows_TF,2][2]
+
+					# Update the state of the parent_node's daughters
+					if (spawned_nodeIndex == left_nodeIndex)
+						res.node_Lparent_state[parent_nodeIndex] = "ready"
+					end
+					if (spawned_nodeIndex == right_nodeIndex)
+						res.node_Rparent_state[parent_nodeIndex] = "ready"
+					end
+
+					# Update the state of the current node
+					res.node_state[spawned_nodeIndex] = "done"
+				end
+			end
+		end
+	
+		# Update which nodes have had both parents complete
+		TF1 = res.node_state .== "not_ready"
+		TF2 = res.node_Lparent_state .== "ready"
+		TF3 = res.node_Rparent_state .== "ready"
+		TF = (TF1 + TF2 + TF3) .== 3
+		res.node_state[TF] .= "ready_for_nodeOp"
+	
+		# Update nodes when the branches above finish
+		indexes_ready = findall(res.node_state .== "ready_for_nodeOp")
+		for current_nodeIndex in indexes_ready
+			# Spawn a node operation
+			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
+			nodeOp(current_nodeIndex, res)
+		end
+	
+		# Check if we are done?
+		are_we_done = count_nodes_finished(res.node_state) >= res.num_nodes
+		
+		# Error trap
+		if (iteration_number >= max_iterations)
+			txt = join(["Error in iterative_downpass(): iteration_number ", string(iteration_number), " exceeded max_iterations. Probably your loop is not concluding, or you have a massively huge tree or slow calculation, and need to set max_iterations=Inf."], "")
+			error(txt)
+		end
+		
+		# Test for concluding the while loop
+		are_we_done && break
+	end
+	
+	# This breaks it for some reason:
+	# ERROR: setfield! immutable struct of type Res cannot be changed
+	#global res.number_of_whileLoop_iterations = iteration_number
+
+	print_num_iterations = false
+	if print_num_iterations
+		txt = join(["\nFinished at iteration_number ", string(iteration_number), "."], "")
+		print(txt)
+		print("\n")
+	end
+	
+	# Final run diagnostics
+	diagnostics[2] = Dates.now()
+	diagnostics[3] = diagnostics[2]-diagnostics[1]
+	total_calctime_in_sec = (diagnostics[2]-diagnostics[1]).value / 1000
+	
+	res.calctime_iterations[1] = total_calctime_in_sec
+	res.calctime_iterations[2] = iteration_number / 1.0
+	
+	return(total_calctime_in_sec, iteration_number)
+end # END iterative_downpass!
+
+
+
+
+"""
+Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
+Non-parallel version (no istaskdone, etc.)
+"""
+function iterative_downpass_nonparallel!(res; max_iterations=10^10, num_iterations=10000000)
+	diagnostics = collect(repeat([Dates.now()], 3))
+	diagnostics[1] = Dates.now()
+	
+	# Setup
+	current_nodeIndex = res.root_nodeIndex
+
+	# Check number of threads
+	numthreads = Threads.nthreads()
+	parallel_TF = numthreads > 1
+	tasks = Any[]
+	tasks_fetched_TF = Bool[]
+	are_we_done = false
+
+	iteration_number = 0
+	while(are_we_done == false)
+		iteration_number = iteration_number+1
+		# As long as all the nodes are not done,
+		# check for "ready" nodes
+		# When they finish, change to "done"
+		indexes_ready = findall(res.node_state .== "ready_for_branchOp")
+		for current_nodeIndex in indexes_ready
+			# Before spawning, do some checks
+			res.node_state[current_nodeIndex] = "calculating_branchOp"
+			# Check for root; no calculation on root branch for now
+			if current_nodeIndex == res.root_nodeIndex
+				res.node_state[current_nodeIndex] = "done"
+				return()
+			end
+
+			# Spawn a branch operation, and a true-false of whether they are fetched
+			res.calc_spawn_start[current_nodeIndex] = Dates.now()
+			print(join(["\nbranchOp on current_nodeIndex=", string(current_nodeIndex)], ""))
+# 			if (parallel_TF == true)
+# 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
+# 			else
+				tmp_results = branchOp(current_nodeIndex, res, num_iterations=num_iterations)
+				push!(tasks, tmp_results)
+# 			end
+			push!(tasks_fetched_TF, false)
+		end
+	
+		# Check which jobs are done, fetch them, and update status of that node
+		num_tasks = length(tasks)
+		for i in 1:num_tasks
+			if (tasks_fetched_TF[i] == false)
+				#if (istaskdone(tasks[i]) == true)
+					# Get the results
+					calc_end_time = Dates.now()
+# 					if (parallel_TF == true)
+# 						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = fetch(tasks[i])
+# 					else
+						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = tasks[i]
+# 					end
+					# Store run information
+					res.calc_start_time[spawned_nodeIndex] = calc_start_time
+					res.calc_end_time[spawned_nodeIndex] = calc_end_time
+					res.calc_duration[spawned_nodeIndex] = (calc_end_time - calc_start_time).value / 1000.0
+					tasks_fetched_TF[i] = true
+					
+					# Record information
+					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
+					# Get the ancestor nodeIndex
+					uppass_edgematrix = res.uppass_edgematrix
+					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex
+					parent_nodeIndex = uppass_edgematrix[TF,1][1]
+
+					# Get the left daughter nodeIndex (1st in the uppass_edgematrix)
+					edge_rows_TF = uppass_edgematrix[:,1] .== parent_nodeIndex
+					left_nodeIndex = uppass_edgematrix[edge_rows_TF,2][1]
+					right_nodeIndex = uppass_edgematrix[edge_rows_TF,2][2]
+
+					# Update the state of the parent_node's daughters
+					if (spawned_nodeIndex == left_nodeIndex)
+						res.node_Lparent_state[parent_nodeIndex] = "ready"
+					end
+					if (spawned_nodeIndex == right_nodeIndex)
+						res.node_Rparent_state[parent_nodeIndex] = "ready"
+					end
+
+					# Update the state of the current node
+					res.node_state[spawned_nodeIndex] = "done"
+				#end
+			end
+		end
+	
+		# Update which nodes have had both parents complete
+		TF1 = res.node_state .== "not_ready"
+		TF2 = res.node_Lparent_state .== "ready"
+		TF3 = res.node_Rparent_state .== "ready"
+		TF = (TF1 + TF2 + TF3) .== 3
+		res.node_state[TF] .= "ready_for_nodeOp"
+	
+		# Update nodes when the branches above finish
+		indexes_ready = findall(res.node_state .== "ready_for_nodeOp")
+		for current_nodeIndex in indexes_ready
+			# Spawn a node operation
+			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
+			nodeOp(current_nodeIndex, res)
+		end
+	
+		# Check if we are done?
+		are_we_done = count_nodes_finished(res.node_state) >= res.num_nodes
+		
+		# Error trap
+		if (iteration_number >= max_iterations)
+			txt = join(["Error in iterative_downpass_nonparallel(): iteration_number ", string(iteration_number), " exceeded max_iterations. Probably your loop is not concluding, or you have a massively huge tree or slow calculation, and need to set max_iterations=Inf."], "")
+			error(txt)
+		end
+		
+		# Test for concluding the while loop
+		are_we_done && break
+	end
+	
+	# This breaks it for some reason:
+	# ERROR: setfield! immutable struct of type Res cannot be changed
+	#global res.number_of_whileLoop_iterations = iteration_number
+
+	print_num_iterations = false
+	if print_num_iterations
+		txt = join(["\nFinished at iteration_number ", string(iteration_number), "."], "")
+		print(txt)
+		print("\n")
+	end
+	
+	# Final run diagnostics
+	diagnostics[2] = Dates.now()
+	diagnostics[3] = diagnostics[2]-diagnostics[1]
+	total_calctime_in_sec = (diagnostics[2]-diagnostics[1]).value / 1000
+	
+	res.calctime_iterations[1] = total_calctime_in_sec
+	res.calctime_iterations[2] = iteration_number / 1.0
+	
+	return(total_calctime_in_sec, iteration_number)
+end # END iterative_downpass_nonparallel!
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
