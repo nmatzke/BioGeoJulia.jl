@@ -3,6 +3,7 @@ using Test, BioGeoJulia, Combinatorics
 # List each BioGeoJulia code file prefix here
 using BioGeoJulia.Example
 using BioGeoJulia.StateSpace
+using BioGeoJulia.TreePass
 
 @testset "Example" begin
 	@test hello("Julia") == "Hello, Julia"
@@ -49,3 +50,6 @@ end
 	@test states_list == states_list_answer
 end
 
+@testset "TreePass" begin
+	@test prt
+end

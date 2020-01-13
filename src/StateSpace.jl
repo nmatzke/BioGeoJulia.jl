@@ -22,14 +22,14 @@ ranges). The inputs are the number of areas (`numareas`), and the maximum range 
 
 If `numareas` = `maxareas`, then the size of the state space is 2^`numareas`. This is
 because, for each area, a species could be absent (0) or present (1). Therefore, if
-there is one area, there are 2*1=2 possible ranges (0 and 1). If there are two areas, there 
-are 2*2=4 possible ranges (00, 01, 10, 11). If there are three areas, there are 2*2*2=8 
+there is one area, there are 2x1=2 possible ranges (0 and 1). If there are two areas, there 
+are 2x2=4 possible ranges (00, 01, 10, 11). If there are three areas, there are 2x2x2=8 
 possible ranges (000, 001, 010, 011, 100, 101, 110, 111), etc.
 
 The `include_null_range` input, if set to `true` allows the "all absent" range (e.g. 000). 
 If set to `false`, this range is disallowed, decreasing the size of the state space by 1.
 
-NOTE: The size of the state space is a fundamental constraint on the computational speed
+*NOTE:* The size of the state space is a fundamental constraint on the computational speed
 of likelihood calculations for biogeographical models using matrix exponentiation, ODEs 
 (ordinary differential equations), etc. Researchers must think carefully about how large 
 of a state space they require to test their hypotheses, and whether their analysis will 
