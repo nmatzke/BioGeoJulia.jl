@@ -1,5 +1,5 @@
 module StateSpace
-using Combinatorics  # for e.g. combinations()
+import Combinatorics.combinations  # for e.g. combinations()
 export numstates_from_numareas, areas_list_to_states_list
 
 
