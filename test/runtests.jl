@@ -4,7 +4,7 @@ using Test, BioGeoJulia, Combinatorics, DataFrames
 using BioGeoJulia.Example
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
-using BioGeoJulia.PhyDFutils
+using BioGeoJulia.TrUtils
 
 @testset "Example" begin
 	@test hello("Julia") == "Hello, Julia"
