@@ -5,6 +5,7 @@ using PhyloNetworks		# for e.g. readTopology()
 using Dates						# for e.g. DateTime, Dates.now()
 using Distributed			# for e.g. @spawn
 using Random					# for MersenneTwister()
+using DifferentialEquations # for ODEProblem
 export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, Res, construct_Res, count_nodes_finished, nodeOp, branchOp, branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel!
 
 
@@ -1146,7 +1147,7 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
 	
 	# Example slow operation
 	#y = countloop(num_iterations, current_nodeIndex)
-	prob_Ds_v5 = ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
+	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
 	sol_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 
 	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
