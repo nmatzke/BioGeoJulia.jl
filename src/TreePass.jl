@@ -1,5 +1,6 @@
 module TreePass
 using BioGeoJulia.TrUtils 
+using BioGeoJulia.SSEs 
 using DataFrames
 using PhyloNetworks		# for e.g. readTopology()
 using Dates						# for e.g. DateTime, Dates.now()

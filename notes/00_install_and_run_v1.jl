@@ -12,6 +12,7 @@ Pkg.add("Combinatorics")
 Pkg.add("DataFrames")		# for DataFrame
 Pkg.add("Dates"	)				# for e.g. Dates.now(), DateTime
 Pkg.add("Distributed")  # for e.g. @spawn
+Pkg.add("DifferentialEquations")  # for e.g. ODEProblem
 Pkg.add("Random")  # for MersenneTwister()
 
 # BioSequences before PhyloNetworks
@@ -245,7 +246,11 @@ u0_Es = repeat([0.0], 1*n)
 uE = repeat([0.0], n)
 tspan = (0.0, 1.1*trdf[tr.root,:node_age]) # 110% of tree root age
 
-prob_Es_v5 = ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
+
+using DifferentialEquations # for ODEProblem
+using LSODA # for 
+
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
 sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
 
 #@benchmark sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9) # slower
