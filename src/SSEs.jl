@@ -60,6 +60,42 @@ parameterized_ClaSSE = (du,u,p,t) -> begin
 end
 
 
+
+
+"""
+This function describes a system of ODEs for calculating the "E" part of the 
+likelihood calculation (probability of a lineage going 
+between time t and the present) of a ClaSSE model
+
+du = time increment
+u = vector of E values (of length numstates)
+p = structure containing parameters
+t = time
+
+This function is input into `ODEProblem()`, along with:
+
+u0    = starting vector of Es (typically, E=0 for all states, as any lineage alive at 
+        t=0 mya has a 0 probability of becoming extinct at 0 mya.
+tspan = vector of start- and end-times, e.g. tspan=(0.0, 10.0)
+p     = structure containing parameters
+
+# Example
+
+```julia-repl
+
+# Initialize evolving state vector
+u = repeat([0.0], 2*n)
+
+# Starting values
+du = repeat([0.0], 2*n)
+u0 = repeat([0.0], 2*n)
+u0[n+1] = 1.0
+tspan = (0.0, 10.0)
+
+prob = ODEProblem(parameterized_ClaSSE, u0, tspan, p)
+sol = solve(prob, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+```
+"""
 parameterized_ClaSSE_Es = (du,u,p,t) -> begin
 
   # Possibly varying parameters

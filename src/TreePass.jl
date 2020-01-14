@@ -1132,6 +1132,33 @@ end
 
 
 
+# Calculate Ds down a branch
+#
+# Modifies branchOp to do Ds calculation down a branch
+#
+# This function can read from res, but writing to res is VERY BAD as 
+# it created conflicts apparently when there were more @spawns than cores
+# Do all the writing to res in the while() loop
+function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
+	calc_start_time = Dates.now()
+	spawned_nodeIndex = current_nodeIndex
+	tmp_threadID = Threads.threadid()
+	
+	# Example slow operation
+	#y = countloop(num_iterations, current_nodeIndex)
+	prob_Ds_v5 = ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
+	sol_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+	#nodeData_at_bottom = nodeData_at_top / 2.0
+	nodeData_at_bottom = sol_Ds
+	
+	return(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time)
+end
+
+
+
+
 
 function countloop(num_iterations, current_nodeIndex)
 	x = 0.0
