@@ -1038,6 +1038,68 @@ function construct_Res(tr::HybridNetwork)
 	return res
 end
 
+
+
+
+
+"""
+# Load a simple tree, see a simple list of nodeIndexes
+using DataFrames
+using PhyloNetworks
+include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
+
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr.root
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+n=10 # number of states in the state space
+
+"""
+function construct_Res(tr::HybridNetwork, n)
+	root_nodeIndex = tr.root
+	num_nodes = tr.numNodes
+	uppass_edgematrix = get_LR_uppass_edgematrix(tr)
+	
+	# Give tip nodeIndexes their nodeNodex as the "likelihood"
+	indexNum_table = get_nodeIndex_PNnumber(tr)
+	tipsTF = indexNum_table[:,2] .> 0
+	tipLikes = indexNum_table[tipsTF,2] * 1.0
+	
+	# Set up an array of length nstates (n), to hold the likelihoods for each node
+	blank_states = collect(repeat([0.0], n))
+	likes_at_each_nodeIndex_branchTop = collect(repeat([0.0], num_nodes))
+	likes_at_each_nodeIndex_branchTop[tipsTF] = tipLikes
+	
+	# Fill in the node_states
+	node_state = collect(repeat(["not_ready"], num_nodes))
+	node_state[tipsTF] .= "ready_for_branchOp"
+	node_Lparent_state = collect(repeat(["not_ready"], num_nodes))
+	node_Rparent_state = collect(repeat(["not_ready"], num_nodes))
+	node_Lparent_state[tipsTF] .= "NA"
+	node_Rparent_state[tipsTF] .= "NA"
+	
+	# Initialize with zeros for the other items
+	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], num_nodes))
+	thread_for_each_nodeOp = collect(repeat([0], num_nodes))
+	thread_for_each_branchOp = collect(repeat([0], num_nodes))
+	
+	calc_spawn_start = collect(repeat([Dates.now()], num_nodes))
+	calc_start_time = collect(repeat([Dates.now()], num_nodes))
+	calc_end_time = collect(repeat([Dates.now()], num_nodes))
+	calc_duration = collect(repeat([0.0], num_nodes))
+
+	calctime_iterations = [0.0, 0.0]
+	number_of_whileLoop_iterations = [0]	
+
+	# Initialize res object
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, num_nodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	return res
+end
+
+
+
+
 # Convert this res object to a DataFrame
 #function res_to_df(res)
 #	

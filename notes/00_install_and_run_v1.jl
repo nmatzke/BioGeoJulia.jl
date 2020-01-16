@@ -78,6 +78,17 @@ using BioGeoJulia
 Pkg.test("BioGeoJulia")
 
 
+
+#######################################################
+# FROM FRESH JULIA: Load the BioGeoJulia package
+#######################################################
+import Pkg
+using Pkg
+Pkg.rm("BioGeoJulia")
+Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+using BioGeoJulia
+
+
 #######################################################
 # Try some functions!
 #######################################################
@@ -247,8 +258,6 @@ uE = repeat([0.0], n)
 tspan = (0.0, 1.1*trdf[tr.root,:node_age]) # 110% of tree root age
 
 
-using DifferentialEquations # for ODEProblem
-using LSODA # for 
 
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
 sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
