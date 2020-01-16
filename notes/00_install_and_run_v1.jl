@@ -273,6 +273,13 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
+
+inputs = setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
+				 save_everystep="false", abstol="1e-9", reltol="1e-9")
+
+res2 = branchOp(current_nodeIndex, res, inputs)
+
+
 prob_str = "prob_Ds_v5a = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)"
 solve_str = "sol_Dsa = solve(prob_Ds_v5a, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)"
 store_str = "nodeData_at_top = sol_Dsa.u[length(sol_Dsa.u)]"

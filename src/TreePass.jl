@@ -1159,6 +1159,11 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
 end
 
 
+
+"""
+	Set up inputs
+"""
+
 function setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
 				 save_everystep="false", abstol="1e-9", reltol="1e-9")
 	
@@ -1167,7 +1172,7 @@ function setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()"
 	store_str = "nodeData_at_bottom = sol_Ds.u[length(sol_Ds.u)]"
 	
 	# Assemble the NamedTuple of inputs
-	inputs = (u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, prob_str=prob_str, solve_str=solve_str, store_str=store_str)
+	inputs = (u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver=solver, save_everystep=save_everystep, abstol=abstol, reltol=reltol, prob_str=prob_str, solve_str=solve_str, store_str=store_str)
 	return inputs
 end
 
@@ -1188,10 +1193,10 @@ function branchOp(current_nodeIndex, res, inputs)
 	u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 	tspan = inputs.tspan
 	p_Ds_v5 = inputs.p_Ds_v5
-	solver = inputs.solver
-	save_everystep = inputs.save_everystep
-	abstol = inputs.abstol
-	reltol = inputs.reltol
+	#solver = inputs.solver
+	#save_everystep = inputs.save_everystep
+	#abstol = inputs.abstol
+	#reltol = inputs.reltol
 	
 	
 	# Example slow operation
