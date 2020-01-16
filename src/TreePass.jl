@@ -1086,7 +1086,7 @@ function construct_Res(tr::HybridNetwork, n)
 	node_Rparent_state[tipsTF] .= "NA"
 	
 	# Initialize with zeros for the other items
-	likes_at_each_nodeIndex_branchBot = collect(blank_states, num_nodes))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], num_nodes))
 	thread_for_each_nodeOp = collect(repeat([0], num_nodes))
 	thread_for_each_branchOp = collect(repeat([0], num_nodes))
 	
