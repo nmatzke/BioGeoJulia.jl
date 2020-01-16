@@ -1061,15 +1061,21 @@ function construct_Res(tr::HybridNetwork, n)
 	num_nodes = tr.numNodes
 	uppass_edgematrix = get_LR_uppass_edgematrix(tr)
 	
-	# Give tip nodeIndexes their nodeNodex as the "likelihood"
-	indexNum_table = get_nodeIndex_PNnumber(tr)
-	tipsTF = indexNum_table[:,2] .> 0
-	tipLikes = indexNum_table[tipsTF,2] * 1.0
 	
 	# Set up an array of length nstates (n), to hold the likelihoods for each node
 	blank_states = collect(repeat([0.0], n))
-	likes_at_each_nodeIndex_branchTop = collect(repeat([0.0], num_nodes))
-	likes_at_each_nodeIndex_branchTop[tipsTF] = tipLikes
+	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], num_nodes))
+
+	# Give tip nodeIndexes a likelihood of 1 at all states
+	indexNum_table = get_nodeIndex_PNnumber(tr)
+	tipsTF = indexNum_table[:,2] .> 0
+	tipnums = seq(1, sum(tipsTF), 1)[tipsTF]
+	
+	for (i in 1:length(tipnums))
+		tipLikes = collect(repeat([1.0], n)
+		likes_at_each_nodeIndex_branchTop[tipnums[i]] = tipLikes
+	end
+
 	
 	# Fill in the node_states
 	node_state = collect(repeat(["not_ready"], num_nodes))
@@ -1080,7 +1086,7 @@ function construct_Res(tr::HybridNetwork, n)
 	node_Rparent_state[tipsTF] .= "NA"
 	
 	# Initialize with zeros for the other items
-	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], num_nodes))
+	likes_at_each_nodeIndex_branchBot = collect(blank_states, num_nodes))
 	thread_for_each_nodeOp = collect(repeat([0], num_nodes))
 	thread_for_each_branchOp = collect(repeat([0], num_nodes))
 	
