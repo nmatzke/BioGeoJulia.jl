@@ -1072,7 +1072,7 @@ function construct_Res(tr::HybridNetwork, n)
 	tipnums = seq(1, sum(tipsTF), 1)[tipsTF]
 	
 	for i in 1:length(tipnums)
-		tipLikes = collect(repeat([1.0], n)
+		tipLikes = collect(repeat([1.0], n))
 		likes_at_each_nodeIndex_branchTop[tipnums[i]] = tipLikes
 	end
 
