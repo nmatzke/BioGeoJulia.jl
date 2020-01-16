@@ -1069,7 +1069,7 @@ function construct_Res(tr::HybridNetwork, n)
 	# Give tip nodeIndexes a likelihood of 1 at all states
 	indexNum_table = get_nodeIndex_PNnumber(tr)
 	tipsTF = indexNum_table[:,2] .> 0
-	tipnums = seq(1, sum(tipsTF), 1)[tipsTF]
+	tipnums = seq(1, length(tipsTF), 1)[tipsTF]
 	
 	for i in 1:length(tipnums)
 		tipLikes = collect(repeat([1.0], n))
