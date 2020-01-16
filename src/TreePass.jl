@@ -963,14 +963,15 @@ end
 
 # Construct a default, simple results structure
 function construct_Res()
+	n = 1 # number of states
 	node_state = ["ready_for_branchOp", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready"]
 	node_Lparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
 	node_Rparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
 	root_nodeIndex = 7
 	num_nodes = 7
 	uppass_edgematrix = [7 6; 7 5; 5 4; 5 3; 3 2; 3 1]
-	likes_at_each_nodeIndex_branchTop = [1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0]
-	likes_at_each_nodeIndex_branchBot = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+	likes_at_each_nodeIndex_branchTop = collect(repeat([1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0], n))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], n))
 	thread_for_each_nodeOp = collect(repeat([0], 7))
 	thread_for_each_branchOp = collect(repeat([0], 7))
 
