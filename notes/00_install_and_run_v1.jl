@@ -81,7 +81,7 @@ Pkg.test("BioGeoJulia")
 #######################################################
 # Try some functions!
 #######################################################
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v3.jl")
+#include("/drives/Dropbox/_njm/__julia/julia4Rppl_v4.jl")
 
 # Try some functions
 using BioGeoJulia.TrUtils
@@ -273,8 +273,25 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
+prob_str = "prob_Ds_v5a = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)"
+solve_str = "sol_Dsa = solve(prob_Ds_v5a, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)"
+store_str = "nodeData_at_top = sol_Dsa.u[length(sol_Dsa.u)]"
+eval(Meta.parse(prob_str))
+eval(Meta.parse(solve_str))
+eval(Meta.parse(store_str))
+nodeData_at_top
+
 res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
 
+@benchmark res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
 
+# tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time
+res2[1]
+res2[2].t
+res2[2].u
+res2[3]
+res2[4]
+
+Rnames(res2)
 
 

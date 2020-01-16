@@ -2,6 +2,7 @@ module BioGeoJulia
 export hello_BioGeoJulia, add_one_BioGeoJulia
 
 # List each BioGeoJulia code file here
+# NOTE: LOAD THE DEPENDENCY .jl FILES *FIRST*, or you get "not recognized" errors
 include("Example.jl")			# default examples
 include("TrUtils.jl")			# basic utility functions for trees, prt() tree tables (DFs), etc.
 include("StateSpace.jl")	# set up lists of areas and states (geographic ranges)
