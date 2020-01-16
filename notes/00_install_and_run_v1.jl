@@ -84,6 +84,17 @@ Pkg.test("BioGeoJulia")
 #######################################################
 import Pkg
 using Pkg
+
+
+using DifferentialEquations # for ODEProblem
+using LSODA          # for lsoda()
+using BenchmarkTools # for @time
+using InvertedIndices # for Not
+# https://github.com/JuliaLang/julia/issues/28276
+#using Sundials # for CVODE_BDF() e.g.
+
+
+
 Pkg.rm("BioGeoJulia")
 Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
 using BioGeoJulia
@@ -159,13 +170,6 @@ compilation_time = (end_compilation-start_compilation).value / 1000
 
 
 
-# Calculate ClaSSE downpass
-using DifferentialEquations
-using BenchmarkTools # for @time
-using LSODA          # for lsoda()
-using InvertedIndices # for Not
-# https://github.com/JuliaLang/julia/issues/28276
-using Sundials # for CVODE_BDF() e.g.
 
 
 n=10
@@ -275,7 +279,7 @@ u0 = repeat([0.0], n)
 u0[2] = 1.0  # Starting likelihood
 tspan = (0.0, 1.0) # Shorter
 current_nodeIndex = 1
-res = construct_Res(tr)
+res = construct_Res(tr, n)
 #u0, tspan, p_Ds_v5
 using BioGeoJulia.TrUtils
 using BioGeoJulia.StateSpace
@@ -285,6 +289,10 @@ using BioGeoJulia.SSEs
 
 inputs = setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
 				 save_everystep="false", abstol="1e-9", reltol="1e-9")
+
+res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = u0;
+res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 
 res2 = branchOp(current_nodeIndex, res, inputs)
 
