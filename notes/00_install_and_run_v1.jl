@@ -165,7 +165,7 @@ y = countloop(countloop_num_iterations, 1)
 # iterative_downpass! -- "!" means the function modifies its arguments
 
 start_compilation = Dates.now()
-calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=100, num_iterations=countloop_num_iterations)
+calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=100000, num_iterations=countloop_num_iterations)
 end_compilation = Dates.now()
 compilation_time = (end_compilation-start_compilation).value / 1000
 

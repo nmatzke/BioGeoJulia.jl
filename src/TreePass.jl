@@ -1258,28 +1258,31 @@ function branchOp(current_nodeIndex, res, inputs)
 	spawned_nodeIndex = current_nodeIndex
 	tmp_threadID = Threads.threadid()
 	
-	#nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-	u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-	tspan = inputs.tspan
-	p_Ds_v5 = inputs.p_Ds_v5
-	#solver = inputs.solver
-	#save_everystep = inputs.save_everystep
-	#abstol = inputs.abstol
-	#reltol = inputs.reltol
-	
-	
-	# Example slow operation
-	#y = countloop(num_iterations, current_nodeIndex)
-#	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
-#	sol_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-#	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+	# The old practice input was an Int64
+	if (class(inputs) != "Int64")
+		u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+		tspan = inputs.tspan
+		p_Ds_v5 = inputs.p_Ds_v5
+		#solver = inputs.solver
+		#save_everystep = inputs.save_everystep
+		#abstol = inputs.abstol
+		#reltol = inputs.reltol
 
-	eval(Meta.parse(inputs.prob_str))
-	eval(Meta.parse(inputs.solve_str))
-	eval(Meta.parse(inputs.store_str))
 
-	#nodeData_at_bottom = nodeData_at_top / 2.0
-	#nodeData_at_bottom = sol_Ds
+		# Example slow operation
+		#y = countloop(num_iterations, current_nodeIndex)
+		#	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
+		#	sol_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+		eval(Meta.parse(inputs.prob_str))
+		eval(Meta.parse(inputs.solve_str))
+		eval(Meta.parse(inputs.store_str))
+	else
+		nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+		nodeData_at_bottom = nodeData_at_top / 2.0
+		nodeData_at_bottom = sol_Ds
+	end
+
 	
 	return(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time)
 end
