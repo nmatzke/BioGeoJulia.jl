@@ -90,6 +90,11 @@ using DifferentialEquations # for ODEProblem
 using LSODA          # for lsoda()
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
+using Distributed
+using Random					# for MersenneTwister()
+using Dates						# for e.g. DateTime, Dates.now()
+using PhyloNetworks
+#using PhyloPlots
 # https://github.com/JuliaLang/julia/issues/28276
 #using Sundials # for CVODE_BDF() e.g.
 
@@ -128,10 +133,6 @@ states_list = areas_list_to_states_list(area_nums, 3, true)
 areas_list_to_states_list()
 
 
-using Random					# for MersenneTwister()
-using Dates						# for e.g. DateTime, Dates.now()
-using PhyloNetworks
-#using PhyloPlots
 
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"

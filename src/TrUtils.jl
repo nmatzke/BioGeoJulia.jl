@@ -2,7 +2,7 @@ module TrUtils
 using DataFrames
 #using RCall
 
-export getwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
+export getwd, Rgetwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
 
 # R-like utilities, and other short functions
 
@@ -10,6 +10,10 @@ export getwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, 
 
 # getwd
 function getwd()
+	pwd()
+end
+
+function Rgetwd()
 	pwd()
 end
 
