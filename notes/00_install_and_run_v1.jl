@@ -156,7 +156,7 @@ res.thread_for_each_nodeOp
 res.thread_for_each_branchOp
 res.node_state
 
-countloop_num_iterations = 10000000
+countloop_num_iterations = 10
 y = countloop(countloop_num_iterations, 1)
 @time y = countloop(countloop_num_iterations, 1)
 
@@ -165,7 +165,7 @@ y = countloop(countloop_num_iterations, 1)
 # iterative_downpass! -- "!" means the function modifies its arguments
 
 start_compilation = Dates.now()
-calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
+calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=100, num_iterations=countloop_num_iterations)
 end_compilation = Dates.now()
 compilation_time = (end_compilation-start_compilation).value / 1000
 
