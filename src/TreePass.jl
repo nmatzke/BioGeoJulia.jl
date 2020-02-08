@@ -1280,7 +1280,7 @@ function branchOp(current_nodeIndex, res, inputs)
 	else
 		nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 		nodeData_at_bottom = nodeData_at_top / 2.0
-		nodeData_at_bottom = sol_Ds
+		#nodeData_at_bottom = sol_Ds
 	end
 
 	
