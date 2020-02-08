@@ -1478,7 +1478,7 @@ function iterative_downpass_nonparallel!(res; max_iterations=10^10, num_iteratio
 # 			if (parallel_TF == true)
 # 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
 # 			else
-				tmp_results = branchOp(current_nodeIndex, res, num_iterations)
+				tmp_results = branchOp(current_nodeIndex, res, num_iterations=num_iterations)
 				push!(tasks, tmp_results)
 # 			end
 			push!(tasks_fetched_TF, false)
