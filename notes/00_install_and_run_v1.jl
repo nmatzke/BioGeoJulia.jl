@@ -100,9 +100,6 @@ using PhyloNetworks
 
 
 
-Pkg.rm("BioGeoJulia")
-Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
-using BioGeoJulia
 
 
 #######################################################
@@ -111,8 +108,10 @@ using BioGeoJulia
 #include("/drives/Dropbox/_njm/__julia/julia4Rppl_v4.jl")
 
 # Try some functions
-revise()
+Pkg.rm("BioGeoJulia")
+Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
 using BioGeoJulia
+
 using BioGeoJulia.TrUtils
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass

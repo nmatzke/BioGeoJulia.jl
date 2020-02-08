@@ -118,9 +118,17 @@ function type(obj)
 end
 
 # class
+# Returns a plain-test version of the type/class
 function class(obj)
-	typeof(obj)
+	string(typeof(obj))
 end
+
+# Rclass
+# Returns a plain-test version of the type/class
+function Rclass(obj)
+	string(typeof(obj))
+end
+
 
 # Convert any multiple slashes to single slashes
 function slashslash(txt)

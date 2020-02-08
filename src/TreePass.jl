@@ -1265,7 +1265,7 @@ function branchOp(current_nodeIndex, res, inputs)
 	print("\n")
 	
 	# The old practice input was an Int64
-	if (class(inputs) != "Int64")
+	if (typeof(inputs) != Int64)
 		u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 		tspan = inputs.tspan
 		p_Ds_v5 = inputs.p_Ds_v5
