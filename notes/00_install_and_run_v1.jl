@@ -111,6 +111,8 @@ using BioGeoJulia
 #include("/drives/Dropbox/_njm/__julia/julia4Rppl_v4.jl")
 
 # Try some functions
+revise()
+using BioGeoJulia
 using BioGeoJulia.TrUtils
 using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass

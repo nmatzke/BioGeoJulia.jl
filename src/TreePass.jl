@@ -1258,6 +1258,9 @@ function branchOp(current_nodeIndex, res, inputs)
 	spawned_nodeIndex = current_nodeIndex
 	tmp_threadID = Threads.threadid()
 	
+	print(class(inputs))
+	print(inputs)
+	
 	# The old practice input was an Int64
 	if (class(inputs) != "Int64")
 		u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
