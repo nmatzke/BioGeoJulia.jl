@@ -1441,7 +1441,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 # 						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = fetch(tasks[i])
 # 					else
 						(tmp_threadID, sol_Ds, spawned_nodeIndex, calc_start_time) = tasks[i]
-						nodeData_at_bottom = sol_Ds.u
+						nodeData_at_bottom = sol_Ds.u[length(sol_Ds.u)]
 # 					end
 					# Store run information
 					res.calc_start_time[spawned_nodeIndex] = calc_start_time
