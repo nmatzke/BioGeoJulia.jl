@@ -1350,8 +1350,14 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		#nodeData_at_top = (tmp1 + tmp2)/2
 		#nodeData_at_top = nodeOp_function(tmp1, tmp2)
 		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+		print("tmpDs:")
+		print(tmpDs)
 		nodeData_at_top = nodeOp_Cmat(tmpDs, tmp1=tmp1, tmp2=tmp2, p_Ds_v5=p_Ds_v5)
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
+
+		print("nodeData_at_top:")
+		print(nodeData_at_top)
+
 		
 		# Check if it's the root node
 		if (current_nodeIndex == res.root_nodeIndex)
