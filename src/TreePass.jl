@@ -1212,7 +1212,8 @@ function nodeOp(current_nodeIndex, res)
 			return(error(txt))
 		end
 
-		nodeData_at_top = (tmp1 + tmp2)/2
+		nodeData_at_top = tmp1 + tmp2
+		#nodeData_at_top = (tmp1 + tmp2)/2
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
 		
 		# Check if it's the root node
