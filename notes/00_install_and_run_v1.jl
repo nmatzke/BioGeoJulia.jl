@@ -117,6 +117,9 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
+res1 = construct_Res()
+ont(res1)
+
 countloop_num_iterations = 10
 calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
 
@@ -141,6 +144,10 @@ areas_list_to_states_list()
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
 tr
+
+#res2 = construct_Res(tr)
+res2 = construct_Res(tr, 5)
+
 
 rootnodenum = tr.root
 trdf = prt(tr, rootnodenum)

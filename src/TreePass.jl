@@ -1294,7 +1294,7 @@ end
 function setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
 				 save_everystep="false", abstol="1e-9", reltol="1e-9")
 	
-	prob_str = "prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)"
+	prob_str = "global u0, tspan, p_Ds_v5; prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)"
 	solve_str = join(["sol_Ds = solve(prob_Ds_v5, ", solver, ", save_everystep=", save_everystep, ", abstol=", abstol, ", reltol=", reltol, ")"])
 	store_str = "nodeData_at_bottom = sol_Ds.u[length(sol_Ds.u)]"
 	
