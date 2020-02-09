@@ -7,7 +7,7 @@ using Dates						# for e.g. DateTime, Dates.now()
 using Distributed			# for e.g. @spawn
 using Random					# for MersenneTwister()
 using DifferentialEquations # for ODEProblem
-export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, Res, construct_Res, count_nodes_finished, nodeOp, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
+export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
 
 
 
@@ -1177,9 +1177,16 @@ function count_nodes_finished(node_state)
 	sum(node_state .== "done")
 end
 
+# Average the downpass likelihoods at a node
+# (default)
+function nodeOp_average_likes(tmp1, tmp2)
+	nodeData_at_top = (tmp1 + tmp2)/2
+	return(nodeData_at_top)
+end
+
 
 # Combine likelihoods from above
-function nodeOp(current_nodeIndex, res)
+function nodeOp(current_nodeIndex, res; nodeOp_function=nodeOp_average_likes)
 	res.node_state[current_nodeIndex] = "calculating_nodeOp"
 	uppass_edgematrix = res.uppass_edgematrix
 	
@@ -1212,8 +1219,10 @@ function nodeOp(current_nodeIndex, res)
 			return(error(txt))
 		end
 
-		nodeData_at_top = tmp1 + tmp2
+		#nodeData_at_top = tmp1 + tmp2
 		#nodeData_at_top = (tmp1 + tmp2)/2
+		nodeData_at_top = nodeOp_function(tmp1, tmp2)
+		
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
 		
 		# Check if it's the root node
