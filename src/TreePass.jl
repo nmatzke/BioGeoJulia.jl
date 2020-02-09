@@ -1231,7 +1231,7 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		tmp2[Carray_kvals[Ci_eq_i]]
 		
 		# Parameter values for these events with nonzero rates
-		tmpDs[i] = sum(Cijk_vals[Ci_eq_i] .* tmp1[Carray_jvals[Cj_sub_i]] * tmp2[Carray_kvals[Ck_sub_i]])
+		tmpDs[i] = sum(Cijk_vals[Ci_eq_i] .* tmp1[Carray_jvals[Cj_sub_i]] .* tmp2[Carray_kvals[Ck_sub_i]])
   end
   return(tmpDs)
 end
