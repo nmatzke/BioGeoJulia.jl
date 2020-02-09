@@ -108,23 +108,29 @@ using PhyloNetworks
 #include("/drives/Dropbox/_njm/__julia/julia4Rppl_v4.jl")
 
 # Try some functions
-Pkg.rm("BioGeoJulia")
-Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
-using BioGeoJulia
+# Pkg.rm("BioGeoJulia")
+# Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+# using BioGeoJulia
+# 
+# using BioGeoJulia.TrUtils
+# using BioGeoJulia.StateSpace
+# using BioGeoJulia.TreePass
+# using BioGeoJulia.SSEs
 
-using BioGeoJulia.TrUtils
-using BioGeoJulia.StateSpace
-using BioGeoJulia.TreePass
-using BioGeoJulia.SSEs
+using Revise
+includet("/GitHub/BioGeoJulia.jl/src/TrUtils.jl")
+includet("/GitHub/BioGeoJulia.jl/src/StateSpace.jl")
+includet("/GitHub/BioGeoJulia.jl/src/TreePass.jl")
+includet("/GitHub/BioGeoJulia.jl/src/SSEs.jl")
 
-atreplinit() do repl
-try
-@eval using Revise
-@async Revise.wait_steal_repl_backend()
-catch
-end
-end
+import Main.TrUtils
+import Main.StateSpace
+import Main.TreePass
+import Main.SSEs
 
+
+countloop_num_iterations = 10
+calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
 
 numstates_from_numareas(3,3,false)
 numstates_from_numareas(3,3,true)
