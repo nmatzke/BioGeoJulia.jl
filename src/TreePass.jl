@@ -1332,7 +1332,7 @@ function branchOp(current_nodeIndex, res, inputs)
 		#y = countloop(num_iterations, current_nodeIndex)
 		#	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
 		#	sol_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-
+		print(u0)
 		eval(Meta.parse(inputs.prob_str))
 		eval(Meta.parse(inputs.solve_str))
 		eval(Meta.parse(inputs.store_str))
