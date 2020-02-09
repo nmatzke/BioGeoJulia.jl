@@ -320,7 +320,7 @@ nodeData_at_top
 
 res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
 
-@benchmark res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
+#@benchmark res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
 
 # tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time
 res2[1]
@@ -352,6 +352,8 @@ res = construct_Res(tr, n)
 #inputs = setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
 #				 save_everystep="false", abstol="1e-9", reltol="1e-9")
 
+res.likes_at_each_nodeIndex_branchTop
+
 res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = u0;
 res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
@@ -362,4 +364,5 @@ res_orig.likes_at_each_nodeIndex_branchTop
 (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, max_iterations=10^10)
 res.likes_at_each_nodeIndex_branchTop
 
+branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
 branchOp_ClaSSE_Ds_v5(current_nodeIndex, resp_Ds_v5; u0, tspan, p_Ds_v5)

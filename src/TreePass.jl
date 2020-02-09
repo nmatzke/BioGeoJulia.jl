@@ -1414,7 +1414,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			brlen = trdf[current_nodeIndex, :brlen]
 			age_branchtop = trdf[current_nodeIndex, :node_age]
 			age_branchbot = age_branchtop + brlen
-			tspan = [age_branchtop, age_branchbot]
+			tspan = (age_branchtop, age_branchbot)
 			#p_Ds_v5 = inputs.p_Ds_v5
 
 			# Spawn a branch operation, and a true-false of whether they are fetched
