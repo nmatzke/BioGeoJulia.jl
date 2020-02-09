@@ -1212,7 +1212,7 @@ function nodeOp(current_nodeIndex, res)
 			return(error(txt))
 		end
 
-		nodeData_at_top = tmp1 + tmp2
+		nodeData_at_top = (tmp1 + tmp2)/2
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
 		
 		# Check if it's the root node
@@ -1451,12 +1451,12 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 					
 					# Record information
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
-					print("\n\n12345\n\n")
-					print("res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex]:\n")
-					print(res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex])
-					print("\n\nnodeData_at_bottom:\n")
-					print(nodeData_at_bottom)
-					print("\n\n12345\n\n")
+# 					print("\n\n12345\n\n")
+# 					print("res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex]:\n")
+# 					print(res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex])
+# 					print("\n\nnodeData_at_bottom:\n")
+# 					print(nodeData_at_bottom)
+# 					print("\n\n12345\n\n")
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
@@ -1494,6 +1494,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 		for current_nodeIndex in indexes_ready
 			# Spawn a node operation
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
+			# Combine the downpass branch likelihoods
 			nodeOp(current_nodeIndex, res)
 		end
 	

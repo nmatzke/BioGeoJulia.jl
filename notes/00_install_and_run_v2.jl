@@ -117,26 +117,6 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
-res1 = construct_Res()
-ont(res1)
-
-countloop_num_iterations = 10
-calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
-
-numstates_from_numareas(3,3,false)
-numstates_from_numareas(3,3,true)
-numstates_from_numareas(10,1,false)
-numstates_from_numareas(10,2,false)
-numstates_from_numareas(10,3,false)
-numstates_from_numareas(10,10,false)
-numstates_from_numareas(10,10,true)
-
-area_nums = collect(1:3)
-states_list = areas_list_to_states_list(area_nums, 1, false)
-states_list = areas_list_to_states_list(area_nums, 1, true)
-states_list = areas_list_to_states_list(area_nums, 3, false)
-states_list = areas_list_to_states_list(area_nums, 3, true)
-areas_list_to_states_list()
 
 
 
@@ -152,36 +132,6 @@ res2 = construct_Res(tr, 5)
 rootnodenum = tr.root
 trdf = prt(tr, rootnodenum)
 trdf
-
-
-# Downpass
-indexNum_table = get_nodeIndex_PNnumber(tr)
-
-#global res = construct_Res(tr);
-res = construct_Res(tr);
-current_nodeIndex = res.root_nodeIndex
-
-res.likes_at_each_nodeIndex_branchTop
-res.likes_at_each_nodeIndex_branchBot
-res.thread_for_each_nodeOp
-res.thread_for_each_branchOp
-res.node_state
-
-countloop_num_iterations = 10
-y = countloop(countloop_num_iterations, 1)
-@time y = countloop(countloop_num_iterations, 1)
-
-
-# First time: compilation
-# iterative_downpass! -- "!" means the function modifies its arguments
-
-start_compilation = Dates.now()
-calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
-end_compilation = Dates.now()
-compilation_time = (end_compilation-start_compilation).value / 1000
-
-
-
 
 
 n=10
@@ -364,8 +314,7 @@ res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 # Updates res
 res_orig = res
 res_orig.likes_at_each_nodeIndex_branchTop
-(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, max_iterations=10^10)
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, max_iterations=10^10);
 res.likes_at_each_nodeIndex_branchTop
-
-branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
-branchOp_ClaSSE_Ds_v5(current_nodeIndex, resp_Ds_v5; u0, tspan, p_Ds_v5)
+total_calctime_in_sec
+iteration_number
