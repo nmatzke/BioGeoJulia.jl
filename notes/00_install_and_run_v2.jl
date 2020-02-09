@@ -235,57 +235,6 @@ sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, relto
 #p_Ds = (n=n, params=params, p_indices=p_indices, sol_Es=sol_Es, uE=uE)
 p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, sol_Es_v5=sol_Es_v5, uE=uE)
 
-# Solve for the Ds
-du = repeat([0.0], n)
-u0 = repeat([0.0], n)
-u0[2] = 1.0  # Starting likelihood
-tspan = (0.0, 1.0) # Shorter
-current_nodeIndex = 1
-res = construct_Res(tr, n)
-#u0, tspan, p_Ds_v5
-using BioGeoJulia.TrUtils
-using BioGeoJulia.StateSpace
-using BioGeoJulia.TreePass
-using BioGeoJulia.SSEs
-
-
-inputs = setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
-				 save_everystep="false", abstol="1e-9", reltol="1e-9")
-
-res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = u0;
-res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-
-res2 = branchOp(current_nodeIndex, res, inputs)
-
-
-# THIS KIND OF STUFF DOESN'T WORK EFFICIENTLY, AS IT REQUIRES GLOBAL VARIABLES
-prob_str = "prob_Ds_v5a = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)"
-solve_str = "sol_Dsa = solve(prob_Ds_v5a, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)"
-store_str = "nodeData_at_top = sol_Dsa.u[length(sol_Dsa.u)]"
-eval(Meta.parse(prob_str))
-eval(Meta.parse(solve_str))
-eval(Meta.parse(store_str))
-nodeData_at_top
-
-res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
-
-#@benchmark res2 = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=(0.0,trdf[tr.root,:node_age]), p_Ds_v5=p_Ds_v5)
-
-# tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time
-res2[1]
-res2[2].t
-res2[2].u
-res2[3]
-res2[4]
-
-Rnames(res2)
-Rtypes(res2)
-
-
-
-
-
 
 #######################################################
 # Downpass with ClaSSE
