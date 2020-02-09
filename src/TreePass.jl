@@ -1411,7 +1411,10 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 	
 			# Retrieve the inputs for the calculation down the branch
 			u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-			tspan = trdf[current_nodeIndex, :brlen]
+			brlen = trdf[current_nodeIndex, :brlen]
+			age_branchtop = trdf[current_nodeIndex, :node_age]
+			age_branchbot = age_branchtop + brlen
+			tspan = [age_branchtop, age_branchbot]
 			#p_Ds_v5 = inputs.p_Ds_v5
 
 			# Spawn a branch operation, and a true-false of whether they are fetched
@@ -1420,7 +1423,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 # 			if (parallel_TF == true)
 # 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
 # 			else
-				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0, tspan, p_Ds_v5)
+				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5)
 				#tmp_results = branchOp(current_nodeIndex, res, num_iterations)
 				push!(tasks, tmp_results)
 # 			end
