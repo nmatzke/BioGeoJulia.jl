@@ -1185,7 +1185,7 @@ function nodeOp_average_likes(tmp1, tmp2)
 end
 
 # Use the Cmat to combine the likelihoods
-function nodeOp_Cmat(tmpDs, tmp1, tmp2, p_Ds_v5) -> begin
+nodeOp_Cmat = (tmpDs, tmp1, tmp2, p_Ds_v5) -> begin
 	p = p_Ds_v5
 #	hcat(p.p_indices.Carray_ivals, p.p_indices.Carray_jvals, p.p_indices.Carray_kvals, p.params.Cijk_vals)
 	
