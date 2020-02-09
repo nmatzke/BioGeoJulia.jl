@@ -8,6 +8,29 @@ export getwd, Rgetwd, setwd, recursive_find, include_jls, source, seq, Rchoose, 
 
 # Handy aliases
 
+# Reload BioGeoJulia
+function re()
+	# Remove and re-install
+	Pkg.rm("BioGeoJulia")
+	Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+	using BioGeoJulia
+
+	using BioGeoJulia.TrUtils
+	using BioGeoJulia.StateSpace
+	using BioGeoJulia.TreePass
+	using BioGeoJulia.SSEs
+	
+	# Refresh Revise's look
+	atreplinit() do repl
+	try
+	@eval using Revise
+	@async Revise.wait_steal_repl_backend()
+	catch
+	end
+	end
+end
+
+
 # getwd
 function getwd()
 	pwd()

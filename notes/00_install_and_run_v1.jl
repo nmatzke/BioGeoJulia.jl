@@ -117,6 +117,14 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
+atreplinit() do repl
+try
+@eval using Revise
+@async Revise.wait_steal_repl_backend()
+catch
+end
+end
+
 
 numstates_from_numareas(3,3,false)
 numstates_from_numareas(3,3,true)
