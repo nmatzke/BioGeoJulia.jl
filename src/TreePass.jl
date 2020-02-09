@@ -1130,9 +1130,12 @@ function construct_Res(tr::HybridNetwork, n)
 	tipsTF = indexNum_table[:,2] .> 0
 	tipnums = seq(1, length(tipsTF), 1)[tipsTF]
 	
-	for i in 1:length(tipnums)
-		tipLikes = collect(repeat([1.0], n))
-		likes_at_each_nodeIndex_branchTop[tipnums[i]] = tipLikes
+	put_in_fake_tipLikes = false
+	if put_in_fake_tipLikes == true
+		for i in 1:length(tipnums)
+			tipLikes = collect(repeat([1.0], n))
+			likes_at_each_nodeIndex_branchTop[tipnums[i]] = tipLikes
+		end
 	end
 
 	
