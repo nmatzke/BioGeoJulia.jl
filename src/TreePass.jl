@@ -1450,6 +1450,10 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 					
 					# Record information
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
+					print("\n\n12345\n\n")
+					print(res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex])
+					print(nodeData_at_bottom)
+					print("\n\n12345\n\n")
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
