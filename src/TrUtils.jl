@@ -13,12 +13,12 @@ function re()
 	# Remove and re-install
 	Pkg.rm("BioGeoJulia")
 	Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
-	using BioGeoJulia
+	@eval using BioGeoJulia
 
-	using BioGeoJulia.TrUtils
-	using BioGeoJulia.StateSpace
-	using BioGeoJulia.TreePass
-	using BioGeoJulia.SSEs
+	@eval using BioGeoJulia.TrUtils
+	@eval using BioGeoJulia.StateSpace
+	@eval using BioGeoJulia.TreePass
+	@eval using BioGeoJulia.SSEs
 	
 	# Refresh Revise's look
 	atreplinit() do repl
