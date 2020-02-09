@@ -946,10 +946,10 @@ struct Res
 	
 	# Tree structure
 	root_nodeIndex::Int64
-	num_nodes::Int64
+	numNodes::Int64
 	uppass_edgematrix::Array{Int64}
-	likes_at_each_nodeIndex_branchTop::Array{Float64}
-	likes_at_each_nodeIndex_branchBot::Array{Float64}
+	likes_at_each_nodeIndex_branchTop::Array{Array{Float64,1},1}
+	likes_at_each_nodeIndex_branchBot::Array{Array{Float64,1},1}
 	thread_for_each_nodeOp::Array{Int64}
 	thread_for_each_branchOp::Array{Int64}
 	
@@ -968,7 +968,7 @@ function construct_Res()
 	node_Lparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
 	node_Rparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
 	root_nodeIndex = 7
-	num_nodes = 7
+	numNodes = 7
 	uppass_edgematrix = [7 6; 7 5; 5 4; 5 3; 3 2; 3 1]
 	likes_at_each_nodeIndex_branchTop = collect(repeat([1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0], n))
 	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], n))
@@ -982,7 +982,7 @@ function construct_Res()
 
 	calctime_iterations = [0.0, 0.0]
 
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, num_nodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
 	return res
 end
 
@@ -1003,39 +1003,39 @@ indexNum_table = get_nodeIndex_PNnumber(tr)
 """
 function construct_Res(tr::HybridNetwork)
 	root_nodeIndex = tr.root
-	num_nodes = tr.numNodes
+	numNodes = tr.numNodes
 	uppass_edgematrix = get_LR_uppass_edgematrix(tr)
 	
 	# Give tip nodeIndexes their nodeNodex as the "likelihood"
 	indexNum_table = get_nodeIndex_PNnumber(tr)
 	tipsTF = indexNum_table[:,2] .> 0
 	tipLikes = indexNum_table[tipsTF,2] * 1.0
-	likes_at_each_nodeIndex_branchTop = collect(repeat([0.0], num_nodes))
+	likes_at_each_nodeIndex_branchTop = collect(repeat([0.0], numNodes))
 	likes_at_each_nodeIndex_branchTop[tipsTF] = tipLikes
 	
 	# Fill in the node_states
-	node_state = collect(repeat(["not_ready"], num_nodes))
+	node_state = collect(repeat(["not_ready"], numNodes))
 	node_state[tipsTF] .= "ready_for_branchOp"
-	node_Lparent_state = collect(repeat(["not_ready"], num_nodes))
-	node_Rparent_state = collect(repeat(["not_ready"], num_nodes))
+	node_Lparent_state = collect(repeat(["not_ready"], numNodes))
+	node_Rparent_state = collect(repeat(["not_ready"], numNodes))
 	node_Lparent_state[tipsTF] .= "NA"
 	node_Rparent_state[tipsTF] .= "NA"
 	
 	# Initialize with zeros for the other items
-	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], num_nodes))
-	thread_for_each_nodeOp = collect(repeat([0], num_nodes))
-	thread_for_each_branchOp = collect(repeat([0], num_nodes))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], numNodes))
+	thread_for_each_nodeOp = collect(repeat([0], numNodes))
+	thread_for_each_branchOp = collect(repeat([0], numNodes))
 	
-	calc_spawn_start = collect(repeat([Dates.now()], num_nodes))
-	calc_start_time = collect(repeat([Dates.now()], num_nodes))
-	calc_end_time = collect(repeat([Dates.now()], num_nodes))
-	calc_duration = collect(repeat([0.0], num_nodes))
+	calc_spawn_start = collect(repeat([Dates.now()], numNodes))
+	calc_start_time = collect(repeat([Dates.now()], numNodes))
+	calc_end_time = collect(repeat([Dates.now()], numNodes))
+	calc_duration = collect(repeat([0.0], numNodes))
 
 	calctime_iterations = [0.0, 0.0]
 	number_of_whileLoop_iterations = [0]	
 
 	# Initialize res object
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, num_nodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
 	return res
 end
 
@@ -1059,13 +1059,13 @@ n=10 # number of states in the state space
 """
 function construct_Res(tr::HybridNetwork, n)
 	root_nodeIndex = tr.root
-	num_nodes = tr.numNodes
+	numNodes = tr.numNodes
 	uppass_edgematrix = get_LR_uppass_edgematrix(tr)
 	
 	
 	# Set up an array of length nstates (n), to hold the likelihoods for each node
 	blank_states = collect(repeat([0.0], n))
-	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], num_nodes))
+	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
 
 	# Give tip nodeIndexes a likelihood of 1 at all states
 	indexNum_table = get_nodeIndex_PNnumber(tr)
@@ -1079,28 +1079,28 @@ function construct_Res(tr::HybridNetwork, n)
 
 	
 	# Fill in the node_states
-	node_state = collect(repeat(["not_ready"], num_nodes))
+	node_state = collect(repeat(["not_ready"], numNodes))
 	node_state[tipsTF] .= "ready_for_branchOp"
-	node_Lparent_state = collect(repeat(["not_ready"], num_nodes))
-	node_Rparent_state = collect(repeat(["not_ready"], num_nodes))
+	node_Lparent_state = collect(repeat(["not_ready"], numNodes))
+	node_Rparent_state = collect(repeat(["not_ready"], numNodes))
 	node_Lparent_state[tipsTF] .= "NA"
 	node_Rparent_state[tipsTF] .= "NA"
 	
 	# Initialize with zeros for the other items
-	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], num_nodes))
-	thread_for_each_nodeOp = collect(repeat([0], num_nodes))
-	thread_for_each_branchOp = collect(repeat([0], num_nodes))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+	thread_for_each_nodeOp = collect(repeat([0], numNodes))
+	thread_for_each_branchOp = collect(repeat([0], numNodes))
 	
-	calc_spawn_start = collect(repeat([Dates.now()], num_nodes))
-	calc_start_time = collect(repeat([Dates.now()], num_nodes))
-	calc_end_time = collect(repeat([Dates.now()], num_nodes))
-	calc_duration = collect(repeat([0.0], num_nodes))
+	calc_spawn_start = collect(repeat([Dates.now()], numNodes))
+	calc_start_time = collect(repeat([Dates.now()], numNodes))
+	calc_end_time = collect(repeat([Dates.now()], numNodes))
+	calc_duration = collect(repeat([0.0], numNodes))
 
 	calctime_iterations = [0.0, 0.0]
 	number_of_whileLoop_iterations = [0]	
 
 	# Initialize res object
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, num_nodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
 	return res
 end
 
@@ -1258,17 +1258,6 @@ function branchOp(current_nodeIndex, res, inputs)
 	spawned_nodeIndex = current_nodeIndex
 	tmp_threadID = Threads.threadid()
 	
-	print("\n")
-	print(class(inputs))
-	print("\n")
-	print(inputs)
-	print("\n")
-	print(inputs)
-	print("\n")
-	print("NEW")
-	print("NEW2")
-	print("3")
-	
 	
 	# The old practice input was an Int64
 	if (typeof(inputs) != Int64)
@@ -1416,7 +1405,7 @@ function iterative_downpass!(res; max_iterations=10^10, num_iterations=10000000)
 		end
 	
 		# Check if we are done?
-		are_we_done = count_nodes_finished(res.node_state) >= res.num_nodes
+		are_we_done = count_nodes_finished(res.node_state) >= res.numNodes
 		
 		# Error trap
 		if (iteration_number >= max_iterations)
@@ -1560,7 +1549,7 @@ function iterative_downpass_nonparallel!(res; max_iterations=10^10, num_iteratio
 		end
 	
 		# Check if we are done?
-		are_we_done = count_nodes_finished(res.node_state) >= res.num_nodes
+		are_we_done = count_nodes_finished(res.node_state) >= res.numNodes
 		
 		# Error trap
 		if (iteration_number >= max_iterations)

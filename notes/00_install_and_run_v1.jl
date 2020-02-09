@@ -108,26 +108,14 @@ using PhyloNetworks
 #include("/drives/Dropbox/_njm/__julia/julia4Rppl_v4.jl")
 
 # Try some functions
-# Pkg.rm("BioGeoJulia")
-# Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
-# using BioGeoJulia
-# 
-# using BioGeoJulia.TrUtils
-# using BioGeoJulia.StateSpace
-# using BioGeoJulia.TreePass
-# using BioGeoJulia.SSEs
+Pkg.rm("BioGeoJulia")
+Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+using BioGeoJulia
 
-using Revise
-includet("/GitHub/BioGeoJulia.jl/src/TrUtils.jl")
-includet("/GitHub/BioGeoJulia.jl/src/StateSpace.jl")
-includet("/GitHub/BioGeoJulia.jl/src/TreePass.jl")
-includet("/GitHub/BioGeoJulia.jl/src/SSEs.jl")
-
-import Main.TrUtils
-import Main.StateSpace
-import Main.TreePass
-import Main.SSEs
-
+using BioGeoJulia.TrUtils
+using BioGeoJulia.StateSpace
+using BioGeoJulia.TreePass
+using BioGeoJulia.SSEs
 
 countloop_num_iterations = 10
 calctime_in_sec1 = iterative_downpass_nonparallel!(res, max_iterations=Inf, num_iterations=countloop_num_iterations)
@@ -162,7 +150,8 @@ trdf
 # Downpass
 indexNum_table = get_nodeIndex_PNnumber(tr)
 
-global res = construct_Res(tr);
+#global res = construct_Res(tr);
+res = construct_Res(tr);
 current_nodeIndex = res.root_nodeIndex
 
 res.likes_at_each_nodeIndex_branchTop
@@ -286,7 +275,7 @@ sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, relto
 #@benchmark sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
 
 
-p_Ds = (n=n, params=params, p_indices=p_indices, sol_Es=sol_Es, uE=uE)
+#p_Ds = (n=n, params=params, p_indices=p_indices, sol_Es=sol_Es, uE=uE)
 p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, sol_Es_v5=sol_Es_v5, uE=uE)
 
 # Solve for the Ds

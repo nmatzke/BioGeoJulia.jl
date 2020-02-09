@@ -2,7 +2,7 @@ module TrUtils
 using DataFrames
 #using RCall
 
-export getwd, Rgetwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
+export getwd, Rgetwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
 
 # R-like utilities, and other short functions
 
@@ -237,9 +237,53 @@ end
 
 # fields / "names" of an object
 # https://stackoverflow.com/questions/41687418/how-to-get-fields-of-a-julia-object
+"""
+obj = construct_Res()
+Rnames(obj)
+Rtypes(obj)
+Rcbind(flat2(fieldnames(typeof(obj))), Rtypes(obj))
+ont(obj)
+"""
 function Rnames(obj)
-	fieldnames(typeof(obj))
+	flat2(fieldnames(typeof(obj)))
 end
+
+
+"""
+obj = construct_Res()
+Rnames(obj)
+Rtypes(obj)
+Rcbind(flat2(fieldnames(typeof(obj))), Rtypes(obj))
+ont(obj)
+"""
+function Rtypes(obj)
+	tmpnames = Rnames(obj)
+	types = [] # empty array
+	for i in 1:length(tmpnames)
+		tmpstr = paste0(["tmptype = typeof(obj.", tmpnames[i], ")"], "")
+		eval(Meta.parse(tmpstr))
+		#tmpstr2 = replace(tmpstr, ":"=>".")
+		push!(types, tmptype)
+	end
+	return types
+end
+
+
+
+
+# ont = object names and types
+"""
+obj = construct_Res()
+Rnames(obj)
+Rtypes(obj)
+Rcbind(flat2(fieldnames(typeof(obj))), Rtypes(obj))
+ont(obj)
+"""
+ont = function(obj)
+	Rcbind(Rnames(obj), Rtypes(obj))
+end
+
+
 
 # Send the just-done plot to PDF, and open
 function saveopen(fn)
