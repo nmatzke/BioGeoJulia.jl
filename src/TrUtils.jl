@@ -258,12 +258,9 @@ ont(obj)
 """
 function Rtypes(obj)
 	tmpnames = Rnames(obj)
-	types = [] # empty array
+	types = collect(repeat([DataType],length(tmpnames))) # empty array
 	for i in 1:length(tmpnames)
-		tmpstr = paste0(["tmptype = typeof(obj.", tmpnames[i], ")"], "")
-		eval(Meta.parse(tmpstr))
-		#tmpstr2 = replace(tmpstr, ":"=>".")
-		push!(types, tmptype)
+		types[i] = typeof(getfield(obj, tmpnames[i]))		
 	end
 	return types
 end
@@ -276,7 +273,7 @@ end
 obj = construct_Res()
 Rnames(obj)
 Rtypes(obj)
-Rcbind(flat2(fieldnames(typeof(obj))), Rtypes(obj))
+Rcbind(Rnames(obj), Rtypes(obj))
 ont(obj)
 """
 ont = function(obj)
