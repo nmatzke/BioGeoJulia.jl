@@ -1184,6 +1184,64 @@ function nodeOp_average_likes(tmp1, tmp2)
 	return(nodeData_at_top)
 end
 
+# Use the Cmat to combine the likelihoods
+function nodeOp_Cmat(tmpDs, tmp1, tmp2, p_Ds_v5) -> begin
+	p = p_Ds_v5
+#	hcat(p.p_indices.Carray_ivals, p.p_indices.Carray_jvals, p.p_indices.Carray_kvals, p.params.Cijk_vals)
+	
+	# Go through each Ci (ancestral state index)
+
+ # Possibly varying parameters
+  n = p.n
+  mu = p.params.mu_vals
+  Cijk_vals = p.params.Cijk_vals
+	
+	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
+	Carray_ivals = p.p_indices.Carray_ivals
+	Carray_jvals = p.p_indices.Carray_jvals
+	Carray_kvals = p.p_indices.Carray_kvals
+	
+	# Calculate likelihoods of states just before speciation
+  @inbounds for i in 1:n
+		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
+		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
+		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
+
+# 		Calculation of "D" (likelihood of tip data)
+# 		for state i=1, multiply
+# 		
+# 		All the speciation rates where the ancestor = i; length is sum(Ci_eq_i)
+# 		Cijk_vals[Ci_eq_i]
+# 		
+# 		All the ancestors (i's) where the ancestor = i; length is sum(Ci_eq_i)
+# 		Carray_ivals[Ci_eq_i]
+# 
+# 		All the left descendant states (j's) where the ancestor just before speciation = i; length is sum(Ci_eq_i)
+# 		Carray_jvals[Ci_eq_i]
+# 		
+# 		All the right descendant states (k's) where the ancestor just before speciation = i; length is sum(Ci_eq_i)
+# 		Carray_kvals[Ci_eq_i]
+# 		
+# 		Coming down from left branch, contributing to likelihood of ancestor state i;
+# 		resulting length is sum(Ci_eq_i)
+# 		tmp1[Carray_jvals[Ci_eq_i]]
+# 
+# 		Coming down from left branch, contributing to likelihood of ancestor state i;
+# 		resulting length is sum(Ci_eq_i)
+# 		tmp2[Carray_kvals[Ci_eq_i]]
+		
+		# Parameter values for these events with nonzero rates
+		tmpDs[i] = sum(Cijk_vals[Ci_eq_i] .* tmp1[Carray_jvals[Cj_sub_i]] * tmp2[Carray_kvals[Ck_sub_i]])
+  end
+  return(tmpDs)
+end
+
+
+	
+	
+
+
+
 
 # Combine likelihoods from above
 function nodeOp(current_nodeIndex, res; nodeOp_function=nodeOp_average_likes)
@@ -1252,6 +1310,81 @@ function nodeOp(current_nodeIndex, res; nodeOp_function=nodeOp_average_likes)
 	print("\n")
 	return(error(txt))
 end
+
+
+
+function nodeOp_ClaSSE_v5(current_nodeIndex, res; tmpDs, tmp1, tmp2, p_Ds_v5)
+	res.node_state[current_nodeIndex] = "calculating_nodeOp"
+	uppass_edgematrix = res.uppass_edgematrix
+	
+	# Record the thread, for kicks
+	tmp_threadID = Threads.threadid()
+	res.thread_for_each_nodeOp[current_nodeIndex] = tmp_threadID
+	TF = uppass_edgematrix[:,1] .== current_nodeIndex
+	if (sum(TF) == 2)
+		# Get likelihoods from above (iterates up to tips)
+		parent_nodeIndexes = uppass_edgematrix[TF,2]
+		tmp1 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
+		tmp2 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
+
+		# Check that data are actually available
+		if (sum(tmp1) == 0.0)
+			txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(tmp1) == 0.0, indicating data at parent nodes actually not available."], "")
+			res.node_state[current_nodeIndex] = txt
+			print("\n")
+			print(txt)
+			print("\n")
+			return(error(txt))
+		end
+
+		if (sum(tmp2) == 0.0)
+			txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(tmp2) == 0.0, indicating data at parent nodes actually not available."], "")
+			res.node_state[current_nodeIndex] = txt
+			print("\n")
+			print(txt)
+			print("\n")
+			return(error(txt))
+		end
+
+		#nodeData_at_top = tmp1 + tmp2
+		#nodeData_at_top = (tmp1 + tmp2)/2
+		#nodeData_at_top = nodeOp_function(tmp1, tmp2)
+		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+		nodeData_at_top = nodeOp_Cmat(tmpDs, tmp1, tmp2, p_Ds_v5)
+		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
+		
+		# Check if it's the root node
+		if (current_nodeIndex == res.root_nodeIndex)
+			res.node_state[current_nodeIndex] = "done"
+		else
+			res.node_state[current_nodeIndex] = "ready_for_branchOp"
+		end
+		return()
+	elseif (sum(TF) == 0)
+	  # If a tip
+	  txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't be run on a tip node."], "")
+	  print("\n")
+	  print(txt)
+	  print("\n")
+		return(error(txt))
+	else
+	  txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(TF) should be 0 or 2"], "")
+	  print("\n")
+	  print(txt)
+	  print("\n")
+		return(error(txt))
+	end
+	txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't get here."], "")
+	print("\n")
+	print(txt)
+	print("\n")
+	return(error(txt))
+end
+
+
+
+
+
 
 # Calculate down a branch
 # This function can read from res, but writing to res is VERY BAD as 
