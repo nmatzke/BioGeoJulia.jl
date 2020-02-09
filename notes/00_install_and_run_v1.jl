@@ -309,6 +309,7 @@ res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 res2 = branchOp(current_nodeIndex, res, inputs)
 
 
+# THIS KIND OF STUFF DOESN'T WORK EFFICIENTLY, AS IT REQUIRES GLOBAL VARIABLES
 prob_str = "prob_Ds_v5a = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)"
 solve_str = "sol_Dsa = solve(prob_Ds_v5a, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)"
 store_str = "nodeData_at_top = sol_Dsa.u[length(sol_Dsa.u)]"
@@ -329,5 +330,36 @@ res2[3]
 res2[4]
 
 Rnames(res2)
+Rtypes(res2)
 
 
+
+
+
+
+#######################################################
+# Downpass with ClaSSE
+#######################################################
+# Solve for the Ds
+du = repeat([0.0], n)
+u0 = repeat([0.0], n)
+u0[2] = 1.0  # Starting likelihood
+tspan = (0.0, 1.0) # Shorter
+current_nodeIndex = 1
+res = construct_Res(tr, n)
+#u0, tspan, p_Ds_v5
+
+#inputs = setup_inputs_branchOp_ClaSSE_Ds_v5(u0, tspan, p_Ds_v5; solver="Tsit5()", 
+#				 save_everystep="false", abstol="1e-9", reltol="1e-9")
+
+res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = u0;
+res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+
+# Updates res
+res_orig = res
+res_orig.likes_at_each_nodeIndex_branchTop
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, max_iterations=10^10)
+res.likes_at_each_nodeIndex_branchTop
+
+branchOp_ClaSSE_Ds_v5(current_nodeIndex, resp_Ds_v5; u0, tspan, p_Ds_v5)
