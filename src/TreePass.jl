@@ -1505,7 +1505,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			# Spawn a node operation
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
 			# Combine the downpass branch likelihoods
-			nodeOp(current_nodeIndex, res)
+			nodeOp(current_nodeIndex, res, nodeOp_function=nodeOp_average_likes)
 		end
 	
 		# Check if we are done?
