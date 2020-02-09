@@ -1349,14 +1349,23 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		#nodeData_at_top = tmp1 + tmp2
 		#nodeData_at_top = (tmp1 + tmp2)/2
 		#nodeData_at_top = nodeOp_function(tmp1, tmp2)
+		print("\n\n")
+		
+		print("\ncurrent_nodeIndex:\n")
+		print(current_nodeIndex)
+
 		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-		print("tmpDs:")
+		print("\ntmpDs:\n")
 		print(tmpDs)
 		nodeData_at_top = nodeOp_Cmat(tmpDs, tmp1=tmp1, tmp2=tmp2, p_Ds_v5=p_Ds_v5)
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
 
-		print("nodeData_at_top:")
+		print("\nnodeData_at_top:\n")
 		print(nodeData_at_top)
+
+		print("\nres.likes_at_each_nodeIndex_branchTop[current_nodeIndex]:\n")
+		print(res.likes_at_each_nodeIndex_branchTop[current_nodeIndex])
+
 
 		
 		# Check if it's the root node
@@ -1379,7 +1388,7 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 	  print(txt)
 	  print("\n")
 		return(error(txt))
-	end
+	end # End if (sum(TF) == 2)
 	txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't get here."], "")
 	print("\n")
 	print(txt)
@@ -1645,8 +1654,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
 			# Combine the downpass branch likelihoods
 			#nodeOp(current_nodeIndex, res, nodeOp_function=nodeOp_average_likes)
-			#nodeOp_ClaSSE_v5(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
-			push!(tasks, @spawn nodeOp_ClaSSE_v5(current_nodeIndex, res, p_Ds_v5=p_Ds_v5))
+			nodeOp_ClaSSE_v5(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
 			# (updates res)
 		end
 	
