@@ -962,7 +962,8 @@ struct Res
 end
 
 # Construct a default, simple results structure
-function construct_Res()
+# (likes_at_each_nodeIndex_branchTop is an array)
+function construct_Res_old()
 	n = 1 # number of states
 	node_state = ["ready_for_branchOp", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready"]
 	node_Lparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
@@ -985,6 +986,43 @@ function construct_Res()
 	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
 	return res
 end
+
+
+# Construct a default, simple results structure
+# (likes_at_each_nodeIndex_branchTop is an array of arrays)
+function construct_Res()
+	n = 1 # number of states
+	numNodes = 7  # number of nodes
+	node_state = ["ready_for_branchOp", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready", "ready_for_branchOp", "not_ready"]
+	node_Lparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
+	node_Rparent_state = ["NA", "NA", "not_ready", "NA", "not_ready", "NA", "not_ready"]
+	root_nodeIndex = 7
+	uppass_edgematrix = [7 6; 7 5; 5 4; 5 3; 3 2; 3 1]
+	likes_OneNode = collect(repeat([0.0], n))
+	likes_at_each_nodeIndex_branchTop = repeat([likes_OneNode], numNodes)
+	likes_at_each_nodeIndex_branchBot = repeat([likes_OneNode], numNodes)
+	
+	default_likes_at_each_nodeIndex_branchTop = [1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0]
+	for i in 1:length(likes_at_each_nodeIndex_branchTop)
+		likes_at_each_nodeIndex_branchTop[i][1] = default_likes_at_each_nodeIndex_branchTop[i]
+	end
+	
+	typeof(likes_at_each_nodeIndex_branchTop)
+	thread_for_each_nodeOp = collect(repeat([0], 7))
+	thread_for_each_branchOp = collect(repeat([0], 7))
+
+	calc_spawn_start = collect(repeat([Dates.now()], 7))
+	calc_start_time = collect(repeat([Dates.now()], 7))
+	calc_end_time = collect(repeat([Dates.now()], 7))
+	calc_duration = collect(repeat([0.0], 7))
+
+	calctime_iterations = [0.0, 0.0]
+
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	return res
+end
+
+
 
 
 
