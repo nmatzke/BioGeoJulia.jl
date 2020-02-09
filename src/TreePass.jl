@@ -1262,6 +1262,7 @@ function branchOp(current_nodeIndex, res, inputs)
 	print(class(inputs))
 	print("\n")
 	print(inputs)
+	print(inputs)
 	print("\n")
 	
 	# The old practice input was an Int64
