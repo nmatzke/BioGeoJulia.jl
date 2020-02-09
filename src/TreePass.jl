@@ -1258,11 +1258,11 @@ function branchOp(current_nodeIndex, res, inputs)
 	spawned_nodeIndex = current_nodeIndex
 	tmp_threadID = Threads.threadid()
 	
-# 	print("\n")
-# 	print(class(inputs))
-# 	print("\n")
-# 	print(inputs)
-# 	print("\n")
+	print("\n")
+	print(class(inputs))
+	print("\n")
+	print(inputs)
+	print("\n")
 	
 	# The old practice input was an Int64
 	if (typeof(inputs) != Int64)
