@@ -1266,6 +1266,7 @@ function branchOp(current_nodeIndex, res, inputs)
 	print(inputs)
 	print("\n")
 	print("NEW")
+	print("NEW2")
 	
 	# The old practice input was an Int64
 	if (typeof(inputs) != Int64)
