@@ -1412,7 +1412,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			# Retrieve the inputs for the calculation down the branch
 			u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 			tspan = trdf[current_nodeIndex, :brlen]
-			p_Ds_v5 = inputs.p_Ds_v5
+			#p_Ds_v5 = inputs.p_Ds_v5
 
 			# Spawn a branch operation, and a true-false of whether they are fetched
 			res.calc_spawn_start[current_nodeIndex] = Dates.now()
