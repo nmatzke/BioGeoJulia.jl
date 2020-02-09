@@ -1283,9 +1283,9 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
 
 	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 	#nodeData_at_bottom = nodeData_at_top / 2.0
-	nodeData_at_bottom = sol_Ds
+	#nodeData_at_bottom = sol_Ds.u
 	
-	return(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time)
+	return(tmp_threadID, sol_Ds, spawned_nodeIndex, calc_start_time)
 end
 
 
@@ -1440,7 +1440,8 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 # 					if (parallel_TF == true)
 # 						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = fetch(tasks[i])
 # 					else
-						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = tasks[i]
+						(tmp_threadID, sol_Ds, spawned_nodeIndex, calc_start_time) = tasks[i]
+						nodeData_at_bottom = sol_Ds.u
 # 					end
 					# Store run information
 					res.calc_start_time[spawned_nodeIndex] = calc_start_time
@@ -1451,7 +1452,9 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 					# Record information
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
 					print("\n\n12345\n\n")
+					print("res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex]:\n")
 					print(res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex])
+					print("\n\nnodeData_at_bottom:\n")
 					print(nodeData_at_bottom)
 					print("\n\n12345\n\n")
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
