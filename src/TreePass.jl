@@ -1048,8 +1048,27 @@ function construct_Res(tr::HybridNetwork)
 	indexNum_table = get_nodeIndex_PNnumber(tr)
 	tipsTF = indexNum_table[:,2] .> 0
 	tipLikes = indexNum_table[tipsTF,2] * 1.0
-	likes_at_each_nodeIndex_branchTop = collect(repeat([0.0], numNodes))
-	likes_at_each_nodeIndex_branchTop[tipsTF] = tipLikes
+
+	# Set up an array of length nstates (n), to hold the likelihoods for each node
+	n = 1
+	blank_states = collect(repeat([0.0], n))
+	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
+	likes_at_each_nodeIndex_branchTop
+	
+	# Put in the tip node numbers as the fake likelihoods
+	function f(numNodes, likes_at_each_nodeIndex_branchTop, tipsTF)
+		j = 0
+		for i in 1:numNodes
+			if (tipsTF[i] == true)
+				j = j+1
+				# Transfer from 1D array to 1D array
+				likes_at_each_nodeIndex_branchTop[i] = [tipLikes[j]]
+			end
+		end
+	end
+	f(numNodes, likes_at_each_nodeIndex_branchTop, tipsTF)
+	likes_at_each_nodeIndex_branchTop
+	
 	
 	# Fill in the node_states
 	node_state = collect(repeat(["not_ready"], numNodes))
@@ -1060,7 +1079,8 @@ function construct_Res(tr::HybridNetwork)
 	node_Rparent_state[tipsTF] .= "NA"
 	
 	# Initialize with zeros for the other items
-	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], numNodes))
+	#likes_at_each_nodeIndex_branchBot = collect(repeat([0.0], numNodes))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
 	thread_for_each_nodeOp = collect(repeat([0], numNodes))
 	thread_for_each_branchOp = collect(repeat([0], numNodes))
 	

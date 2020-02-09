@@ -241,7 +241,7 @@ end
 obj = construct_Res()
 Rnames(obj)
 Rtypes(obj)
-Rcbind(flat2(fieldnames(typeof(obj))), Rtypes(obj))
+Rcbind(Rnames(obj), Rtypes(obj))
 ont(obj)
 """
 function Rnames(obj)
@@ -253,7 +253,7 @@ end
 obj = construct_Res()
 Rnames(obj)
 Rtypes(obj)
-Rcbind(flat2(fieldnames(typeof(obj))), Rtypes(obj))
+Rcbind(Rnames(obj), Rtypes(obj))
 ont(obj)
 """
 function Rtypes(obj)
