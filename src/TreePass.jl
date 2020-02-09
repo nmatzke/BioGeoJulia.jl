@@ -1185,7 +1185,7 @@ function nodeOp_average_likes(tmp1, tmp2)
 end
 
 # Use the Cmat to combine the likelihoods
-nodeOp_Cmat = (tmpDs, tmp1, tmp2, p_Ds_v5) -> begin
+nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 	p = p_Ds_v5
 #	hcat(p.p_indices.Carray_ivals, p.p_indices.Carray_jvals, p.p_indices.Carray_kvals, p.params.Cijk_vals)
 	
@@ -1313,7 +1313,7 @@ end
 
 
 
-function nodeOp_ClaSSE_v5(current_nodeIndex, res; tmp1, tmp2, p_Ds_v5)
+function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 	res.node_state[current_nodeIndex] = "calculating_nodeOp"
 	uppass_edgematrix = res.uppass_edgematrix
 	
@@ -1350,7 +1350,7 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; tmp1, tmp2, p_Ds_v5)
 		#nodeData_at_top = (tmp1 + tmp2)/2
 		#nodeData_at_top = nodeOp_function(tmp1, tmp2)
 		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-		nodeData_at_top = nodeOp_Cmat(tmpDs, tmp1, tmp2, p_Ds_v5)
+		nodeData_at_top = nodeOp_Cmat(tmpDs, tmp1=tmp1, tmp2=tmp2, p_Ds_v5=p_Ds_v5)
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = nodeData_at_top
 		
 		# Check if it's the root node
@@ -1639,7 +1639,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
 			# Combine the downpass branch likelihoods
 			#nodeOp(current_nodeIndex, res, nodeOp_function=nodeOp_average_likes)
-			nodeOp_ClaSSE_v5(current_nodeIndex, res; tmp1, tmp2, p_Ds_v5)
+			nodeOp_ClaSSE_v5(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
 			# (updates res)
 		end
 	
