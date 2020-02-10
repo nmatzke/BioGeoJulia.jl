@@ -135,15 +135,15 @@ trdf = prt(tr, rootnodenum)
 trdf
 
 
-n=2
+n=1000000
 
 # 4 states, no Q
 # 3 tips in state 2, branch is 1 Mya long
 birthRate = 0.222222
 deathRate = 0.1
-d_val = 0.0
-e_val = 0.0
-j_val = 0.0
+d_val = 0.01
+e_val = 0.001
+j_val = 0.3
 
 # Define Qarray - zeros
 Qarray_ivals = collect(1:(n-1))
@@ -171,7 +171,34 @@ Qij_vals[((Qarray_ivals .== 1) .+ (Qarray_jvals .!= 1)) .== 2]
 Carray_ivals = collect(1:n)
 Carray_jvals = collect(1:n)
 Carray_kvals = collect(1:n)
-Cijk_vals = repeat([birthRate], n)
+#Cijk_vals = repeat([birthRate], n)
+
+#######################################################
+# Add some j events
+#######################################################
+# Narrow sympatry
+Cijk_vals = repeat([birthRate*(1.0/(1.0+2*j_val))], n)
+
+# j events
+Carray_ivals_leftJump = collect(1:n)
+Carray_jvals_leftJump = reverse(collect(1:n))
+Carray_kvals_leftJump = collect(1:n)
+Cijk_vals_leftJump = repeat([birthRate*(j_val/(1.0+2*j_val))], n)
+
+Carray_ivals_rightJump = collect(1:n)
+Carray_jvals_rightJump = collect(1:n)
+Carray_kvals_rightJump = reverse(collect(1:n))
+Cijk_vals_rightJump = repeat([birthRate*(j_val/(1.0+2*j_val))], n)
+
+
+Carray_ivals = vcat(Carray_ivals, Carray_ivals_leftJump, Carray_ivals_rightJump)
+Carray_jvals = vcat(Carray_jvals, Carray_jvals_leftJump, Carray_jvals_rightJump)
+Carray_kvals = vcat(Carray_kvals, Carray_kvals_leftJump, Carray_kvals_rightJump)
+Cijk_vals = vcat(Cijk_vals, Cijk_vals_leftJump, Cijk_vals_rightJump)
+
+
+
+
 
 mu_vals = repeat([deathRate], n)
 
@@ -318,8 +345,121 @@ res.logsum_likes_at_nodes
 
 
 
+#######################################################
+# When deathRate = 0.0
+# After putting in normalization
+#######################################################
+res.likes_at_each_nodeIndex_branchBot
+# 5-element Array{Array{Float64,1},1}:
+#  [0.0, 0.8007375794916948]
+#  [0.0, 0.8007375794916948]
+#  [0.0, 0.8007375796021832]
+#  [0.0, 0.6411806717956291]
+#  [0.0, 0.0]               
+# 
+res.likes_at_each_nodeIndex_branchTop
+# 5-element Array{Array{Float64,1},1}:
+#  [0.0, 1.0]                
+#  [0.0, 1.0]                
+#  [0.0, 0.14248445111767713]
+#  [0.0, 1.0]                
+#  [0.0, 0.11409265462308325]
+# 
+res.normlikes_at_each_nodeIndex_branchBot
+# 5-element Array{Array{Float64,1},1}:
+#  [0.0, 0.0]
+#  [0.0, 0.0]
+#  [0.0, 0.0]
+#  [0.0, 0.0]
+#  [0.0, 0.0]
+# 
+res.normlikes_at_each_nodeIndex_branchTop
+# 5-element Array{Array{Float64,1},1}:
+#  [0.0, 0.0]
+#  [0.0, 0.0]
+#  [0.0, 1.0]
+#  [0.0, 0.0]
+#  [0.0, 1.0]
+# 
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
+# -0.6666660049827136
+# 
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+# 5-element Array{Float64,1}:
+#    -0.22222200170689896
+#    -0.22222200170689896
+#    -0.22222200156891567
+#    -0.4444440025007777 
+#  -Inf                  
+# 
+res.sum_likes_at_nodes
+# 5-element Array{Float64,1}:
+#  0.0                
+#  0.0                
+#  0.14248445111767713
+#  0.0                
+#  0.11409265462308325
+# 
+res.logsum_likes_at_nodes
+# 5-element Array{Float64,1}:
+#   0.0               
+#   0.0               
+#  -1.9485224001905719
+#   0.0               
+#  -2.1707444008464676
+# 
+res.likes_at_each_nodeIndex_branchBot
+# 5-element Array{Array{Float64,1},1}:
+#  [0.0, 0.8007375794916948]
+#  [0.0, 0.8007375794916948]
+#  [0.0, 0.8007375796021832]
+#  [0.0, 0.6411806717956291]
+#  [0.0, 0.0]               
+# 
+res.sum_likes_at_nodes
+# 5-element Array{Float64,1}:
+#  0.0                
+#  0.0                
+#  0.14248445111767713
+#  0.0                
+#  0.11409265462308325
+# 
+# 
+-1.9485224001905719+-2.1707444008464676
+# -4.119266801037039
+
+sum(res.logsum_likes_at_nodes)
+# -4.119266801037039
+
+# Branch likes
+-2.1707444008464676 + -0.4444440025007777
+-2.6151884033472452
+# Matches
+# LnLs1 -4.119266 -2.615189
+# LnLs2 -4.812413 -2.615189
+# LnLs3 -4.119266 -2.615189
 
 
+
+res.likes_at_each_nodeIndex_branchTop
+log(res.likes_at_each_nodeIndex_branchTop[3][2])
+log(res.likes_at_each_nodeIndex_branchTop[5][2])
+# julia> log(res.likes_at_each_nodeIndex_branchTop[3][2])
+# -1.9485224001905719
+# 
+# julia> log(res.likes_at_each_nodeIndex_branchTop[5][2])
+# -2.1707444008464676
+
+-2.1707444008464676- -1.9485224001905719
+# -0.2222220006558957
+
+
+-1.9485224001905719 - -0.2222220006558957
+# -1.7263003995346762
+
+# Matches:
+# lq
+# [1] -0.2222222 -0.2222222 -0.4444444  0.0000000 -1.7262996
 
 
 
@@ -381,4 +521,79 @@ log.(sum.(res.likes_at_each_nodeIndex_branchBot))
 
 res.sum_likes_at_nodes
 res.logsum_likes_at_nodes
+
+
+
+
+
+
+
+
+
+#######################################################
+# When deathRate = 0.1, q01 = 0.01, q10 = 0.01
+#######################################################
+# Matching:
+# /GitHub/phyBEARS/ex/groking_ClaSSE/BiSSE_branchlikes_w_BDq01_v6_WORKING.R
+
+sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
+# -4.457350176563324
+
+# Matches
+#            [,1]      [,2]
+# LnLs1 -4.457691 -2.923784
+# LnLs2 -5.150440 -2.923784
+# LnLs3 -4.457492 -2.923784
+
+
+
+res.likes_at_each_nodeIndex_branchBot
+# 5-element Array{Array{Float64,1},1}:
+#  [0.007351758755615916, 0.7384915796335971]
+#  [0.007351758755615916, 0.7384915796335971]
+#  [0.007673866446696122, 0.7633169235133778]
+#  [0.011174271120372939, 0.5637645381772777]
+#  [0.0, 0.0]  
+
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+# 5-element Array{Float64,1}:
+#    -0.2932397029911491
+#    -0.2932397029911491
+#    -0.2600788510672332
+#    -0.5534916624604305
+#  -Inf   
+
+sum(res.likes_at_each_nodeIndex_branchBot[4])
+# 0.5749388092976506
+
+
+log(res.likes_at_each_nodeIndex_branchTop[3][2])
+# Likelihoods at first internal node (Humans,Chimps)
+# -2.1103695548994863
+
+# Likelihoods at the bottom of the branches above the root
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))[3:4]
+
+# julia> log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+# 5-element Array{Float64,1}:
+#    -0.2932397029911491
+#    -0.2932397029911491
+#    -0.2600788510672332
+#    -0.5534916624604305
+#  -Inf                 
+# 
+# julia> log.(sum.(res.likes_at_each_nodeIndex_branchBot))[3:4]
+# 2-element Array{Float64,1}:
+#  -0.2600788510672332
+#  -0.5534916624604305
+
+log(res.likes_at_each_nodeIndex_branchTop[3][2]) + sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[3:4])
+# -2.92394006842715
+# ...all likelihoods above the root
+# Matches!
+#            [,1]      [,2]
+# LnLs1 -4.457691 -2.923784
+# LnLs2 -5.150440 -2.923784
+# LnLs3 -4.457492 -2.923784
 
