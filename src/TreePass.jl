@@ -1619,7 +1619,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			#u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 			
 			# Use the NORMALIZED (rescaled to sum to 1) likelihoods
-			u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+			u0 = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
 			
 			brlen = trdf[current_nodeIndex, :brlen]
 			age_branchtop = trdf[current_nodeIndex, :node_age]
