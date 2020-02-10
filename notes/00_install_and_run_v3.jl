@@ -140,7 +140,7 @@ n=2
 # 4 states, no Q
 # 3 tips in state 2, branch is 1 Mya long
 birthRate = 0.222222
-deathRate = 0.0
+deathRate = 0.1
 d_val = 0.0
 e_val = 0.0
 j_val = 0.0
@@ -274,6 +274,10 @@ sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
 total_calctime_in_sec
 iteration_number
 
+
+#######################################################
+# When deathRate = 0.0
+#######################################################
 # Sum of branch bottom likelihoods
 sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
 # This script: -2.615188402901533
@@ -311,3 +315,70 @@ log.(sum.(res.likes_at_each_nodeIndex_branchBot))
 
 res.sum_likes_at_nodes
 res.logsum_likes_at_nodes
+
+
+
+
+
+
+
+
+
+
+#######################################################
+# When deathRate = 0.1
+#######################################################
+# Sum of branch bottom likelihoods
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
+# This script: -2.981668534925785
+# 
+# Matches sum(lq)
+# -2.948449
+# ...from 
+# /GitHub/phyBEARS/ex/groking_ClaSSE/BiSSE_branchlikes_w_BD_v6_WORKING.R
+
+# Log sum of each branch bottom (cumulative)
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+# 5-element Array{Float64,1}:
+#    -0.3021505419023683
+#    -0.3021505419023683
+#    -2.3773674511210485
+#    -0.5711384700773261
+#  -Inf     
+
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
+# -2.981668534925785
+
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:4])
+# -2.981668534925785
+
+# The last number (total root lnL) is close to
+# LnLs1 -4.452527 -2.948449
+# LnLs2 -5.145674 -2.948449
+# LnLs3 -4.452527 -2.948449
+
+res.logsum_likes_at_nodes
+# 5-element Array{Float64,1}:
+#   0.0              
+#   0.0              
+#  -2.108379480581511
+#   0.0              
+#  -4.452584317975149
+
+# The last number equals -4.452527
+
+# ...i.e., flat root probabilities, condition.surv=FALSE
+# ...from 
+# /GitHub/phyBEARS/ex/groking_ClaSSE/BiSSE_branchlikes_w_BD_v6_WORKING.R
+res.likes_at_each_nodeIndex_branchBot
+res.likes_at_each_nodeIndex_branchTop
+
+res.normlikes_at_each_nodeIndex_branchBot
+res.normlikes_at_each_nodeIndex_branchTop
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+
+
+res.sum_likes_at_nodes
+res.logsum_likes_at_nodes
+

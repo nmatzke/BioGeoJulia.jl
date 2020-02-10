@@ -1617,8 +1617,13 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 			
 			# Use the RAW likelihoods (don't normalize)
 			u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+			u0 = u0 ./ (sum(u0))
 			
 			# Use the NORMALIZED (rescaled to sum to 1) likelihoods
+			# Doesn't work -- claims an interpolation error for going beyond range
+			# branchOp on current_nodeIndex=4ERROR: LoadError: Solution interpolation 
+			# cannot extrapolate past the final timepoint. Either solve on a longer 
+			# timespan or use the local extrapolation from the integrator interface.
 			#u0 = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
 			
 			brlen = trdf[current_nodeIndex, :brlen]
