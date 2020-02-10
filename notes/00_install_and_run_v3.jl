@@ -135,7 +135,7 @@ trdf = prt(tr, rootnodenum)
 trdf
 
 
-n=1000000
+n=2
 
 # 4 states, no Q
 # 3 tips in state 2, branch is 1 Mya long
