@@ -1070,7 +1070,7 @@ function construct_Res(tr::HybridNetwork)
 	normlikes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
 
 	# Put in the tip node numbers as the fake likelihoods
-	function f(numNodes, likes_at_each_nodeIndex_branchTop, tipsTF)
+	function f(numNodes, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, tipsTF)
 		j = 0
 		for i in 1:numNodes
 			if (tipsTF[i] == true)
@@ -1081,7 +1081,7 @@ function construct_Res(tr::HybridNetwork)
 			end
 		end
 	end
-	f(numNodes, likes_at_each_nodeIndex_branchTop, tipsTF)
+	f(numNodes, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, tipsTF)
 	likes_at_each_nodeIndex_branchTop
 	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
 	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
@@ -1149,14 +1149,14 @@ function construct_Res(tr::HybridNetwork, n)
 	tipsTF = indexNum_table[:,2] .> 0
 	tipnums = seq(1, length(tipsTF), 1)[tipsTF]
 	
-	put_in_fake_tipLikes = false
-	if put_in_fake_tipLikes == true
-		for i in 1:length(tipnums)
-			tipLikes = collect(repeat([1.0], n))
-			likes_at_each_nodeIndex_branchTop[tipnums[i]] = tipLikes
-			normlikes_at_each_nodeIndex_branchTop[i] = [tipLikes[j] / sum(tipLikes[j])]
-		end
-	end
+# 	put_in_fake_tipLikes = false
+# 	if put_in_fake_tipLikes == true
+# 		for i in 1:length(tipnums)
+# 			tipLikes = collect(repeat([1.0], n))
+# 			likes_at_each_nodeIndex_branchTop[tipnums[i]] = tipLikes
+# 			normlikes_at_each_nodeIndex_branchTop[i] = [tipLikes[j] / sum(tipLikes[j])]
+# 		end
+# 	end
 	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
 	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
 	
