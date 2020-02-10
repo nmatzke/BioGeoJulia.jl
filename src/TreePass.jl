@@ -949,9 +949,8 @@ struct Res
 	root_nodeIndex::Int64
 	numNodes::Int64
 	uppass_edgematrix::Array{Int64}
-	likes_at_each_nodeIndex_branchTop::Array{Array{Float64,1},1}
-	likes_at_each_nodeIndex_branchBot::Array{Array{Float64,1},1}
 	sum_likes_at_nodes::Array{Float64}
+	logsum_likes_at_nodes::Array{Float64}
 	thread_for_each_nodeOp::Array{Int64}
 	thread_for_each_branchOp::Array{Int64}
 	
@@ -961,6 +960,10 @@ struct Res
 	calc_end_time::Array{DateTime}
 	calc_duration::Array{Float64}
 	calctime_iterations::Array{Float64}
+	likes_at_each_nodeIndex_branchTop::Array{Array{Float64,1},1}
+	normlikes_at_each_nodeIndex_branchTop::Array{Array{Float64,1},1}
+	likes_at_each_nodeIndex_branchBot::Array{Array{Float64,1},1}
+	normlikes_at_each_nodeIndex_branchBot::Array{Array{Float64,1},1}
 end
 
 # Construct a default, simple results structure
@@ -1156,6 +1159,7 @@ function construct_Res(tr::HybridNetwork, n)
 	end
 	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
 	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
+	
 	# Fill in the node_states
 	node_state = collect(repeat(["not_ready"], numNodes))
 	node_state[tipsTF] .= "ready_for_branchOp"
