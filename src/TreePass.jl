@@ -1656,7 +1656,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 # 						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = fetch(tasks[i])
 # 					else
 					(tmp_threadID, sol_Ds, spawned_nodeIndex, calc_start_time) = tasks[i]
-					nodeData_at_bottom = sol_Ds.u[length(sol_Ds.u)] + 0.0
+					nodeData_at_bottom = sol_Ds.u[length(sol_Ds.u)] .+ 0.0
 # 					end
 					# Store run information
 					res.calc_start_time[spawned_nodeIndex] = calc_start_time
@@ -1672,7 +1672,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 # 					print("\n\nnodeData_at_bottom:\n")
 # 					print(nodeData_at_bottom)
 # 					print("\n\n12345\n\n")
-					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom + 0.0
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
 					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex
