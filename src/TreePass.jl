@@ -1383,7 +1383,8 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		sum_likes_at_node = sum(nodeData_at_top)
 		#sum_likes_at_node = 1.0
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = (nodeData_at_top .+ 0.0)
-		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = (nodeData_at_top ./ sum_likes_at_node) .+ 0.0
+		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = (nodeData_at_top .+ 0.0)
+		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = (res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] ./ sum_likes_at_node)
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 		
 		res.sum_likes_at_nodes[current_nodeIndex] = sum_likes_at_node + 0.0
