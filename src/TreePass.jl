@@ -1006,10 +1006,14 @@ function construct_Res()
 	root_nodeIndex = 7
 	uppass_edgematrix = [7 6; 7 5; 5 4; 5 3; 3 2; 3 1]
 	likes_OneNode = collect(repeat([0.0], n))
-	likes_at_each_nodeIndex_branchTop = repeat([likes_OneNode], numNodes)
-	likes_at_each_nodeIndex_branchBot = repeat([likes_OneNode], numNodes)
-	normlikes_at_each_nodeIndex_branchTop = repeat([likes_OneNode], numNodes)
-	normlikes_at_each_nodeIndex_branchBot = repeat([likes_OneNode], numNodes)
+# 	likes_at_each_nodeIndex_branchTop = repeat([likes_OneNode], numNodes)
+# 	likes_at_each_nodeIndex_branchBot = repeat([likes_OneNode], numNodes)
+# 	normlikes_at_each_nodeIndex_branchTop = repeat([likes_OneNode], numNodes)
+# 	normlikes_at_each_nodeIndex_branchBot = repeat([likes_OneNode], numNodes)
+	likes_at_each_nodeIndex_branchTop = repeat([collect(repeat([0.0], n))], numNodes)
+	likes_at_each_nodeIndex_branchBot = repeat([collect(repeat([0.0], n))], numNodes)
+	normlikes_at_each_nodeIndex_branchTop = repeat([collect(repeat([0.0], n))], numNodes)
+	normlikes_at_each_nodeIndex_branchBot = repeat([collect(repeat([0.0], n))], numNodes)
 	
 	default_likes_at_each_nodeIndex_branchTop = [1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0]
 	for i in 1:length(likes_at_each_nodeIndex_branchTop)
@@ -1064,10 +1068,14 @@ function construct_Res(tr::HybridNetwork)
 	# Set up an array of length nstates (n), to hold the likelihoods for each node
 	n = 1
 	blank_states = collect(repeat([0.0], n))
-	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
-	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
-	normlikes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
-	normlikes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+# 	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
+# 	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+# 	normlikes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
+# 	normlikes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+	likes_at_each_nodeIndex_branchTop = collect(repeat([collect(repeat([0.0], n))], numNodes))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([collect(repeat([0.0], n))], numNodes))
+	normlikes_at_each_nodeIndex_branchTop = collect(repeat([collect(repeat([0.0], n))], numNodes))
+	normlikes_at_each_nodeIndex_branchBot = collect(repeat([collect(repeat([0.0], n))], numNodes))
 
 	# Put in the tip node numbers as the fake likelihoods
 	function f(numNodes, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, tipsTF)
@@ -1139,10 +1147,14 @@ function construct_Res(tr::HybridNetwork, n)
 	
 	# Set up an array of length nstates (n), to hold the likelihoods for each node
 	blank_states = collect(repeat([0.0], n))
-	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
-	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
-	normlikes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
-	normlikes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+# 	likes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
+# 	likes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+# 	normlikes_at_each_nodeIndex_branchTop = collect(repeat([blank_states], numNodes))
+# 	normlikes_at_each_nodeIndex_branchBot = collect(repeat([blank_states], numNodes))
+	likes_at_each_nodeIndex_branchTop = collect(repeat([collect(repeat([0.0], n))], numNodes))
+	likes_at_each_nodeIndex_branchBot = collect(repeat([collect(repeat([0.0], n))], numNodes))
+	normlikes_at_each_nodeIndex_branchTop = collect(repeat([collect(repeat([0.0], n))], numNodes))
+	normlikes_at_each_nodeIndex_branchBot = collect(repeat([collect(repeat([0.0], n))], numNodes))
 
 	# Give tip nodeIndexes a likelihood of 1 at all states
 	indexNum_table = get_nodeIndex_PNnumber(tr)
