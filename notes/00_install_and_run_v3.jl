@@ -222,7 +222,7 @@ p_indices = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Carray_ivals=
 # Solutions to the E vector
 u0_Es = repeat([0.0], 1*n)
 uE = repeat([0.0], n)
-tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
+tspan = (0.0, 3.0*trdf[tr.root,:node_age]) # 110% of tree root age
 
 
 
