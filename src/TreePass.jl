@@ -8,7 +8,7 @@ using Distributed			# for e.g. @spawn
 using Random					# for MersenneTwister()
 using DifferentialEquations # for ODEProblem
 using LSODA						# for lsoda()
-export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, nodeOp_Cmat, nodeOp_ClaSSE_v5, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
+export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, SolverOpt, construct_SolverOpt, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, nodeOp_Cmat, nodeOp_ClaSSE_v5, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
 
 
 
@@ -932,6 +932,23 @@ end
 #######################################################
 # Threaded downpass that spawns new processes when the 2 nodes above are done.
 
+# Solver options structure
+struct SolverOpt
+	solver::Any
+	save_everystep::Bool
+	abstol::Float64
+	reltol::Float64
+end
+
+function construct_SolverOpt
+	solver = Tsit5()
+	save_everystep = false
+	abstol = 1e-9
+	reltol = 1e-9
+	solver_options = SolverOpt(solver, save_everystep, abstol, reltol)
+	return solver_options
+end
+
 
 # Results structure
 struct Res
@@ -1475,7 +1492,7 @@ end
 # This function can read from res, but writing to res is VERY BAD as 
 # it created conflicts apparently when there were more @spawns than cores
 # Do all the writing to res in the while() loop
-function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5, solver=Tsit5())
+function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5, solver_options=solver_options)
 	calc_start_time = Dates.now()
 	spawned_nodeIndex = current_nodeIndex
 	tmp_threadID = Threads.threadid()
@@ -1483,7 +1500,7 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5, solve
 	# Example slow operation
 	#y = countloop(num_iterations, current_nodeIndex)
 	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
-	sol_Ds = solve(prob_Ds_v5, solver, save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	sol_Ds = solve(prob_Ds_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=save_everystep.abstol, reltol=save_everystep.reltol)
 
 	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 	#nodeData_at_bottom = nodeData_at_top / 2.0
@@ -1583,7 +1600,7 @@ end
 Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
 Non-parallel version (no istaskdone, etc.)
 """
-function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver=Tsit5(), max_iterations=10^10)
+function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
 	diagnostics = collect(repeat([Dates.now()], 3))
 	diagnostics[1] = Dates.now()
 	
@@ -1638,7 +1655,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver=Ts
 # 			if (parallel_TF == true)
 # 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
 # 			else
-				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver=solver)
+				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver_options=solver_options)
 				#tmp_results = branchOp(current_nodeIndex, res, num_iterations)
 				push!(tasks, tmp_results)
 # 			end
