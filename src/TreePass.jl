@@ -1449,7 +1449,7 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
 	# Example slow operation
 	#y = countloop(num_iterations, current_nodeIndex)
 	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
-	sol_Ds = solve(prob_Ds_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	sol_Ds = solve(prob_Ds_v5, LSODA(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 
 	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 	#nodeData_at_bottom = nodeData_at_top / 2.0
