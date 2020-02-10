@@ -933,7 +933,7 @@ end
 # Threaded downpass that spawns new processes when the 2 nodes above are done.
 
 # Solver options structure
-struct SolverOpt
+mutable struct SolverOpt
 	solver::Any
 	save_everystep::Bool
 	abstol::Float64
