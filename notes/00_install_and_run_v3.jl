@@ -300,3 +300,14 @@ log.(sum.(res.likes_at_each_nodeIndex_branchBot))
 # ...i.e., flat root probabilities, condition.surv=FALSE
 # ...from 
 # /GitHub/phyBEARS/ex/groking_ClaSSE/BiSSE_branchlikes_w_pureYule_v6_WORKING.R
+res.likes_at_each_nodeIndex_branchBot
+res.likes_at_each_nodeIndex_branchTop
+
+res.normlikes_at_each_nodeIndex_branchBot
+res.normlikes_at_each_nodeIndex_branchTop
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+
+
+res.sum_likes_at_nodes
+res.logsum_likes_at_nodes
