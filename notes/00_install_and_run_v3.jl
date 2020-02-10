@@ -267,8 +267,36 @@ res_orig.likes_at_each_nodeIndex_branchTop
 (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, max_iterations=10^10);
 res.likes_at_each_nodeIndex_branchTop
 res.sum_likes_at_nodes
+res.logsum_likes_at_nodes
 log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0])
 sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
 
 total_calctime_in_sec
 iteration_number
+
+# Sum of branch bottom likelihoods
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchBot))[1:3])
+# This script: -2.615188402901533
+# 
+# Matches sum(lq)
+# -2.615189
+# ...from 
+# /GitHub/phyBEARS/ex/groking_ClaSSE/BiSSE_branchlikes_w_pureYule_v6_WORKING.R
+
+# Log sum of each branch bottom (cumulative)
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+# 5-element Array{Float64,1}:
+#  -0.22222200170689896
+#  -0.22222200170689896
+#  -2.170744399487735  
+#  -0.4444440025007777 
+#  -4.1192667987652865 
+
+# The last number (total root lnL) equals
+# LnLs1 -4.119266 -2.615189
+# LnLs2 -4.812413 -2.615189
+# LnLs3 -4.119266 -2.615189
+
+# ...i.e., flat root probabilities, condition.surv=FALSE
+# ...from 
+# /GitHub/phyBEARS/ex/groking_ClaSSE/BiSSE_branchlikes_w_pureYule_v6_WORKING.R
