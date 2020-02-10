@@ -1155,7 +1155,7 @@ function construct_Res(tr::HybridNetwork, n)
 		end
 	end
 	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
-	
+	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
 	# Fill in the node_states
 	node_state = collect(repeat(["not_ready"], numNodes))
 	node_state[tipsTF] .= "ready_for_branchOp"
