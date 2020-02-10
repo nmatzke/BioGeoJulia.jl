@@ -940,7 +940,7 @@ struct SolverOpt
 	reltol::Float64
 end
 
-function construct_SolverOpt
+function construct_SolverOpt()
 	solver = Tsit5()
 	save_everystep = false
 	abstol = 1e-9
