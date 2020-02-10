@@ -143,7 +143,7 @@ birthRate = 0.222222
 deathRate = 0.1
 d_val = 0.01
 e_val = 0.001
-j_val = 0.3
+j_val = 0.0
 
 # Define Qarray - zeros
 Qarray_ivals = collect(1:(n-1))
@@ -291,7 +291,14 @@ res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 # Updates res
 res_orig = res
 res_orig.likes_at_each_nodeIndex_branchTop
-(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, max_iterations=10^10);
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver=Tsit5(), max_iterations=10^10);
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver=Tsit5(), max_iterations=10^10);
+total_calctime_in_sec
+
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver=lsoda(), max_iterations=10^10);
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver=lsoda(), max_iterations=10^10);
+total_calctime_in_sec
+
 res.likes_at_each_nodeIndex_branchTop
 res.sum_likes_at_nodes
 res.logsum_likes_at_nodes

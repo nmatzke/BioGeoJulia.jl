@@ -1475,7 +1475,7 @@ end
 # This function can read from res, but writing to res is VERY BAD as 
 # it created conflicts apparently when there were more @spawns than cores
 # Do all the writing to res in the while() loop
-function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
+function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5, solver=Tsit5())
 	calc_start_time = Dates.now()
 	spawned_nodeIndex = current_nodeIndex
 	tmp_threadID = Threads.threadid()
@@ -1483,7 +1483,7 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5)
 	# Example slow operation
 	#y = countloop(num_iterations, current_nodeIndex)
 	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
-	sol_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	sol_Ds = solve(prob_Ds_v5, solver, save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 
 	nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 	#nodeData_at_bottom = nodeData_at_top / 2.0
@@ -1583,7 +1583,7 @@ end
 Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
 Non-parallel version (no istaskdone, etc.)
 """
-function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_iterations=10^10)
+function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver=Tsit5(), max_iterations=10^10)
 	diagnostics = collect(repeat([Dates.now()], 3))
 	diagnostics[1] = Dates.now()
 	
@@ -1638,7 +1638,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, max_itera
 # 			if (parallel_TF == true)
 # 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
 # 			else
-				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5)
+				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver=solver)
 				#tmp_results = branchOp(current_nodeIndex, res, num_iterations)
 				push!(tasks, tmp_results)
 # 			end
