@@ -121,7 +121,8 @@ using BioGeoJulia.SSEs
 
 
 
-great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+#great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+great_ape_newick_string = "((chimp:1,human:1):1,gorilla:2);"
 tr = readTopology(great_ape_newick_string)
 tr
 
@@ -134,14 +135,14 @@ trdf = prt(tr, rootnodenum)
 trdf
 
 
-n=50000
+n=2
 
 # 4 states, no Q
 # 3 tips in state 2, branch is 1 Mya long
 birthRate = 0.222222
-deathRate = 0.1
-d_val = 0.1
-e_val = 0.01
+deathRate = 0.0
+d_val = 0.0
+e_val = 0.0
 j_val = 0.0
 
 # Define Qarray - zeros
@@ -152,10 +153,10 @@ Qarray_jvals = vcat(Qarray_jvals, collect(1:(n-1)))
 Qij_vals = vcat(repeat([0.0],(n-1)), repeat([0.0],(n-1)))
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals)
 
-# A 4-state DEC matrix
-Qarray_ivals = [2,3,2,3,4,4]
-Qarray_jvals = [1,1,4,4,2,3]
-Qij_vals = [e_val, e_val, d_val, d_val, e_val, e_val]
+# A 2-state DEC matrix
+Qarray_ivals = [2,1]
+Qarray_jvals = [1,2]
+Qij_vals = [e_val, d_val]
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals)
 
 
@@ -257,7 +258,7 @@ res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 res.likes_at_each_nodeIndex_branchTop[1] = u0;
 res.likes_at_each_nodeIndex_branchTop[2] = u0;
 res.likes_at_each_nodeIndex_branchTop[4] = u0;
-res.likes_at_each_nodeIndex_branchTop[6] = u0;
+#res.likes_at_each_nodeIndex_branchTop[6] = u0;
 res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 
 # Updates res
