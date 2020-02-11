@@ -249,7 +249,7 @@ p_indices = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Carray_ivals=
 # Solutions to the E vector
 u0_Es = repeat([0.0], 1*n)
 uE = repeat([0.0], n)
-tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
+tspan = (0.0, 1.2*trdf[tr.root,:node_age]) # 110% of tree root age
 
 p_Es_v5 = setup_MuSSE(2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 p_Es_v5 = setup_MuSSE(3; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
@@ -268,6 +268,7 @@ p_Es_v5.p_TFs.Ci_sub_i
 p_Es_v5.p_TFs.Cj_sub_i
 p_Es_v5.p_TFs.Ck_sub_i
 
+p_Es_v5 = setup_MuSSE(2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
 sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
@@ -287,7 +288,7 @@ p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, sol_Es_v5=sol_E
 du = repeat([0.0], n)
 u0 = repeat([0.0], n)
 u0[2] = 1.0  # Starting likelihood
-tspan = (0.0, 1.0) # Shorter
+#tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
 current_nodeIndex = 1
 res = construct_Res(tr, n)
 #u0, tspan, p_Ds_v5
