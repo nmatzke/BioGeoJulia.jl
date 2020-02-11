@@ -319,11 +319,14 @@ function setup_MuSSE(n=2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001
 	# The push! operation may get slow at huge n
 	# This will have to change for non-Mk models
 	for i in 1:n
-		push!(Ci_sub_i, Carray_ivals .== i)
-		push!(Qi_sub_i, Qarray_ivals .== i)
+		push!(Qi_eq_i, Qarray_ivals .== i)
+		push!(Qi_sub_i, Qarray_ivals[Qarray_ivals .== i])
+		push!(Qj_sub_i, Qarray_jvals[Qarray_ivals .== i])
+
+		push!(Ci_eq_i, Carray_ivals .== i)
+		push!(Ci_sub_i, Carray_ivals[Carray_ivals .== i])
 		push!(Cj_sub_i, Carray_jvals[Carray_ivals .== i])
 		push!(Ck_sub_i, Carray_kvals[Carray_ivals .== i])
-		push!(Qj_sub_i, Qarray_jvals[Qarray_ivals .== i])
 	end
 	
 	# Inputs to the Es calculation
