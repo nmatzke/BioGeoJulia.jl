@@ -1253,35 +1253,35 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 	
 	# Calculate likelihoods of states just before speciation
   @inbounds for i in 1:n
-		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
+		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
 
 # 		Calculation of "D" (likelihood of tip data)
 # 		for state i=1, multiply
 # 		
-# 		All the speciation rates where the ancestor = i; length is sum(Ci_eq_i)
-# 		Cijk_vals[Ci_eq_i]
+# 		All the speciation rates where the ancestor = i; length is sum(Ci_sub_i)
+# 		Cijk_vals[Ci_sub_i]
 # 		
-# 		All the ancestors (i's) where the ancestor = i; length is sum(Ci_eq_i)
-# 		Carray_ivals[Ci_eq_i]
+# 		All the ancestors (i's) where the ancestor = i; length is sum(Ci_sub_i)
+# 		Carray_ivals[Ci_sub_i]
 # 
-# 		All the left descendant states (j's) where the ancestor just before speciation = i; length is sum(Ci_eq_i)
-# 		Carray_jvals[Ci_eq_i]
+# 		All the left descendant states (j's) where the ancestor just before speciation = i; length is sum(Ci_sub_i)
+# 		Carray_jvals[Ci_sub_i]
 # 		
-# 		All the right descendant states (k's) where the ancestor just before speciation = i; length is sum(Ci_eq_i)
-# 		Carray_kvals[Ci_eq_i]
+# 		All the right descendant states (k's) where the ancestor just before speciation = i; length is sum(Ci_sub_i)
+# 		Carray_kvals[Ci_sub_i]
 # 		
 # 		Coming down from left branch, contributing to likelihood of ancestor state i;
-# 		resulting length is sum(Ci_eq_i)
-# 		tmp1[Carray_jvals[Ci_eq_i]]
+# 		resulting length is sum(Ci_sub_i)
+# 		tmp1[Carray_jvals[Ci_sub_i]]
 # 
 # 		Coming down from left branch, contributing to likelihood of ancestor state i;
-# 		resulting length is sum(Ci_eq_i)
-# 		tmp2[Carray_kvals[Ci_eq_i]]
+# 		resulting length is sum(Ci_sub_i)
+# 		tmp2[Carray_kvals[Ci_sub_i]]
 		
 		# Parameter values for these events with nonzero rates
-		tmpDs[i] = sum(Cijk_vals[Ci_eq_i] .* tmp1[Carray_jvals[Cj_sub_i]] .* tmp2[Carray_kvals[Ck_sub_i]])
+		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* tmp1[Carray_jvals[Cj_sub_i]] .* tmp2[Carray_kvals[Ck_sub_i]])
   end
   return(tmpDs)
 end

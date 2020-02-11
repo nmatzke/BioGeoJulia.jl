@@ -182,25 +182,25 @@ parameterized_ClaSSE_v5 = (du,u,p,t) -> begin
 	
 	two = 1.0
   @inbounds for i in 1:n
-		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
-		Qi_eq_i = p.p_TFs.Qi_eq_i[i]
+		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
+		Qi_sub_i = p.p_TFs.Qi_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
 		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
 
 		# Calculation of "E" (prob. of extinction)
 		du[i] = mu[i] +                                         # case 1: lineage extinction
-			-(sum(Cijk_vals[Ci_eq_i]) + sum(Qij_vals[Qi_eq_i]) + mu[i])*u[i] +  # case 2: no event + eventual extinction
-			(sum(Qij_vals[Qi_eq_i] .* u[Qj_sub_i])) + 			# case 3: change + eventual extinction
-			(two * sum(Cijk_vals[Ci_eq_i] .* u[Cj_sub_i] .* u[Ck_sub_i])) 
+			-(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 2: no event + eventual extinction
+			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 			# case 3: change + eventual extinction
+			(two * sum(Cijk_vals[Ci_sub_i] .* u[Cj_sub_i] .* u[Ck_sub_i])) 
 			# case 4 & 5: speciation from i producing j,k or k,j, eventually both daughters go extinct
 			# Because Carray contains all nonzero i->j,k rates, iterating once through on a particular
 			# "i" does the double-summation required
 
 		# Calculation of "D" (likelihood of tip data)
-		du[n+i] = -(sum(Cijk_vals[Ci_eq_i]) + sum(Qij_vals[Qi_eq_i]) + mu[i])*u[n+i] +  # case 1: no event
-			(sum(Qij_vals[Qi_eq_i] .* u[(n.+Qj_sub_i)])) + 	# case 2	
-			(sum(Cijk_vals[Ci_eq_i] .*                                               # case 34: change + eventual extinction
+		du[n+i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[n+i] +  # case 1: no event
+			(sum(Qij_vals[Qi_sub_i] .* u[(n.+Qj_sub_i)])) + 	# case 2	
+			(sum(Cijk_vals[Ci_sub_i] .*                                               # case 34: change + eventual extinction
 				 (u[(n.+Ck_sub_i)].*u[Cj_sub_i] 
 			 .+ u[(n.+Cj_sub_i)].*u[Ck_sub_i]) ))
   end
@@ -224,17 +224,17 @@ parameterized_ClaSSE_Es_v5 = (du,u,p,t) -> begin
 	
 	two = 1.0
   @inbounds for i in 1:n
-		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
-		Qi_eq_i = p.p_TFs.Qi_eq_i[i]
+		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
+		Qi_sub_i = p.p_TFs.Qi_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
 		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
 
 		# Calculation of "E" (prob. of extinction)
 		du[i] = mu[i] +                                         # case 1: lineage extinction
-			-(sum(Cijk_vals[Ci_eq_i]) + sum(Qij_vals[Qi_eq_i]) + mu[i])*u[i] +  # case 2: no event + eventual extinction
-			(sum(Qij_vals[Qi_eq_i] .* u[Qj_sub_i])) + 			# case 3: change + eventual extinction
-			(two * sum(Cijk_vals[Ci_eq_i] .* u[Cj_sub_i] .* u[Ck_sub_i])) 
+			-(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 2: no event + eventual extinction
+			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 			# case 3: change + eventual extinction
+			(two * sum(Cijk_vals[Ci_sub_i] .* u[Cj_sub_i] .* u[Ck_sub_i])) 
 			# case 4 & 5: speciation from i producing j,k or k,j, eventually both daughters go extinct
 			# Because Carray contains all nonzero i->j,k rates, iterating once through on a particular
 			# "i" does the double-summation required
@@ -263,16 +263,16 @@ parameterized_ClaSSE_Ds_v5 = (du,u,p,t) -> begin
 	
 	two = 1.0
   @inbounds for i in 1:n
-		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
-		Qi_eq_i = p.p_TFs.Qi_eq_i[i]
+		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
+		Qi_sub_i = p.p_TFs.Qi_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
 		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
 
 		# Calculation of "D" (likelihood of tip data)
-		du[i] = -(sum(Cijk_vals[Ci_eq_i]) + sum(Qij_vals[Qi_eq_i]) + mu[i])*u[i] +  # case 1: no event
-			(sum(Qij_vals[Qi_eq_i] .* u[Qj_sub_i])) + 	# case 2	
-			(sum(Cijk_vals[Ci_eq_i] .*                                               # case 34: change + eventual extinction
+		du[i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 1: no event
+			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 	# case 2	
+			(sum(Cijk_vals[Ci_sub_i] .*                                               # case 34: change + eventual extinction
 				 (u[Ck_sub_i].*uE[Cj_sub_i] 
 			 .+ u[Cj_sub_i].*uE[Ck_sub_i]) ))
   end
