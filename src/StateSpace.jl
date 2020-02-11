@@ -1,5 +1,6 @@
 module StateSpace
 using Combinatorics  # for e.g. combinations()
+using DataFrames     # for e.g. DataFrame()
 export numstates_from_numareas, areas_list_to_states_list, setup_MuSSE, setup_DEC_DEmat
 
 
@@ -243,6 +244,25 @@ end
 #   - same birthRate & deathRate across all states
 #   - transitions only possible to adjacent states
 # 
+"""
+p_Es_v5 = setup_MuSSE(2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+p_Es_v5 = setup_MuSSE(3; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+p_Es_v5 = setup_MuSSE(4, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+
+# Anagenetic transition matrix
+hcat(p_Es_v5.p_indices.Qarray_ivals, p_Es_v5.p_indices.Qarray_jvals, p_Es_v5.params.Qij_vals)
+DataFrame(p_Es_v5.p_TFs.Qi_eq_i)
+p_Es_v5.p_TFs.Qi_sub_i
+p_Es_v5.p_TFs.Qj_sub_i
+
+# Cladogenetic transition matrix
+hcat(p_Es_v5.p_indices.Carray_ivals, p_Es_v5.p_indices.Carray_jvals, p_Es_v5.p_indices.Carray_kvals, p_Es_v5.params.Cijk_vals)
+DataFrame(p_Es_v5.p_TFs.Ci_eq_i)
+p_Es_v5.p_TFs.Ci_sub_i
+p_Es_v5.p_TFs.Cj_sub_i
+p_Es_v5.p_TFs.Ck_sub_i
+"""
+
 function setup_MuSSE(n=2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 	# Define Qarray - zeros
 	Qarray_ivals = collect(1:(n-1))
@@ -285,26 +305,29 @@ function setup_MuSSE(n=2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001
 	# Pre-allocating the Carray_ivals .== i, Qarray_jvals[Qarray_ivals .== i
 	# Reduces GC (Garbage Collection) from 40% to ~5%
 	# 10+ times speed improvement (!)
-	Ci_eq_i = Any[]
 	Qi_eq_i = Any[]
+	Ci_eq_i = Any[]
+
+	Qi_sub_i = Any[]
+	Qj_sub_i = Any[]
 	
 	# These are the (e.g.) j state-indices (left descendant) when the ancestor==state i
+	Ci_sub_i = Any[]
 	Cj_sub_i = Any[]
 	Ck_sub_i = Any[]
-	Qj_sub_i = Any[]
 	
 	# The push! operation may get slow at huge n
 	# This will have to change for non-Mk models
 	for i in 1:n
-		push!(Ci_eq_i, Carray_ivals .== i)
-		push!(Qi_eq_i, Qarray_ivals .== i)
+		push!(Ci_sub_i, Carray_ivals .== i)
+		push!(Qi_sub_i, Qarray_ivals .== i)
 		push!(Cj_sub_i, Carray_jvals[Carray_ivals .== i])
 		push!(Ck_sub_i, Carray_kvals[Carray_ivals .== i])
 		push!(Qj_sub_i, Qarray_jvals[Qarray_ivals .== i])
 	end
 	
 	# Inputs to the Es calculation
-	p_TFs = (Ci_eq_i=Ci_eq_i, Qi_eq_i=Qi_eq_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i, Qj_sub_i=Qj_sub_i)
+	p_TFs = (Qi_eq_i=Qi_eq_i, Ci_eq_i=Ci_eq_i, Qi_sub_i=Qi_sub_i, Qj_sub_i=Qj_sub_i, Ci_sub_i=Ci_sub_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i)
 	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
 	
 	tmptxt="""

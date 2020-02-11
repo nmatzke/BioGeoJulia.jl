@@ -251,8 +251,23 @@ u0_Es = repeat([0.0], 1*n)
 uE = repeat([0.0], n)
 tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
 
+p_Es_v5 = setup_MuSSE(2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+p_Es_v5 = setup_MuSSE(3; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+p_Es_v5 = setup_MuSSE(4, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 
-p_Es_v5 = setup_MuSSE(2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+# Anagenetic transition matrix
+hcat(p_Es_v5.p_indices.Qarray_ivals, p_Es_v5.p_indices.Qarray_jvals, p_Es_v5.params.Qij_vals)
+DataFrame(p_Es_v5.p_TFs.Qi_eq_i)
+p_Es_v5.p_TFs.Qi_sub_i
+p_Es_v5.p_TFs.Qj_sub_i
+
+# Cladogenetic transition matrix
+hcat(p_Es_v5.p_indices.Carray_ivals, p_Es_v5.p_indices.Carray_jvals, p_Es_v5.p_indices.Carray_kvals, p_Es_v5.params.Cijk_vals)
+DataFrame(p_Es_v5.p_TFs.Ci_eq_i)
+p_Es_v5.p_TFs.Ci_sub_i
+p_Es_v5.p_TFs.Cj_sub_i
+p_Es_v5.p_TFs.Ck_sub_i
+
 
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
 sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
