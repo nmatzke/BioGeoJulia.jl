@@ -135,7 +135,7 @@ trdf = prt(tr, rootnodenum)
 trdf
 
 
-n=2
+n=10
 
 # 4 states, no Q
 # 3 tips in state 2, branch is 1 Mya long
@@ -252,6 +252,7 @@ uE = repeat([0.0], n)
 tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
 
 
+p_Es_v5 = setup_MuSSE(n=2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
 sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
@@ -293,6 +294,8 @@ res_orig = res
 res_orig.likes_at_each_nodeIndex_branchTop
 
 solver_options = construct_SolverOpt()
+solver_options.abstol = 1.0e-6
+solver_options.reltol = 1.0e-6
 (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
 
 

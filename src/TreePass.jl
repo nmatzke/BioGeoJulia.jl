@@ -933,6 +933,7 @@ end
 # Threaded downpass that spawns new processes when the 2 nodes above are done.
 
 # Solver options structure
+# "mutable" means you can change the values referred to by the keys
 mutable struct SolverOpt
 	solver::Any
 	save_everystep::Bool

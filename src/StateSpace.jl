@@ -1,6 +1,6 @@
 module StateSpace
 using Combinatorics  # for e.g. combinations()
-export numstates_from_numareas, areas_list_to_states_list, setup_DEC_DEmat
+export numstates_from_numareas, areas_list_to_states_list, setup_MuSSE, setup_DEC_DEmat
 
 
 """
@@ -238,6 +238,84 @@ end
 # Set up models
 #######################################################
 
+# Set up a MuSSE (or BiSSE) model with n states
+# This default model assumes:
+#   - same birthRate & deathRate across all states
+#   - transitions only possible to adjacent states
+# 
+function setup_MuSSE(n=2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+	# Define Qarray - zeros
+	Qarray_ivals = collect(1:(n-1))
+	Qarray_jvals = collect(2:n)
+	Qarray_ivals = vcat(Qarray_ivals, collect(2:n))
+	Qarray_jvals = vcat(Qarray_jvals, collect(1:(n-1)))
+	Qij_vals = vcat(repeat([q01],(n-1)), repeat([q10],(n-1)))
+	
+	# Carray: Cladogenetic parameters
+	# column 1: state i
+	# column 2: state j
+	# column 3: state k
+	# column 4: lambda_ijk (a parameter that is at least possibly nonzero, under the given model)
+	Carray_ivals = collect(1:n)
+	Carray_jvals = collect(1:n)
+	Carray_kvals = collect(1:n)
+	Cijk_vals = repeat([birthRate], n)
+
+# 	Qij_vals[((Qarray_ivals .== 1) .+ (Qarray_jvals .!= 1)) .== 2]
+# 	hcat(Qarray_ivals, Qarray_jvals, Qij_vals)
+# 	hcat(Carray_ivals, Carray_jvals, Carray_kvals, Cijk_vals)
+	
+	# Extinction rates
+	mu_vals = repeat([deathRate], n)
+	
+	# Assemble a "params" tuple
+	
+	# Possibly varying parameters
+	params = (mu_vals=mu_vals, Qij_vals=Qij_vals, Cijk_vals=Cijk_vals)
+
+	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
+	p_indices = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals)
+
+	# True/False statements by index
+	# The calculation of dEi and dDi for state i involves many
+	# ==i and !=i operations across Q and C. These only need to be 
+	# done once per problem (may or may not save time to 
+	# pre-calculate).
+	# 
+	# Pre-allocating the Carray_ivals .== i, Qarray_jvals[Qarray_ivals .== i
+	# Reduces GC (Garbage Collection) from 40% to ~5%
+	# 10+ times speed improvement (!)
+	Ci_eq_i = Any[]
+	Qi_eq_i = Any[]
+	
+	# These are the (e.g.) j state-indices (left descendant) when the ancestor==state i
+	Cj_sub_i = Any[]
+	Ck_sub_i = Any[]
+	Qj_sub_i = Any[]
+	
+	# The push! operation may get slow at huge n
+	# This will have to change for non-Mk models
+	for i in 1:n
+		push!(Ci_eq_i, Carray_ivals .== i)
+		push!(Qi_eq_i, Qarray_ivals .== i)
+		push!(Cj_sub_i, Carray_jvals[Carray_ivals .== i])
+		push!(Ck_sub_i, Carray_kvals[Carray_ivals .== i])
+		push!(Qj_sub_i, Qarray_jvals[Qarray_ivals .== i])
+	end
+	
+	# Inputs to the Es calculation
+	p_TFs = (Ci_eq_i=Ci_eq_i, Qi_eq_i=Qi_eq_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i, Qj_sub_i=Qj_sub_i)
+	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
+	
+	tmptxt="""
+	n = p_Es_v5.n
+	params = p_Es_v5.params
+	p_indices = p_Es_v5.p_indices
+	p_TFs = p_Es_v5.p_TFs
+	"""
+	
+	return(p_Es_v5)
+end
 
 # Set up a sparse Qmat for the DEC model
 # It will contain references to the parameters
