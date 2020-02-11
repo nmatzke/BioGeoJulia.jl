@@ -1,7 +1,8 @@
 module StateSpace
 using Combinatorics  # for e.g. combinations()
 using DataFrames     # for e.g. DataFrame()
-export numstates_from_numareas, areas_list_to_states_list, setup_MuSSE, setup_DEC_DEmat
+using PhyloNetworks
+export numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat
 
 
 """
@@ -225,8 +226,65 @@ end
 
 
 
+#######################################################
+# Run models
+#######################################################
+function get_default_inputs(n=2)
+	# Load tree
+	great_ape_newick_string = "((chimp:1,human:1):1,gorilla:2);"
+	tr = readTopology(great_ape_newick_string)
+	rootnodenum = tr.root
+	trdf = prt(tr, rootnodenum)
+	#trdf
+	
+	# Set up a simple MuSSE model
+	p_Es_v5 = setup_MuSSE(n; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+	
+	# Solutions to the E vector
+	u0_Es = repeat([0.0], 1*n)
+	uE = repeat([0.0], n)
+	tspan = (0.0, 1.2*trdf[tr.root,:node_age]) # 110% of tree root age
+
+	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
+	sol_Es_v5 = solve(prob_Es_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
+
+	#######################################################
+	# Downpass with ClaSSE
+	#######################################################
+	# Solve for the Ds
+	du = repeat([0.0], n)
+	u0 = repeat([0.0], n)
+	u0[2] = 1.0  # Starting likelihood
+	
+	
+	#tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
+	current_nodeIndex = 1
+	res = construct_Res(tr, n)
+
+	# Populate the tip likelihoods -- MODIFY THIS
+	res.likes_at_each_nodeIndex_branchTop[1] = u0;
+	res.likes_at_each_nodeIndex_branchTop[2] = u0;
+	res.likes_at_each_nodeIndex_branchTop[4] = u0;
+
+	solver_options = construct_SolverOpt()
+	solver_options.solver=Tsit5()
+	solver_options.abstol = 1.0e-6
+	solver_options.reltol = 1.0e-6
+
+	inputs = (res=res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options)
+	return inputs
+end
 
 
+function run_model(inputs=default_inputs())
+	res = inputs.res
+	trdf = inputs.trdf
+	p_Ds_v5 = inputs.p_Ds_v5
+	solver_options = inputs.solver_options
+	(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10)
+	return (total_calctime_in_sec, iteration_number)
+	# return res?
+end
 
 
 

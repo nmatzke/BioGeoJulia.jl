@@ -220,26 +220,36 @@ p_indices = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Carray_ivals=
 # Pre-allocating the Carray_ivals .== i, Qarray_jvals[Qarray_ivals .== i
 # Reduces GC (Garbage Collection) from 40% to ~5%
 # 10+ times speed improvement (!)
-Ci_eq_i = Any[]
 Qi_eq_i = Any[]
-Cj_sub_i = Any[]
-Ck_sub_i = Any[]
+Ci_eq_i = Any[]
+
+Qi_sub_i = Any[]
 Qj_sub_i = Any[]
 
+# These are the (e.g.) j state-indices (left descendant) when the ancestor==state i
+Ci_sub_i = Any[]
+Cj_sub_i = Any[]
+Ck_sub_i = Any[]
+
+# The push! operation may get slow at huge n
+# This will have to change for non-Mk models
 for i in 1:n
-	push!(Ci_eq_i, Carray_ivals .== i)
 	push!(Qi_eq_i, Qarray_ivals .== i)
+	push!(Qi_sub_i, Qarray_ivals[Qarray_ivals .== i])
+	push!(Qj_sub_i, Qarray_jvals[Qarray_ivals .== i])
+
+	push!(Ci_eq_i, Carray_ivals .== i)
+	push!(Ci_sub_i, Carray_ivals[Carray_ivals .== i])
 	push!(Cj_sub_i, Carray_jvals[Carray_ivals .== i])
 	push!(Ck_sub_i, Carray_kvals[Carray_ivals .== i])
-	push!(Qj_sub_i, Qarray_jvals[Qarray_ivals .== i])
 end
 
-
-p_TFs = (Ci_eq_i=Ci_eq_i, Qi_eq_i=Qi_eq_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i, Qj_sub_i=Qj_sub_i)
-
+# Inputs to the Es calculation
+p_TFs = (Qi_eq_i=Qi_eq_i, Ci_eq_i=Ci_eq_i, Qi_sub_i=Qi_sub_i, Qj_sub_i=Qj_sub_i, Ci_sub_i=Ci_sub_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i)
 p_orig = (n=n, params=params, p_indices=p_indices)
 p = p_orig
 p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
+
 
 params = (mu_vals=mu_vals, Qij_vals=Qij_vals, Cijk_vals=Cijk_vals)
 
@@ -310,6 +320,7 @@ res_orig = res
 res_orig.likes_at_each_nodeIndex_branchTop
 
 solver_options = construct_SolverOpt()
+solver_options.solver=Tsit5()
 solver_options.abstol = 1.0e-6
 solver_options.reltol = 1.0e-6
 (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
@@ -323,6 +334,23 @@ sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
 
 total_calctime_in_sec
 iteration_number
+
+
+# Log sum of each branch bottom (cumulative)
+log.(sum.(res.likes_at_each_nodeIndex_branchBot))
+# 5-element Array{Float64,1}:
+#  -0.22222200170689896
+#  -0.22222200170689896
+#  -2.170744399487735  
+#  -0.4444440025007777 
+#  -4.1192667987652865 
+
+# The last number (total root lnL) equals
+# LnLs1 -4.119266 -2.615189
+# LnLs2 -4.812413 -2.615189
+# LnLs3 -4.119266 -2.615189
+
+
 
 
 #######################################################
