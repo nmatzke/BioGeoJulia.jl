@@ -243,7 +243,7 @@ end
 #   - same birthRate & deathRate across all states
 #   - transitions only possible to adjacent states
 # 
-function setup_MuSSE(n=2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+function setup_MuSSE(n=2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 	# Define Qarray - zeros
 	Qarray_ivals = collect(1:(n-1))
 	Qarray_jvals = collect(2:n)

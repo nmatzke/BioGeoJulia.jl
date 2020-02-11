@@ -252,7 +252,7 @@ uE = repeat([0.0], n)
 tspan = (0.0, 2.0*trdf[tr.root,:node_age]) # 110% of tree root age
 
 
-p_Es_v5 = setup_MuSSE(n=2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
+p_Es_v5 = setup_MuSSE(2, birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001)
 
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
 sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
