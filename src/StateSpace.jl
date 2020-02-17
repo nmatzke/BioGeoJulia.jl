@@ -427,6 +427,7 @@ numstates = length(states_list)
 amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
 dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
 elist = repeat([0.123], numstates)
+allowed_event_types=["d","e"]
 
 Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 Qarray_ivals = Qmat.Qarray_ivals
@@ -434,6 +435,21 @@ Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
 event_type_vals = Qmat.event_type_vals
 
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+
+
+Qmat = setup_DEC_DEmat(areas_list)
+Qarray_ivals = Qmat.Qarray_ivals
+Qarray_jvals = Qmat.Qarray_jvals
+Qij_vals = Qmat.Qij_vals
+event_type_vals = Qmat.event_type_vals
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+
+Qmat = setup_DEC_DEmat(areas_list; allowed_event_types=["a"])
+Qarray_ivals = Qmat.Qarray_ivals
+Qarray_jvals = Qmat.Qarray_jvals
+Qij_vals = Qmat.Qij_vals
+event_type_vals = Qmat.event_type_vals
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
 
 """
@@ -480,7 +496,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	
 	# Events of "a" type: anagenetic range-switching
 	# restricted to single-area ranges (!)
-	if (setdiff(["a"], allowed_event_types) == ["a"])
+	if (in("a", allowed_event_types))
 		rangesize_eq1_TF = range_sizes .== 1
 		statenums_of_size1 = statenums[rangesize_eq1_TF]
 		
@@ -529,7 +545,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	
 	
 	# Events of "d" type: anagenetic range-expansion dispersal
-	if (setdiff(["d"], allowed_event_types) == ["d"])
+	if (in("d", allowed_event_types))
 		for i in 1:(numstates-1)			# starting states
 			for j in (i+1):numstates		# ending states
 				starting_state = states_list[i]
@@ -569,7 +585,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	end # ending if (setdiff(["d"]
 		
 	# Events of "e" type: anagenetic range-loss/extirpation
-	if (setdiff(["e"], allowed_event_types) == ["e"])
+	if (in("e", allowed_event_types))
 		for i in 2:numstates			# starting states
 			for j in 1:(i-1)		# ending states
 				if (starting_state != ending_state) && ((size_i-1) == size_j) && (size_i != 0) # state i is 1 bigger; not null
