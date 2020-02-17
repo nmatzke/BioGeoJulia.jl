@@ -541,7 +541,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 				end # ending if a[] > 0
 			end # ending for j in (i+1):length(statenums_of_size1
 		end # ending for i in 1:(length(statenums_of_size1)-1)
-	end # ending if (setdiff(["a"]
+	end # ending if (in("a", allowed_event_types))
 	
 	
 	# Events of "d" type: anagenetic range-expansion dispersal
@@ -569,14 +569,8 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 						# Add up the d events
 						tmp_d_sum = 0.0
 						for k in 1:size_i
-							print("\n")
-							print(starting_areanums[k])
-							print("\n")
-							print(end_areanums_not_found_in_start_areas)
-							print("\n")
-							print(ending_areanums[end_areanums_not_found_in_start_areas])
-							
-							tmp_d_sum += dmat[starting_areanums[k], ending_areanums[end_areanums_not_found_in_start_areas]][]
+							# Because there is only 1 end_areanums_not_found_in_start_areas
+							tmp_d_sum += dmat[starting_areanums[k], end_areanums_not_found_in_start_areas[1]][]
 						end
 
 						Qij_vals[index] = tmp_d_sum
@@ -591,7 +585,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 				end # ending if (starting_state != ending_state)...
 			end # ending j loop
 		end # ending i loop
-	end # ending if (setdiff(["d"]
+	end # ending if (in("d", allowed_event_types)
 		
 	# Events of "e" type: anagenetic range-loss/extirpation
 	if (in("e", allowed_event_types))
@@ -612,12 +606,13 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 						event_type_vals[index] = "e"
 						Qarray_ivals[index] = i
 						Qarray_jvals[index] = j
-						Qij_vals[index] = elist[start_areanums_not_found_in_end_areas]
+						# Because there is only 1 area in start_areanums_not_found_in_end_areas
+						Qij_vals[index] = elist[start_areanums_not_found_in_end_areas[1]]
 					end # ending if length(start_areanums_not...
 				end # ending if (starting_state != ending_state)...
 			end # ending j loop
 		end # ending i loop
-	end # ending if (setdiff(["e"]
+	end # ending if (in("e", allowed_event_types)
 	
 	# Return results
 	Qmat = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, event_type_vals=event_type_vals)
