@@ -94,7 +94,7 @@ function numstates_from_numareas(numareas=3, maxareas=1, include_null_range=fals
 	end
 	
 	if include_null_range == true
-		numstates = numstates + 1
+		numstates += 1
 	end
 	return numstates
 end
@@ -213,7 +213,7 @@ function areas_list_to_states_list(areas_list=collect(1:3), maxareas=3, include_
 	for k in 1:maxareas
 		tmp_states_list = collect(Combinatorics.combinations(areas_list, k))
 		for j in 1:length(tmp_states_list)
-			state_num = state_num + 1
+			state_num += 1
 			states_list[state_num] = tmp_states_list[j]
 		end
 	end
@@ -413,18 +413,17 @@ end
 """
 numareas = 3
 areas_list = collect(1:numareas)
-states_list = areas_list_to_states_list(areas_list, 1, false)
+states_list = areas_list_to_states_list(areas_list, 3, true)
+numstates = length(states_list)
 amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
 dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
 elist = repeat([0.123], numstates)
-Qmat = setup_DEC_DEmat(areas_list, states_list, )
 
-
-states_list = areas_list_to_states_list(areas_list, 1, true)
+Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 
 """
 
-function setup_DEC_DEmat(areas_list, states_list, dmat=reshape(repeat([0.1], numstates),(length(areas_list),length(areas_list))), elist=repeat([0.01],length(areas_list)), amat=reshape(repeat([0.0], numstates),(length(areas_list),length(areas_list))); allowed_event_types=["d","e"])
+function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas_list, length(areas_list), true), dmat=reshape(repeat([0.1], numstates),(length(areas_list),length(areas_list))), elist=repeat([0.01],length(areas_list)), amat=reshape(repeat([0.0], numstates),(length(areas_list),length(areas_list))); allowed_event_types=["d","e"])
 	# Set up items to iterate over
 	numstates = length(states_list)
 	statenums = collect(1:numstates)
@@ -443,7 +442,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat=reshape(repeat([0.1], num
 	for i in 1:(length(states_list)-1)
 		for j in (i+1):length(states_list)
 			if ((lengths_states_list[i]+1) == lengths_states_list[j])
-				num_d_rates = num_d_rates + 1
+				num_d_rates += 1
 			end
 		end
 	end
@@ -488,14 +487,14 @@ function setup_DEC_DEmat(areas_list, states_list, dmat=reshape(repeat([0.1], num
 					if (amat[starting_areanum, ending_areanum][] > 0) || (exclude_zeros == false)
 						# Add to arrays
 						# Forward event
-						index = index + 1
+						index += 1
 						event_type_vals[index] = "a"
 						Qarray_ivals[index] = statenum_ival
 						Qarray_jvals[index] = statenum_jval
 						Qij_vals[index] = amat[starting_areanum,ending_areanum]
 						
 						# Reverse event
-						index = index + 1
+						index += 1
 						event_type_vals[index] = "a"
 						Qarray_ivals[index] = statenum_jval
 						Qarray_jvals[index] = statenum_ival
@@ -529,7 +528,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat=reshape(repeat([0.1], num
 					end_areanums_not_found_in_start_areas = setdiff(ending_areanums, starting_areanums)
 					if length(end_areanums_not_found_in_start_areas) == 1
 						# Add to arrays
-						index = index + 1
+						index += 1
 						event_type_vals[index] = "d"
 						Qarray_ivals[index] = i
 						Qarray_jvals[index] = j
@@ -564,7 +563,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat=reshape(repeat([0.1], num
 					start_areanums_not_found_in_end_areas = setdiff(starting_areanums, ending_areanums)
 					if length(start_areanums_not_found_in_end_areas) == 1
 						# Add to arrays
-						index = index + 1
+						index += 1
 						event_type_vals[index] = "e"
 						Qarray_ivals[index] = i
 						Qarray_jvals[index] = j
