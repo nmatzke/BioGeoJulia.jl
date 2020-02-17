@@ -401,14 +401,23 @@ function setup_MuSSE(n=2; birthRate=0.222222, deathRate=0.1, q01=0.01, q10=0.001
 	return(p_Es_v5)
 end
 
+
+
+
+
+
+
+
+#######################################################
 # Set up a sparse Qmat for the DEC model
+#######################################################
 # It will contain references to the parameters
 # dmat: a numareas x numareas matrix of "d" values (range-expansion dispersal)
 # elist: a numareas array of "e" values (range-contraction, extirpation, "local extinction")
 # amat: a numareas x numareas matrix of "a" values
-# mult_mat: a numareas x numareas matrix of dispersal multipliers
-# e_mult: a numareas list of extirpation multipliers
-# exclude_zeros if true, exclude from the matrix 
+### mult_mat: a numareas x numareas matrix of dispersal multipliers
+### e_mult: a numareas list of extirpation multipliers
+### exclude_zeros if true, exclude from the matrix 
 
 """
 numareas = 3
