@@ -440,8 +440,8 @@ function setup_DEC_DEmat(areas_list, states_list, dmat=reshape(repeat([0.1], num
 	#num_d_rates = ceil((numstates^2)/2)
 	num_d_rates = 0
 	lengths_states_list = length.(states_list)
-	for (i in 1:(length(states_list)-1))
-		for (j in (i+1):length(states_list))
+	for i in 1:(length(states_list)-1)
+		for j in (i+1):length(states_list)
 			if ((lengths_states_list[i]+1) == lengths_states_list[j])
 				num_d_rates = num_d_rates + 1
 			end
