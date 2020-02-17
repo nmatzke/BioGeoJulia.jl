@@ -463,22 +463,36 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	numareas = length(areas_list)
 	
 	# Get the approx size of the nonzero rates (for pre-allocation)
-	num_e_rates = numstates
+	if (in("e", allowed_event_types))
+		num_e_rates = numstates
+	else
+		num_e_rates = 0
+	end
+
 	
 	# Count the approximate number of d events by
 	# iterating counts upwards (assumes states_list is size-ordered)
 	#num_d_rates = ceil((numstates^2)/2)
-	num_d_rates = 0
-	lengths_states_list = length.(states_list)
-	for i in 1:(length(states_list)-1)
-		for j in (i+1):length(states_list)
-			if ((lengths_states_list[i]+1) == lengths_states_list[j])
-				num_d_rates += 1
+	if (in("d", allowed_event_types))
+		num_d_rates = 0
+		lengths_states_list = length.(states_list)
+		for i in 1:(length(states_list)-1)
+			for j in (i+1):length(states_list)
+				if ((lengths_states_list[i]+1) == lengths_states_list[j])
+					num_d_rates += 1
+				end
 			end
 		end
+	else
+		num_d_rates = 0
+	end
+
+	if (in("a", allowed_event_types))
+		num_a_rates = 2*numstates
+	else
+		num_a_rates = 0
 	end
 	
-	num_a_rates = 2*numstates
 	num_nonzero_rates = num_e_rates + num_d_rates + num_a_rates
 	
 	# Initialize empty arrays
