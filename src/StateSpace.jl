@@ -438,14 +438,16 @@ event_type_vals = Qmat.event_type_vals
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
 
 
-Qmat = setup_DEC_DEmat(areas_list)
+states_list = areas_list_to_states_list(areas_list, 3, false)
+Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
 event_type_vals = Qmat.event_type_vals
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
 
-Qmat = setup_DEC_DEmat(areas_list; allowed_event_types=["a"])
+states_list = areas_list_to_states_list(areas_list, 3, false)
+Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
@@ -454,7 +456,9 @@ hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
 
 """
 
-function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas_list, length(areas_list), true), dmat=reshape(repeat([0.1], numstates),(length(areas_list),length(areas_list))), elist=repeat([0.01],length(areas_list)), amat=reshape(repeat([0.0], numstates),(length(areas_list),length(areas_list))); allowed_event_types=["d","e"])
+# states_list=areas_list_to_states_list(areas_list, length(areas_list), true), dmat=reshape(repeat([0.1], numstates),(length(areas_list),length(areas_list))), elist=repeat([0.01],length(areas_list)), amat=reshape(repeat([0.0], numstates),(length(areas_list),length(areas_list))); allowed_event_types=["d","e"]
+
+function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 	# Set up items to iterate over
 	numstates = length(states_list)
 	statenums = collect(1:numstates)
@@ -602,6 +606,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	end # ending if (in("d", allowed_event_types)
 		
 	# Events of "e" type: anagenetic range-loss/extirpation
+	# NOTE: we could combine with "d" with some effort
 	if (in("e", allowed_event_types))
 		for i in 2:numstates			# starting states
 			for j in 1:(i-1)		# ending states
@@ -627,6 +632,12 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 			end # ending j loop
 		end # ending i loop
 	end # ending if (in("e", allowed_event_types)
+	
+	keepTF = event_type_vals .!= ""
+	Qarray_ivals = Qarray_ivals[keepTF]
+	Qarray_jvals = Qarray_jvals[keepTF]
+	Qij_vals = Qij_vals[keepTF]
+	event_type_vals = event_type_vals[keepTF]
 	
 	# Return results
 	Qmat = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, event_type_vals=event_type_vals)
