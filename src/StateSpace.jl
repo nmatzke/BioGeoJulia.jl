@@ -569,7 +569,14 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 						# Add up the d events
 						tmp_d_sum = 0.0
 						for k in 1:size_i
-							tmp_d_sum = tmp_d_sum + dmat[starting_areanums[k], ending_areanums[end_areanums_not_found_in_start_areas]][]
+							print("\n")
+							print(starting_areanums[k])
+							print("\n")
+							print(end_areanums_not_found_in_start_areas)
+							print("\n")
+							print(ending_areanums[end_areanums_not_found_in_start_areas])
+							
+							tmp_d_sum += dmat[starting_areanums[k], ending_areanums[end_areanums_not_found_in_start_areas]][]
 						end
 
 						Qij_vals[index] = tmp_d_sum
