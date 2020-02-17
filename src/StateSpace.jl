@@ -429,6 +429,12 @@ dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
 elist = repeat([0.123], numstates)
 
 Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+Qarray_ivals = Qmat.Qarray_ivals
+Qarray_jvals = Qmat.Qarray_jvals
+Qij_vals = Qmat.Qij_vals
+event_type_vals = Qmat.event_type_vals
+
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
 
 """
 
@@ -584,7 +590,7 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	end # ending if (setdiff(["e"]
 	
 	# Return results
-	Qmat = (Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+	Qmat = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, event_type_vals=event_type_vals)
 	
 	"""
 	Qarray_ivals = Qmat.Qarray_ivals
