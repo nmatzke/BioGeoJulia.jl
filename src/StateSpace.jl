@@ -550,7 +550,9 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 			for j in (i+1):numstates		# ending states
 				starting_state = states_list[i]
 				ending_state = states_list[j]
-		
+				size_i = length(starting_state)
+				size_j = length(ending_state)
+						
 				# "d" events -- anagenetic range-expansion events
 				# Is the ending range 1 area more than the starting range?
 				if (starting_state != ending_state) && ((size_i+1) == size_j) && (size_i != 0) # state i is 1 smaller; not null
@@ -588,6 +590,11 @@ function setup_DEC_DEmat(areas_list, states_list=areas_list_to_states_list(areas
 	if (in("e", allowed_event_types))
 		for i in 2:numstates			# starting states
 			for j in 1:(i-1)		# ending states
+				starting_state = states_list[i]
+				ending_state = states_list[j]
+				size_i = length(starting_state)
+				size_j = length(ending_state)
+
 				if (starting_state != ending_state) && ((size_i-1) == size_j) && (size_i != 0) # state i is 1 bigger; not null
 					starting_areanums = starting_state
 					ending_areanums = ending_state
