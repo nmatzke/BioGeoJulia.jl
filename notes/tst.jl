@@ -26,6 +26,9 @@ module Tst
 	import .Tmp
 	#using .Tmp
 
+	using BioGeoJulia.StateSpace 
+
+
 	Tmp.say_hello()
 	# say_hello()
 
@@ -61,6 +64,20 @@ module Tst
 
 	maxent_constraint_01=0.5
 	relprob_subsets_matrix = Tmp.relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01, NA_val)
+
+	areas_list = [1,2,3]
+	states_list = areas_list_to_states_list(areas_list, 3, true)
+	params=(y=1.0,s=1.0,v=1.0,j=0.0)
+	max_numareas = length(areas_list)
+	maxent_constraint_01 = 0.0
+	maxent01symp = Tmp.relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+	maxent01sub = Tmp.relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+	maxent01jump = Tmp.relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+	maxent_constraint_01 = 0.5
+	maxent01vic = Tmp.relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
+	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
+	predeclare_array_length=10000000
+	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, params)
 
 	# your other test code here
 
