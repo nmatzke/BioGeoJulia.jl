@@ -160,4 +160,19 @@ module Tst
 	by(df3, :i, :prob => sum)
 	
 	
+	
+	#######################################################
+	# NEXT:
+	# 1. multiply conditional probabilities by lambda
+	# 2. load some geographic states, and a phylogeny
+	# 3. input into likelihood
+	# 4. maximum likelihood (or speed tests)
+	#######################################################
+	
+	
+	
+	
+	
+	
+	
 end # End of module
