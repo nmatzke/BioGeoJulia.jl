@@ -79,6 +79,12 @@ module Tst
 	predeclare_array_length=10000000
 	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, params)
 
+	# Extract the values
+	Carray_ivals = Carray.Carray_ivals;
+	Carray_jvals = Carray.Carray_jvals;
+	Carray_kvals = Carray.Carray_kvals;
+	Carray_event_types = Carray.Carray_event_types;
+	hcat(Carray_ivals, Carray_jvals, Carray_kvals, Carray_event_types)
 	# your other test code here
 
 

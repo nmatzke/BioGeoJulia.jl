@@ -346,12 +346,29 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, params=(y=1.0,s=1.0,v
 							row_weightvals[i] += tmp_weightval
 						end # end if tmp_weightval > 0.0
 					end # if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
+					
+					# If the left descendant is of size 1, & different from right, then
+					# jump dispersal
+					if ( (lsize == 1) && (array_in_array(lstate, rstate) == false) )
+						tmp_weightval = j * maxent01jump[ancsize, lsize] * 1.0 * 1.0
+					end
+					
 				end # if ( (ancstate == rstate) )
 			end # end i (right state indices)
 		end # end j (left state indices)
 	end # end i (ancestor state indices)
 	
-	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals)
+	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Carray_event_types=Carray_event_types)
+	
+	"""
+	# Extract the values
+	Carray_ivals = Carray.Carray_ivals;
+	Carray_jvals = Carray.Carray_jvals;
+	Carray_kvals = Carray.Carray_kvals;
+	Carray_event_types = Carray.Carray_event_types;
+	hcat(Carray_ivals, Carray_jvals, Carray_kvals, Carray_event_types)
+	"""
+	
 	return Carray
 end
 
