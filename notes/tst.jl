@@ -27,7 +27,7 @@ module Tst
 	#using .Tmp
 
 	using BioGeoJulia.StateSpace 
-
+	using DataFrames  # for DataFrame
 
 	Tmp.say_hello()
 	# say_hello()
@@ -67,7 +67,7 @@ module Tst
 
 	areas_list = [1,2,3]
 	states_list = areas_list_to_states_list(areas_list, 3, true)
-	params=(y=1.0,s=1.0,v=1.0,j=0.0)
+	Cparams = Tmp.default_Cparams()
 	max_numareas = length(areas_list)
 	maxent_constraint_01 = 0.0
 	maxent01symp = Tmp.relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
@@ -77,14 +77,52 @@ module Tst
 	maxent01vic = Tmp.relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 	predeclare_array_length=10000000
-	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, params)
+	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 
 	# Extract the values
 	Carray_ivals = Carray.Carray_ivals;
 	Carray_jvals = Carray.Carray_jvals;
 	Carray_kvals = Carray.Carray_kvals;
 	Carray_event_types = Carray.Carray_event_types;
-	hcat(Carray_ivals, Carray_jvals, Carray_kvals, Carray_event_types)
+	Cijk_vals = Carray.Cijk_vals;
+	row_weightvals = Carray.row_weightvals;
+	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_vals)
+	row_weightvals
+
+	# DEC+J
+	Cparams.j = 0.1
+	Cparams.y = (3.0-Cparams.j) / 3.0
+	Cparams.s = (3.0-Cparams.j) / 3.0
+	Cparams.v = (3.0-Cparams.j) / 3.0
+	Cparams
+	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
+
+	Carray_ivals = Carray.Carray_ivals;
+	Carray_jvals = Carray.Carray_jvals;
+	Carray_kvals = Carray.Carray_kvals;
+	Carray_event_types = Carray.Carray_event_types;
+	Cijk_vals = Carray.Cijk_vals;
+	row_weightvals = Carray.row_weightvals;
+	df = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_vals);
+	showall(df, true)
+	by(df, :event, nrow)
+	
+	function sumy(x)
+		sum(x .== "y")
+	end
+	function sums(x)
+		sum(x .== "s")
+	end
+	function sumv(x)
+		sum(x .== "v")
+	end
+	function sumj(x)
+		sum(x .== "j")
+	end
+	
+	by(df, :i, ysum = :event => sumy, ssum = :event => sums, vsum = :event => sumv, jsum = :event => sumj) 
+	row_weightvals
+
 	# your other test code here
 
 

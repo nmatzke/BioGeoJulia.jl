@@ -3,7 +3,7 @@ using BioGeoJulia.TrUtils # for flat2() (similar to unlist)
 
 
 # (1) List all function names here:
-export say_hello, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat
+export say_hello, CparamsStructure, default_Cparams, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat
 
 
 #######################################################
@@ -36,6 +36,29 @@ using Distributions  # for quantile
 using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
+
+
+
+
+# Cladogenetic parameter weights structure
+# "mutable" means you can change the values referred to by the keys
+mutable struct CparamsStructure
+	y::Float64
+	s::Float64
+	v::Float64
+	j::Float64
+end
+
+"""
+Cparams = default_Cparams()
+"""
+function default_Cparams()
+	y = 1.0
+	s = 1.0
+	v = 1.0
+	j = 0.0
+	Cparams = CparamsStructure(y, s, v, j)
+end
 
 
 """
@@ -213,7 +236,7 @@ ancstate == lstate == rstate
 
 areas_list = [1,2,3]
 states_list = areas_list_to_states_list(areas_list, 3, true)
-params=(y=1.0,s=1.0,v=1.0,j=0.0)
+Cparams=(y=1.0,s=1.0,v=1.0,j=0.0)
 max_numareas = length(areas_list)
 maxent_constraint_01 = 0.0
 maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
@@ -223,11 +246,11 @@ maxent_constraint_01 = 0.5
 maxent01vic = relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
 maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 predeclare_array_length=10000000
-Carray = setup_DEC_Cmat(areas_list, states_list, params)
+Carray = setup_DEC_Cmat(areas_list, states_list, Cparams)
 
 """
 
-function setup_DEC_Cmat(areas_list, states_list, maxent01, params=(y=1.0,s=1.0,v=1.0,j=0.0); predeclare_array_length=10000000)
+function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))); predeclare_array_length=Integer(min(length(states_list)*length(states_list)*round((length(states_list)/2)), 10000000)), min_precision=1e-9)
 	numstates = length(states_list)
 	
 	maxent01symp = maxent01.maxent01symp
@@ -235,10 +258,11 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, params=(y=1.0,s=1.0,v
 	maxent01vic = maxent01.maxent01vic
 	maxent01jump = maxent01.maxent01jump
 	
-	y = params.y
-	s = params.s
-	v = params.v
-	j = params.j
+	# Weights
+	y_wt = Cparams.y
+	s_wt = Cparams.s
+	v_wt = Cparams.v
+	j_wt = Cparams.j
 	
 	# MAKE SURE the states_list is sorted by size
 	range_sizes = length.(states_list)
@@ -288,77 +312,173 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, params=(y=1.0,s=1.0,v
 			lstate = states_list[j]
 			lsize = length(lstate)
 			if (lsize == 0)
-				continue
+				continue # go to the next j
 			end
-
+		
 			# Right states
-			for k in j:numstates # We only have to do half of the possible right events;
+			for k in 1:numstates # We only have to do half of the possible right events;
 													 # reverse each to make a pair
 				rstate = states_list[k]
 				rsize = length(rstate)
 				if (rsize == 0)
-					continue
+					continue # go to the next k
 				end
 				
-				# Sympatry (range-copying)
-				if (ancstate == lstate == rstate)
-					# Check if the weight > 0.0
-					# ancsize, lsize, rsize are the same so we don't have to 
-					# choose the smaller daugher
-					tmp_weightval = y * maxent01symp[ancsize, lsize] * 1.0 * 1.0
-					if tmp_weightval > 0.0
-						# Record the range-copying event
-						numC += 1
-						Carray_event_types[numC] = "y"
-						Carray_ivals[numC] = i
-						Carray_jvals[numC] = j
-						Carray_kvals[numC] = k
-						row_weightvals[i] += tmp_weightval
-					end # end if tmp_weightval > 0.0
-				end # end if (ancstate == lstate == rstate)
+				if (y_wt > min_precision)
+					# Sympatry (range-copying)
+					if (ancstate == lstate == rstate)
+						# Check if the weight > 0.0
+						# ancsize, lsize, rsize are the same so we don't have to 
+						# choose the smaller daugher
+						tmp_weightval = y_wt * maxent01symp[ancsize, lsize] * 1.0 * 1.0
+						if tmp_weightval > min_precision
+							# Record the range-copying event
+							numC += 1
+							Carray_event_types[numC] = "y"
+							Carray_ivals[numC] = i
+							Carray_jvals[numC] = j
+							Carray_kvals[numC] = k
+							Cijk_vals[numC] = tmp_weightval
+							row_weightvals[i] += tmp_weightval
+						end # end if tmp_weightval > 0.0
+					end # end if (ancstate == lstate == rstate)
+				end # end if (y_wt > min_precision)
 				
 				# If one of the descendants is identical to the ancestor, 
 				# (after we've excluded sympatry)
 				# we can have jump dispersal or subset speciation
 				if ( (ancstate == rstate) )
-				
-					# Check for subset sympatry: lstate smaller than rstate, lstate inside rstate
-					if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
-						# Check if the weight > 0.0
-						# lsize is smaller by definition
-						# choose the smaller daughter
-						tmp_weightval = s * maxent01sub[ancsize, lsize] * 1.0 * 1.0
-						if tmp_weightval > 0.0
-							# Record the range-copying event
+					# Subset sympatry
+					if (s_wt > min_precision)
+						# Check for subset sympatry: lstate smaller than rstate, lstate inside rstate
+						if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
+							# Check if the weight > 0.0
+							# lsize is smaller by definition
+							# choose the smaller daughter
+							tmp_weightval = s_wt * maxent01sub[ancsize, lsize] * 1.0 * 1.0
+							if tmp_weightval > min_precision
+								# Record the range-copying event
+								numC += 1
+								Carray_event_types[numC] = "s"
+								Carray_ivals[numC] = i
+								Carray_jvals[numC] = j
+								Carray_kvals[numC] = k
+								Cijk_vals[numC] = tmp_weightval
+								row_weightvals[i] += tmp_weightval
+
+								# Same event, flip left/right descendant states
+								numC += 1
+								Carray_event_types[numC] = "s"
+								Carray_ivals[numC] = i
+								Carray_jvals[numC] = k
+								Carray_kvals[numC] = j
+								Cijk_vals[numC] = tmp_weightval
+								row_weightvals[i] += tmp_weightval
+							end # end if tmp_weightval > 0.0
+						end # end if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
+					end # end if (s_wt > min_precision)
+					
+					# Jump dispersal
+					if (j_wt > min_precision)
+						# If the left descendant is of size 1, & different from right, then
+						# jump dispersal
+						if ( (lsize == 1) && (array_in_array(lstate, rstate) == false) )
+							# Historically, on analogy with other DEC cladogenesis events
+							# the weight of each j event was not influenced by the number of
+							# ranges of the ancestor. That is followed here. Obviously, 
+							# other models could be imagined! (e.g., d events *are* influenced
+							# by ancestor rangesize).
+							try_jump_dispersal_based_on_dist = true
+							normalize_by_number_of_dispersal_events = true
+							jweight_for_cell_based_on_distances = 0.0
+							if (try_jump_dispersal_based_on_dist == true)
+								for anc_area in ancstate
+									for left_area in lstate
+										 jweight_for_cell_based_on_distances += dmat[anc_area,left_area]
+									end
+								end
+								# Normalize by number of possible jump dispersals
+								if (normalize_by_number_of_dispersal_events == true)
+									jweight_for_cell_based_on_distances = jweight_for_cell_based_on_distances / (ancsize * lsize)
+								end
+							else
+								# 
+								jweight_for_cell_based_on_distances = 1.0
+							end # end if (try_jump_dispersal_based_on_dist == true)
+					
+							# Calculate the final weight of this jump dispersal
+							tmp_weightval = j_wt * maxent01jump[ancsize, lsize] * 1.0 * 1.0 * jweight_for_cell_based_on_distances
+					
+							print("\n")
+							print([i, j, k, tmp_weightval])
+							if (tmp_weightval > min_precision)
+								print("yes")
+								# Record the jump-dispersal event
+								numC += 1
+								Carray_event_types[numC] = "j"
+								Carray_ivals[numC] = i
+								Carray_jvals[numC] = j
+								Carray_kvals[numC] = k
+								Cijk_vals[numC] = tmp_weightval
+								row_weightvals[i] += tmp_weightval
+
+								# Same event, flip left/right descendant states
+								numC += 1
+								Carray_event_types[numC] = "j"
+								Carray_ivals[numC] = i
+								Carray_jvals[numC] = k
+								Carray_kvals[numC] = j
+								Cijk_vals[numC] = tmp_weightval
+								row_weightvals[i] += tmp_weightval
+					
+							end # if (tmp_weightval > 0.0)
+							# end of jump dispersal
+						end # end if ( (lsize == 1) && (array_in_array(lstate, rstate) == false) )
+					end # end if (j_wt > min_precision)
+				end # end if ( (ancstate == rstate) )
+			
+				# Vicariance
+				if (v_wt > min_precision)
+					# Check if the combined vector equals the ancestor vector
+					combined_vector = sort(cat(lstate,rstate; dims=1))
+					if ( combined_vector == sort(ancstate) )
+						smaller_range_size = min(lsize, rsize)
+						tmp_weightval = v_wt * maxent01vic[ancsize,smaller_range_size] * 1.0 * 1.0
+						if (tmp_weightval > min_precision)
+							# Record the jump-dispersal event
 							numC += 1
-							Carray_event_types[numC] = "s"
+							Carray_event_types[numC] = "v"
 							Carray_ivals[numC] = i
 							Carray_jvals[numC] = j
 							Carray_kvals[numC] = k
+							Cijk_vals[numC] = tmp_weightval
 							row_weightvals[i] += tmp_weightval
 
 							# Same event, flip left/right descendant states
-							numC += 1
-							Carray_event_types[numC] = "s"
-							Carray_ivals[numC] = i
-							Carray_jvals[numC] = k
-							Carray_kvals[numC] = j
-							row_weightvals[i] += tmp_weightval
-						end # end if tmp_weightval > 0.0
-					end # if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
-					
-					# If the left descendant is of size 1, & different from right, then
-					# jump dispersal
-					if ( (lsize == 1) && (array_in_array(lstate, rstate) == false) )
-						tmp_weightval = j * maxent01jump[ancsize, lsize] * 1.0 * 1.0
-					end
-					
-				end # if ( (ancstate == rstate) )
+							# You won't hit it again, as k >= i
+# 							numC += 1
+# 							Carray_event_types[numC] = "v"
+# 							Carray_ivals[numC] = i
+# 							Carray_jvals[numC] = k
+# 							Carray_kvals[numC] = j
+# 							Cijk_vals[numC] = tmp_weightval
+# 							row_weightvals[i] += tmp_weightval
+						end # end if (tmp_weightval > 0.0)
+					end # end if ( combined_vector == sort(ancstate) )
+				end # end if ( (v>0.0) && ..
+				# End of Vicariance
 			end # end i (right state indices)
 		end # end j (left state indices)
 	end # end i (ancestor state indices)
 	
-	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Carray_event_types=Carray_event_types)
+	TF = Carray_event_types .!= ""
+	Carray_ivals = Carray_ivals[TF]
+	Carray_jvals = Carray_jvals[TF]
+	Carray_kvals = Carray_kvals[TF]
+	Cijk_vals = Cijk_vals[TF]
+	Carray_event_types = Carray_event_types[TF]
+	
+	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_vals=Cijk_vals, Carray_event_types=Carray_event_types, row_weightvals=row_weightvals)
 	
 	"""
 	# Extract the values
@@ -366,7 +486,10 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, params=(y=1.0,s=1.0,v
 	Carray_jvals = Carray.Carray_jvals;
 	Carray_kvals = Carray.Carray_kvals;
 	Carray_event_types = Carray.Carray_event_types;
-	hcat(Carray_ivals, Carray_jvals, Carray_kvals, Carray_event_types)
+	Cijk_vals = Carray.Cijk_vals;
+	row_weightvals = Carray.row_weightvals
+	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_vals)
+	row_weightvals
 	"""
 	
 	return Carray
