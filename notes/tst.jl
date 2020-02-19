@@ -76,18 +76,24 @@ module Tst
 	maxent_constraint_01 = 0.5
 	maxent01vic = Tmp.relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
-	predeclare_array_length=10000000
+
 	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 
 	# Extract the values
+	Carray_event_types = Carray.Carray_event_types;
 	Carray_ivals = Carray.Carray_ivals;
 	Carray_jvals = Carray.Carray_jvals;
 	Carray_kvals = Carray.Carray_kvals;
-	Carray_event_types = Carray.Carray_event_types;
+	Cijk_weights = Carray.Cijk_weights;
 	Cijk_vals = Carray.Cijk_vals;
 	row_weightvals = Carray.row_weightvals;
-	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_vals)
+	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals)
 	row_weightvals
+	
+	df = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals);
+
+	showall(df, true)
+	by(df, :event, nrow)
 
 	# DEC+J
 	Cparams.j = 0.1
@@ -97,33 +103,61 @@ module Tst
 	Cparams
 	Carray = Tmp.setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 
+	Carray_event_types = Carray.Carray_event_types;
 	Carray_ivals = Carray.Carray_ivals;
 	Carray_jvals = Carray.Carray_jvals;
 	Carray_kvals = Carray.Carray_kvals;
-	Carray_event_types = Carray.Carray_event_types;
+	Cijk_weights = Carray.Cijk_weights;
 	Cijk_vals = Carray.Cijk_vals;
 	row_weightvals = Carray.row_weightvals;
-	df = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_vals);
-	showall(df, true)
-	by(df, :event, nrow)
-	
-	function sumy(x)
-		sum(x .== "y")
-	end
-	function sums(x)
-		sum(x .== "s")
-	end
-	function sumv(x)
-		sum(x .== "v")
-	end
-	function sumj(x)
-		sum(x .== "j")
-	end
-	
-	by(df, :i, ysum = :event => sumy, ssum = :event => sums, vsum = :event => sumv, jsum = :event => sumj) 
+	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals)
 	row_weightvals
+	
+	df = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals);
+	showall(df, true)
+	
+	
+	by(df, :event, nrow)
+		
+	by(df, :i, ysum = :event => Tmp.sumy, ssum = :event => Tmp.sums, vsum = :event => Tmp.sumv, jsum = :event => Tmp.sumj) 
 
-	# your other test code here
+	by(df, :i, :prob => sum)
+	
+	
+	
+	# Update the parameter values
+	Cparams.j = 0.3;
+	Cparams.y = (3.0-Cparams.j) / 3.0;
+	Cparams.s = (3.0-Cparams.j) / 3.0;
+	Cparams.v = (3.0-Cparams.j) / 3.0;
+	
+	Carray2 = Tmp.update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams);
+	Carray_event_types = Carray2.Carray_event_types;
+	Carray_ivals = Carray2.Carray_ivals;
+	Carray_jvals = Carray2.Carray_jvals;
+	Carray_kvals = Carray2.Carray_kvals;
+	Cijk_weights = Carray2.Cijk_weights;
+	Cijk_vals = Carray2.Cijk_vals;
+	row_weightvals = Carray2.row_weightvals;
+	df2 = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals)
+	by(df2, :i, :prob => sum)
+	
 
-
-end
+	Cparams.j = 1.0;
+	Cparams.y = (3.0-Cparams.j) / 3.0;
+	Cparams.s = (3.0-Cparams.j) / 3.0;
+	Cparams.v = (3.0-Cparams.j) / 3.0;
+	
+	Carray3 = Tmp.update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams);
+	Carray_event_types = Carray3.Carray_event_types;
+	Carray_ivals = Carray3.Carray_ivals;
+	Carray_jvals = Carray3.Carray_jvals;
+	Carray_kvals = Carray3.Carray_kvals;
+	Cijk_weights = Carray3.Cijk_weights;
+	Cijk_vals = Carray3.Cijk_vals;
+	row_weightvals = Carray3.row_weightvals;
+	df3 = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals)
+	by(df3, :i, :prob => sum)
+	
+	
+end # End of module

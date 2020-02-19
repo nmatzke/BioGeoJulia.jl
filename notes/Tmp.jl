@@ -1,9 +1,9 @@
 module Tmp
 using BioGeoJulia.TrUtils # for flat2() (similar to unlist)
-
+using DataFrames          # for DataFrame()
 
 # (1) List all function names here:
-export say_hello, CparamsStructure, default_Cparams, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat
+export say_hello, CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat, update_Cijk_vals
 
 
 #######################################################
@@ -59,6 +59,25 @@ function default_Cparams()
 	j = 0.0
 	Cparams = CparamsStructure(y, s, v, j)
 end
+
+
+
+function sumy(x)
+	sum(x .== "y")
+end
+
+function sums(x)
+	sum(x .== "s")
+end
+
+function sumv(x)
+	sum(x .== "v")
+end
+
+function sumj(x)
+	sum(x .== "j")
+end
+
 
 
 """
@@ -288,7 +307,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 	Carray_ivals = collect(repeat([0], predeclare_array_length))
 	Carray_jvals = collect(repeat([0], predeclare_array_length))
 	Carray_kvals = collect(repeat([0], predeclare_array_length))
-	Cijk_vals = collect(repeat([0.0], predeclare_array_length))
+	Cijk_weights = collect(repeat([0.0], predeclare_array_length))
 	Carray_event_types = collect(repeat([""], predeclare_array_length))
 	numC = 0 # counter of the number of allow cladogenesis events
 	
@@ -338,7 +357,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 							Carray_ivals[numC] = i
 							Carray_jvals[numC] = j
 							Carray_kvals[numC] = k
-							Cijk_vals[numC] = tmp_weightval
+							Cijk_weights[numC] = tmp_weightval
 							row_weightvals[i] += tmp_weightval
 						end # end if tmp_weightval > 0.0
 					end # end if (ancstate == lstate == rstate)
@@ -363,7 +382,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 								Carray_ivals[numC] = i
 								Carray_jvals[numC] = j
 								Carray_kvals[numC] = k
-								Cijk_vals[numC] = tmp_weightval
+								Cijk_weights[numC] = tmp_weightval
 								row_weightvals[i] += tmp_weightval
 
 								# Same event, flip left/right descendant states
@@ -372,7 +391,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 								Carray_ivals[numC] = i
 								Carray_jvals[numC] = k
 								Carray_kvals[numC] = j
-								Cijk_vals[numC] = tmp_weightval
+								Cijk_weights[numC] = tmp_weightval
 								row_weightvals[i] += tmp_weightval
 							end # end if tmp_weightval > 0.0
 						end # end if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
@@ -419,7 +438,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 								Carray_ivals[numC] = i
 								Carray_jvals[numC] = j
 								Carray_kvals[numC] = k
-								Cijk_vals[numC] = tmp_weightval
+								Cijk_weights[numC] = tmp_weightval
 								row_weightvals[i] += tmp_weightval
 
 								# Same event, flip left/right descendant states
@@ -428,7 +447,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 								Carray_ivals[numC] = i
 								Carray_jvals[numC] = k
 								Carray_kvals[numC] = j
-								Cijk_vals[numC] = tmp_weightval
+								Cijk_weights[numC] = tmp_weightval
 								row_weightvals[i] += tmp_weightval
 					
 							end # if (tmp_weightval > 0.0)
@@ -451,7 +470,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 							Carray_ivals[numC] = i
 							Carray_jvals[numC] = j
 							Carray_kvals[numC] = k
-							Cijk_vals[numC] = tmp_weightval
+							Cijk_weights[numC] = tmp_weightval
 							row_weightvals[i] += tmp_weightval
 
 							# Same event, flip left/right descendant states
@@ -461,7 +480,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 # 							Carray_ivals[numC] = i
 # 							Carray_jvals[numC] = k
 # 							Carray_kvals[numC] = j
-# 							Cijk_vals[numC] = tmp_weightval
+# 							Cijk_weights[numC] = tmp_weightval
 # 							row_weightvals[i] += tmp_weightval
 						end # end if (tmp_weightval > 0.0)
 					end # end if ( combined_vector == sort(ancstate) )
@@ -475,25 +494,218 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 	Carray_ivals = Carray_ivals[TF]
 	Carray_jvals = Carray_jvals[TF]
 	Carray_kvals = Carray_kvals[TF]
-	Cijk_vals = Cijk_vals[TF]
+	Cijk_weights = Cijk_weights[TF]
 	Carray_event_types = Carray_event_types[TF]
 	
-	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_vals=Cijk_vals, Carray_event_types=Carray_event_types, row_weightvals=row_weightvals)
+	# Convert the weights to conditional event probabilities
+	num_clado_events = length(Cijk_weights)
+	Cijk_vals = collect(repeat([0.0], num_clado_events))
+	for i in 1:length(states_list)
+		TF = Carray_ivals .== i
+		Cijk_vals[TF] = Cijk_weights[TF] ./ row_weightvals[i]
+	end
+
+	
+	Carray = (Carray_event_types=Carray_event_types, Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_weights=Cijk_weights, Cijk_vals=Cijk_vals, row_weightvals=row_weightvals)
 	
 	"""
 	# Extract the values
+	Carray_event_types = Carray.Carray_event_types;
 	Carray_ivals = Carray.Carray_ivals;
 	Carray_jvals = Carray.Carray_jvals;
 	Carray_kvals = Carray.Carray_kvals;
-	Carray_event_types = Carray.Carray_event_types;
+	Cijk_weights = Carray.Cijk_weights;
 	Cijk_vals = Carray.Cijk_vals;
 	row_weightvals = Carray.row_weightvals
-	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_vals)
+	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals)
 	row_weightvals
 	"""
 	
 	return Carray
 end
+
+
+
+#######################################################
+# Update the Cijk_vals
+#######################################################
+function update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))) )
+
+	Carray_ivals = Carray.Carray_ivals;
+	Carray_jvals = Carray.Carray_jvals;
+	Carray_kvals = Carray.Carray_kvals;
+	Carray_event_types = Carray.Carray_event_types;
+	Cijk_weights = Carray.Cijk_weights;
+	Cijk_vals = Carray.Cijk_vals;
+	row_weightvals = Carray.row_weightvals
+
+	numstates = length(states_list)
+	
+	maxent01symp = maxent01.maxent01symp
+	maxent01sub = maxent01.maxent01sub
+	maxent01vic = maxent01.maxent01vic
+	maxent01jump = maxent01.maxent01jump
+	
+	# Weights
+	y_wt = Cparams.y
+	s_wt = Cparams.s
+	v_wt = Cparams.v
+	j_wt = Cparams.j
+	
+	# Update the "y" events (narrow sympatry / range-copying)
+	TF = Carray_event_types .== "y"
+	if (sum(TF) > 0)
+		ivals = Carray_ivals[TF]
+		jvals = Carray_jvals[TF]
+		kvals = Carray_kvals[TF]
+		weights = Cijk_weights[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			k = kvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			lstate = states_list[j]
+			lsize = length(lstate)
+			rstate = states_list[k]
+			rsize = length(rstate)
+			weights[z] = y_wt * maxent01symp[ancsize, lsize] * 1.0 * 1.0
+		end
+		Cijk_weights[TF] = weights
+	end # End update of y event weights
+
+
+	# Update the "s" events (subset sympatry)
+	TF = Carray_event_types .== "s"
+	if (sum(TF) > 0)
+		ivals = Carray_ivals[TF]
+		jvals = Carray_jvals[TF]
+		kvals = Carray_kvals[TF]
+		weights = Cijk_weights[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			k = kvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			lstate = states_list[j]
+			lsize = length(lstate)
+			rstate = states_list[k]
+			rsize = length(rstate)
+			weights[z] = s_wt * maxent01sub[ancsize, lsize] * 1.0 * 1.0
+		end
+		Cijk_weights[TF] = weights
+	end # End update of s event weights
+
+	# Update the "v" events (vicariance)
+	TF = Carray_event_types .== "v"
+	if (sum(TF) > 0)
+		ivals = Carray_ivals[TF]
+		jvals = Carray_jvals[TF]
+		kvals = Carray_kvals[TF]
+		weights = Cijk_weights[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			k = kvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			lstate = states_list[j]
+			lsize = length(lstate)
+			rstate = states_list[k]
+			rsize = length(rstate)
+			smaller_range_size = min(lsize, rsize)
+			weights[z] = v_wt * maxent01vic[ancsize,smaller_range_size] * 1.0 * 1.0
+		end
+		Cijk_weights[TF] = weights
+	end # End update of s event weights
+	
+	# Update the "j" events (jump dispersal)
+	TF = Carray_event_types .== "v"
+	if (sum(TF) > 0)
+		ivals = Carray_ivals[TF]
+		jvals = Carray_jvals[TF]
+		kvals = Carray_kvals[TF]
+		weights = Cijk_weights[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			k = kvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			lstate = states_list[j]
+			lsize = length(lstate)
+			rstate = states_list[k]
+			rsize = length(rstate)
+			
+			# j events, modified by distance / multipliers (via input "dmat") if needed
+			try_jump_dispersal_based_on_dist = true
+			normalize_by_number_of_dispersal_events = true
+			jweight_for_cell_based_on_distances = 0.0
+			if (try_jump_dispersal_based_on_dist == true)
+				for anc_area in ancstate
+					for left_area in lstate
+						 jweight_for_cell_based_on_distances += dmat[anc_area,left_area]
+					end
+				end
+				# Normalize by number of possible jump dispersals
+				if (normalize_by_number_of_dispersal_events == true)
+					jweight_for_cell_based_on_distances = jweight_for_cell_based_on_distances / (ancsize * lsize)
+				end
+			else
+				# 
+				jweight_for_cell_based_on_distances = 1.0
+			end # end if (try_jump_dispersal_based_on_dist == true)
+	
+			# Calculate the final weight of this jump dispersal
+			tmp_weightval = j_wt * maxent01jump[ancsize, lsize] * 1.0 * 1.0 * jweight_for_cell_based_on_distances
+			weights[z] = tmp_weightval
+		end
+		Cijk_weights[TF] = weights
+	end # End update of s event weights
+
+	df1 = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals);
+	
+	row_weightvals_df = by(df1, :i, :weight => sum)
+	row_weightvals = row_weightvals_df[!,2]
+	
+	# If i=1 is missing from row_weightvals_df, add it to row_weightvals
+	if (in(1, row_weightvals_df[!,1]) == false)
+		row_weightvals = cat([1], row_weightvals_df[!,2]; dims=1)
+	end
+	row_weightvals
+	
+	# Convert the weights to conditional event probabilities
+	num_clado_events = length(Cijk_weights)
+	Cijk_vals = collect(repeat([0.0], num_clado_events))
+	for i in 1:length(states_list)
+		TF = Carray_ivals .== i
+		Cijk_vals[TF] = Cijk_weights[TF] ./ row_weightvals[i]
+	end
+
+	df2 = DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals);
+	row_weightvals_df = by(df2, :i, :weight => sum)
+	
+	# Finally, return updated Carray:
+	Carray = (Carray_event_types=Carray_event_types, Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_weights=Cijk_weights, Cijk_vals=Cijk_vals, row_weightvals=row_weightvals)
+
+	"""
+	# Extract the values
+	Carray_event_types = Carray.Carray_event_types;
+	Carray_ivals = Carray.Carray_ivals;
+	Carray_jvals = Carray.Carray_jvals;
+	Carray_kvals = Carray.Carray_kvals;
+	Cijk_weights = Carray.Cijk_weights;
+	Cijk_vals = Carray.Cijk_vals;
+	row_weightvals = Carray.row_weightvals;
+	DataFrame(event=Carray_event_types, i=Carray_ivals, j=Carray_jvals, k=Carray_kvals, weight=Cijk_weights, prob=Cijk_vals)
+	row_weightvals
+	"""
+
+	return Carray
+end
+
+
 
 
 
