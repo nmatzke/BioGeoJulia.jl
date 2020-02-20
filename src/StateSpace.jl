@@ -673,16 +673,6 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 					starting_areanums = starting_state
 					ending_areanums = ending_state
 					start_areanums_not_found_in_end_areas = setdiff(starting_areanums, ending_areanums)
-					print("\n")
-					print("starting_areanums")
-					print(starting_areanums)
-					print("\n")
-					print("ending_areanums")
-					print(ending_areanums)
-					print("\n")
-					print("start_areanums_not_found_in_end_areas")
-					print(start_areanums_not_found_in_end_areas)
-					print("\n")
 					if length(start_areanums_not_found_in_end_areas) == 1
 						# Add to arrays
 						index += 1
