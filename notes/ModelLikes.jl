@@ -43,7 +43,7 @@ say_hello2() = println("Hello dude2!")
 
 
 function setup_DEC_SSE(tr=readTopology("((chimp:1,human:1):1,gorilla:2);"), numareas=2)
-	areas_list = [1:numareas]
+	areas_list = [1,2]
 	states_list = areas_list_to_states_list(areas_list, numareas, false)
 	Cparams = default_Cparams()
 	max_numareas = length(areas_list)

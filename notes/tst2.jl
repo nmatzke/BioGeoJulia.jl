@@ -28,8 +28,10 @@ module Tst2
 	
 	using DataFrames  # for DataFrame
 	using PhyloNetworks
+	using BioGeoJulia.TrUtils # for flat2() (similar to unlist)
 	using BioGeoJulia.StateSpace
 	using BioGeoJulia.TreePass
+	using BioGeoJulia.SSEs
 
 	ModelLikes.say_hello2()
 	

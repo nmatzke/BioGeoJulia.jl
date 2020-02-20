@@ -1,5 +1,5 @@
 module TreePass
-using BioGeoJulia.TrUtils 
+using BioGeoJulia.TrUtils # for e.g. flat2
 using BioGeoJulia.SSEs 
 using DataFrames			# for e.g. DataFrame()
 using PhyloNetworks		# for e.g. readTopology()
