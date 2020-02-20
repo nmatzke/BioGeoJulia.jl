@@ -43,7 +43,11 @@ module Tst2
 	# 4. maximum likelihood (or speed tests)
 	#######################################################
 	
-	ModelLikes.setup_DEC_SSE()
+	ModelLikes.setup_DEC_SSE(2)
+	ModelLikes.setup_DEC_SSE(4)
+	ModelLikes.setup_DEC_SSE(10)
+	ModelLikes.setup_DEC_SSE(20)
+	ModelLikes.setup_DEC_SSE(100)
 	
 	
 	

@@ -18,6 +18,12 @@ using LSODA          # for lsoda()
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
 using Distributed     # for @spawn
+using Distributions  # for quantile
+using Convex				 # for Convex.entropy(), maximize()
+using SCS						 # for SCSSolve, solve (maximize(entropy()))
+using Combinatorics  # for e.g. combinations()
+using DataFrames     # for e.g. DataFrame()
+
 using Random					# for MersenneTwister()
 using Dates						# for e.g. DateTime, Dates.now()
 using DifferentialEquations # for ODEProblem (THE SLOWEST ONE)
