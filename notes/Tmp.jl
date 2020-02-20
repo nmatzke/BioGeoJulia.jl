@@ -522,7 +522,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 	"""
 	
 	return Carray
-end
+end # end setup_DEC_Cmat()
 
 
 
@@ -703,7 +703,7 @@ function update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams=def
 	"""
 
 	return Carray
-end
+end # end update_Cijk_vals()
 
 
 
