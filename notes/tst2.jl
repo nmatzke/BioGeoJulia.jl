@@ -22,6 +22,7 @@ include("tst2.jl")
 #######################################################
 
 module Tst2
+	cd("/GitHub/BioGeoJulia.jl/notes/")
 	include("ModelLikes.jl")
 	import .ModelLikes
 	#using .Tmp
