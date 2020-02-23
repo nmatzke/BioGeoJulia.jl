@@ -1090,6 +1090,10 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 	# i = ancestor state index
 	# j = left state index
 	# k = right state index
+	
+	# Preallocate this vector ONCE, size = numareas * 2
+	tmp_merged_vec = repeat([0], 2*numareas)
+	
 	for i in 1:numstates
 		ancstate = states_list[i]
 		ancsize = length(ancstate)
@@ -1232,12 +1236,14 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 			
 				# Vicariance
 				if (v_wt > min_precision)
-					# Check if the combined vector equals the ancestor vector
-					tmp_merged_vec = repeat([0], length(lstate)+length(rstate))
+					# Check if the combined vector equals the ancestor vector					
+					tmp_merged_vec .= repeat([0], 2*numareas)
+					combined_size = length(lstate)+length(rstate)
+					
 					tmp_merged_vec[1:length(lstate)] = lstate
 					tmp_merged_vec[(length(lstate)+1):(length(lstate)+length(rstate))] = rstate
-					combined_vector = sort(tmp_merged_vec)
-					if ( combined_vector == sort(ancstate) )
+					#combined_vector = sort(tmp_merged_vec)
+					if ( sort(tmp_merged_vec[1:combined_size]) == sort(ancstate) )
 						smaller_range_size = min(lsize, rsize)
 						tmp_weightval = v_wt * maxent01vic[ancsize,smaller_range_size] * 1.0 * 1.0
 						if (tmp_weightval > min_precision)
