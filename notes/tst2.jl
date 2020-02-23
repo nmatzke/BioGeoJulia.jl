@@ -26,7 +26,7 @@ module Tst2
 	import .ModelLikes
 	#using .Tmp
 	
-	using Profile     for @profile
+	using Profile     # for @profile
 	using DataFrames  # for DataFrame
 	using PhyloNetworks
 	using BioGeoJulia.TrUtils # for flat2() (similar to unlist)
@@ -89,7 +89,7 @@ module Tst2
 	numstates_vec = repeat([0.0], length(numareas_vec))
 	calctimes = repeat([0.0], length(numareas_vec))
 	ind=1
-	for ind in 1:length(numareas_vec)
+#	for ind in 1:length(numareas_vec)
 		numareas = numareas_vec[ind]
 		areas_list = collect(1:numareas)
 		
@@ -103,6 +103,8 @@ module Tst2
 		trdf = inputs.trdf
 		solver_options = inputs.solver_options
 		p_Ds_v5 = inputs.p_Ds_v5
+
+		(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
 
 		@profile (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
 		Profile.print()
