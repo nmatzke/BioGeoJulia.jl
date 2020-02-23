@@ -49,10 +49,36 @@ module Tst2
 # 	ModelLikes.setup_DEC_SSE(20)
 # 	ModelLikes.setup_DEC_SSE(100)
 	
+	# Update Qij_vals
+	numareas = 3
+	areas_list = collect(1:numareas)
+	states_list = areas_list_to_states_list(areas_list, 3, true)
+	numstates = length(states_list)
+	amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
+	dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
+	elist = repeat([0.123], numstates)
+	allowed_event_types=["d","e"]
+
+	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+	Qarray_ivals = Qmat.Qarray_ivals
+	Qarray_jvals = Qmat.Qarray_jvals
+	Qij_vals = Qmat.Qij_vals
+	event_type_vals = Qmat.event_type_vals
+	Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+
+	# Update!
+	dmat = reshape(repeat([0.5], numareas^2), (numareas,numareas))
+	Qmat2 = ModelLikes.update_Qij_vals(Qmat, areas_list, states_list, dmat, elist, amat )
+	Qmat2
 	
+	Qarray_ivals = Qmat2.Qarray_ivals
+	Qarray_jvals = Qmat2.Qarray_jvals
+	Qij_vals = Qmat2.Qij_vals
+	event_type_vals = Qmat2.event_type_vals
+	Qmat2_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
 	
-	
-	
+	Qmat1_df
+	Qmat2_df
 end # End of module Tst2
 
 

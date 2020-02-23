@@ -1,6 +1,5 @@
 module StateSpace
 using BioGeoJulia.TrUtils # for e.g. flat2
-using Distributions  # for e.g. uniform
 using Combinatorics  # for e.g. combinations()
 using DataFrames     # for e.g. DataFrame()
 using PhyloNetworks
@@ -14,7 +13,7 @@ using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
 
-export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat, update_Cijk_vals
+export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat, update_Cijk_vals
 
 
 
@@ -710,6 +709,140 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 end # end setup_DEC_DEmat()
 
 
+
+
+
+
+"""
+# Update Qij_vals
+numareas = 3
+areas_list = collect(1:numareas)
+states_list = areas_list_to_states_list(areas_list, 3, true)
+numstates = length(states_list)
+amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
+dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
+elist = repeat([0.123], numstates)
+allowed_event_types=["d","e"]
+
+Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+Qarray_ivals = Qmat.Qarray_ivals
+Qarray_jvals = Qmat.Qarray_jvals
+Qij_vals = Qmat.Qij_vals
+event_type_vals = Qmat.event_type_vals
+Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+
+# Update!
+dmat = reshape(repeat([0.5], numareas^2), (numareas,numareas))
+Qmat2 = update_Qij_vals(Qmat, areas_list, states_list, dmat, elist, amat )
+Qmat2
+
+Qarray_ivals = Qmat2.Qarray_ivals
+Qarray_jvals = Qmat2.Qarray_jvals
+Qij_vals = Qmat2.Qij_vals
+event_type_vals = Qmat2.event_type_vals
+Qmat2_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+
+Qmat1_df
+Qmat2_df
+
+"""
+function update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))), elist=repeat([1.0], length(areas_list)), amat=dmat )
+
+	numstates = length(states_list)
+	statenums = collect(1:numstates)
+	range_sizes = length.(states_list)
+	#areas_list = sort(unique(flat2(states_list)))
+	numareas = length(areas_list)
+
+	Qarray_ivals = Qmat.Qarray_ivals
+	Qarray_jvals = Qmat.Qarray_jvals
+	Qij_vals = Qmat.Qij_vals
+	event_type_vals = Qmat.event_type_vals
+
+	# Update the "d" events (anagenetic range expansion)
+	TF = event_type_vals .== "d"
+	if (sum(TF) > 0)
+		ivals = Qarray_ivals[TF]
+		jvals = Qarray_jvals[TF]
+		rates = Qij_vals[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			decstate = states_list[j]
+			decsize = length(decstate)
+			
+			starting_areanums = ancstate
+			ending_areanums = decstate
+			end_areanums_not_found_in_start_areas = setdiff(ending_areanums, starting_areanums)
+			
+			# Add up the d events
+			tmp_d_sum = 0.0
+			for k in 1:ancsize
+				# Because there is only 1 end_areanums_not_found_in_start_areas
+				tmp_d_sum += dmat[starting_areanums[k], end_areanums_not_found_in_start_areas[1]][]
+			end
+			# Store the result
+			rates[z] = tmp_d_sum
+		end
+		Qij_vals[TF] = rates
+	end # End update of d event weights
+
+
+	# Update the "a" events (anagenetic range expansion)
+	TF = event_type_vals .== "a"
+	if (sum(TF) > 0)
+		ivals = Qarray_ivals[TF]
+		jvals = Qarray_jvals[TF]
+		rates = Qij_vals[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			decstate = states_list[j]
+			decsize = length(decstate)
+			
+			starting_areanum = ancstate # because it has size=1 by def.
+			ending_areanum = decstate   # because it has size=1 by def.
+
+			# Store the result
+			rates[z] = amat[starting_areanum,ending_areanum]
+		end
+		Qij_vals[TF] = rates
+	end # End update of a event weights
+
+	# Update the "e" events (anagenetic range extinction/
+	# local extirpation/range loss)
+	TF = event_type_vals .== "e"
+	if (sum(TF) > 0)
+		ivals = Qarray_ivals[TF]
+		jvals = Qarray_jvals[TF]
+		rates = Qij_vals[TF]
+		for z in 1:sum(TF)
+			i = ivals[z]
+			j = jvals[z]
+			ancstate = states_list[i]
+			ancsize = length(ancstate)
+			decstate = states_list[j]
+			decsize = length(decstate)
+			
+			starting_areanums = ancstate
+			ending_areanums = decstate
+			start_areanums_not_found_in_end_areas = setdiff(starting_areanums, ending_areanums)
+
+			# Store the result
+			rates[z] = elist[start_areanums_not_found_in_end_areas[1]]
+		end
+		Qij_vals[TF] = rates
+	end # End update of a event weights
+
+	# Return results
+	# Return results
+	Qmat2 = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, event_type_vals=event_type_vals)
+	return Qmat2
+end # end function update_Qij_vals
 
 
 

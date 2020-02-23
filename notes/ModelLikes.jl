@@ -22,7 +22,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello2
+export say_hello2, setup_DEC_SSE
 
 #######################################################
 # Temporary file to store functions under development
@@ -43,6 +43,10 @@ include("tst2.jl")
 #######################################################
 
 say_hello2() = println("Hello dude2!")
+
+
+
+
 
 
 function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"))
