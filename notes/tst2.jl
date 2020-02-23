@@ -45,9 +45,9 @@ module Tst2
 	
 	ModelLikes.setup_DEC_SSE(2)
 	ModelLikes.setup_DEC_SSE(4)
-	ModelLikes.setup_DEC_SSE(10)
-	ModelLikes.setup_DEC_SSE(20)
-	ModelLikes.setup_DEC_SSE(100)
+# 	ModelLikes.setup_DEC_SSE(10)
+# 	ModelLikes.setup_DEC_SSE(20)
+# 	ModelLikes.setup_DEC_SSE(100)
 	
 	
 	

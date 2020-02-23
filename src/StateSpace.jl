@@ -1,5 +1,6 @@
 module StateSpace
 using BioGeoJulia.TrUtils # for e.g. flat2
+using Distributions  # for e.g. uniform
 using Combinatorics  # for e.g. combinations()
 using DataFrames     # for e.g. DataFrame()
 using PhyloNetworks

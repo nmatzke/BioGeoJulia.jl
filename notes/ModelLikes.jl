@@ -5,6 +5,7 @@
 
 module ModelLikes
 
+print("\n\nStarting module 'ModelLikes'...loading dependencies...\n")
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
 using LSODA
