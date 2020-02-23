@@ -171,7 +171,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	res_orig.likes_at_each_nodeIndex_branchTop
 
 	solver_options = construct_SolverOpt()
-	solver_options.solver=Tsit5()
+	solver_options.solver=lsoda()
 	solver_options.save_everystep = false
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
