@@ -6,14 +6,14 @@
 # FIRST TIME:
 # "enables automatic tracing of compiler activity through adding itself to the startup.jl file."
 using Pkg
-Pkg.add("https://github.com/TsurHerman/Fezzik")
+Pkg.add(PackageSpec(url="https://github.com/TsurHerman/Fezzik"))
 using Fezzik
 Fezzik.auto_trace()
 
 # CLOSE, THEN OPEN JULIA:
 using Fezzik
 using Pkg
-using Revise
+#using Revise
 using LSODA          # for lsoda()
 using BenchmarkTools # for @time
 using InvertedIndices # for Not

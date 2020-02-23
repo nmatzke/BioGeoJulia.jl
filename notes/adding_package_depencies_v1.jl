@@ -7,6 +7,8 @@ pkg> comes up...
 
 activate .
 add LSODA
+add Distributions
+add PhyloNetworks
 resolve
 
 # Changes to .toml files appear on GitHub

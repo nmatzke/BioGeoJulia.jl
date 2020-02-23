@@ -16,7 +16,16 @@ Pkg.add("DifferentialEquations")  # for e.g. ODEProblem
 Pkg.add("Random")  # for MersenneTwister()
 
 # BioSequences before PhyloNetworks
-# https://github.com/BioJulia/BioSequences.jl
+# 
+Pkg.add(Pkg.PackageSpec(url="https://github.com/BioJulia/BioSymbols.jl"))
+Pkg.add(Pkg.PackageSpec(url="https://github.com/BioJulia/BioGenerics.jl"))
+Pkg.add(Pkg.PackageSpec(url="https://github.com/BioJulia/BioSequences.jl"))
+Pkg.add(Pkg.PackageSpec(url="https://github.com/crsl4/PhyloNetworks.jl"))
+using BioSymbols
+using BioGenerics
+using BioSequences
+using PhyloNetworks
+
 ]
 registry add https://github.com/BioJulia/BioJuliaRegistry.git
 add BioSequences
