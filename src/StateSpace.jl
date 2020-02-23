@@ -1308,7 +1308,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 					#tmp_merged_vec[1:length(lstate)] = lstate
 					#tmp_merged_vec[(length(lstate)+1):(length(lstate)+length(rstate))] = rstate
 					#combined_vector = sort(tmp_merged_vec)
-					if ( is_event_vicariance(ancstate, lstate, rstate )
+					if ( is_event_vicariance(ancstate, lstate, rstate) )
 						smaller_range_size = min(lsize, rsize)
 						tmp_weightval = v_wt * maxent01vic[ancsize,smaller_range_size] * 1.0 * 1.0
 						if (tmp_weightval > min_precision)
