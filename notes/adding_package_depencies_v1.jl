@@ -8,6 +8,8 @@ pkg> comes up...
 activate .
 add LSODA
 add Distributions
+add Convex
+add SCS
 add PhyloNetworks
 resolve
 
