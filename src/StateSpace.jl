@@ -1233,8 +1233,9 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 				# Vicariance
 				if (v_wt > min_precision)
 					# Check if the combined vector equals the ancestor vector
-					tmp_merged_vec = lstate
-					append!(tmp_merged_vec,rstate)
+					tmp_merged_vec = repeat([0], length(lstate)+length(rstate))
+					tmp_merged_vec[1:length(lstate)] = lstate
+					tmp_merged_vec[(length(lstate)+1):(length(lstate)+length(rstate))] = rstate
 					combined_vector = sort(tmp_merged_vec)
 					if ( combined_vector == sort(ancstate) )
 						smaller_range_size = min(lsize, rsize)
@@ -1447,8 +1448,9 @@ function update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams=def
 	
 	# If i=1 is missing from row_weightvals_df, add it to row_weightvals
 	if (in(1, row_weightvals_df[!,1]) == false)
-		row_weightvals = row_weightvals_df[!,2]
-		row_weightvals = prepend!(row_weightvals, [1])
+		row_weightvals = repeat([0], 1+length(row_weightvals_df[!,2]))
+		row_weightvals[1] = 1
+		row_weightvals[2:length(row_weightvals)] = row_weightvals_df[!,2]
 	end
 	row_weightvals
 	
