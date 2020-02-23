@@ -1188,9 +1188,10 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 				
 				if (y_wt > min_precision)
 					# Sympatry (range-copying)
-# 204:					if (all([lsize == ancsize, rsize==ancsize, lstate==ancstate, rstate==ancstate])
+# 204:
+					if (all([lsize == ancsize, rsize==ancsize, lstate==ancstate, rstate==ancstate])
 
-					if (all([lstate==ancstate, rstate==ancstate]))
+#2244					if (all([lstate==ancstate, rstate==ancstate]))
 						# Check if the weight > 0.0
 						# ancsize, lsize, rsize are the same so we don't have to 
 						# choose the smaller daugher
