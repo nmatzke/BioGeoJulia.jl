@@ -91,13 +91,13 @@ module Tst2
 	numstates_vec = repeat([0.0], length(numareas_vec))
 	calctimes = repeat([0.0], length(numareas_vec))
 	ind=1
-#	for ind in 1:length(numareas_vec)
+	for ind in 1:length(numareas_vec)
 		numareas = numareas_vec[ind]
 		areas_list = collect(1:numareas)
 		
 		inputs = ModelLikes.setup_DEC_SSE(numareas, tr);
-		@profile inputs = ModelLikes.setup_DEC_SSE(numareas, tr);
-		Profile.print()
+# 		@profile inputs = ModelLikes.setup_DEC_SSE(numareas, tr);
+# 		Profile.print()
 		states_list = areas_list_to_states_list(areas_list, length(areas_list), true);
 		numstates = length(states_list);
 
@@ -109,8 +109,8 @@ module Tst2
 
 		(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
 
-		@profile (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
-		Profile.print()
+# 		@profile (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
+# 		Profile.print()
 
 		res.likes_at_each_nodeIndex_branchTop
 		res.sum_likes_at_nodes
