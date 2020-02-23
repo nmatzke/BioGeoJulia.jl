@@ -1188,7 +1188,9 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 				
 				if (y_wt > min_precision)
 					# Sympatry (range-copying)
-					if (ancstate == lstate == rstate)
+# 204:					if (all([lsize == ancsize, rsize==ancsize, lstate==ancstate, rstate==ancstate])
+
+					if (all([lstate==ancstate, rstate==ancstate])
 						# Check if the weight > 0.0
 						# ancsize, lsize, rsize are the same so we don't have to 
 						# choose the smaller daugher
@@ -1203,13 +1205,13 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 							Cijk_weights[numC] = tmp_weightval
 							row_weightvals[i] += tmp_weightval
 						end # end if tmp_weightval > 0.0
-					end # end if (ancstate == lstate == rstate)
+					end # end if (all([lsize == ancsize, rsize==ancsize, lstate==ancstate, rstate==ancstate])
 				end # end if (y_wt > min_precision)
 				
 				# If one of the descendants is identical to the ancestor, 
 				# (after we've excluded sympatry)
 				# we can have jump dispersal or subset speciation
-				if ( (ancstate == rstate) )
+				if ( all([ancsize==rsize, ancstate==rstate]) )
 					# Subset sympatry
 					if (s_wt > min_precision)
 						# Check for subset sympatry: lstate smaller than rstate, lstate inside rstate
