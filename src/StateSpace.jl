@@ -1044,6 +1044,7 @@ Carray = setup_DEC_Cmat(areas_list, states_list, Cparams)
 """
 
 function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))); predeclare_array_length=Integer(min(length(states_list)*length(states_list)*round((length(states_list)/2)), 10000000)), min_precision=1e-9)
+	numareas = length(areas_list)
 	numstates = length(states_list)
 	
 	maxent01symp = maxent01.maxent01symp
