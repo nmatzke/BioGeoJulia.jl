@@ -22,7 +22,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello2, setup_DEC_SSE
+export say_hello2, setup_DEC_SSE, calclike_DEC_SSE
 
 #######################################################
 # Temporary file to store functions under development
@@ -145,12 +145,8 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	# Solutions to the E vector
 	u0_Es = repeat([0.0], 1*n)
 	uE = repeat([0.0], n)
-	tspan = (0.0, 1.2*trdf[tr.root,:node_age]) # 110% of tree root age
+	Es_tspan = (0.0, 1.2*trdf[tr.root,:node_age]) # 110% of tree root age
 
-	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, tspan, p_Es_v5)
-	sol_Es_v5 = solve(prob_Es_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9);
-
-	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, sol_Es_v5=sol_Es_v5, uE=uE)
 
 	#######################################################
 	# Downpass with ClaSSE
@@ -176,40 +172,31 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 
 	solver_options = construct_SolverOpt()
 	solver_options.solver=Tsit5()
+	solver_options.save_everystep = false
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
-	(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
-
-
-	res.likes_at_each_nodeIndex_branchTop
-	res.sum_likes_at_nodes
-	res.logsum_likes_at_nodes
-	log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0])
-	sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
-
-	total_calctime_in_sec
-	iteration_number
-
-
-	print("\n")
-	print(res.likes_at_each_nodeIndex_branchTop)
-	print("\n")
-	print(res.sum_likes_at_nodes)
-	print("\n")
-	print(res.logsum_likes_at_nodes)
-	print("\n")
-	print(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
-	print("\n")
-	print(sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0])))
-	print("\n")
-
-	print(total_calctime_in_sec)
-	print("\n")
-	print(iteration_number)
-	print("\n")
-
 	
-end
+	print("\nSolving the Es once, for the whole tree timespan...")
+	
+	# Solve the Es
+	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, Es_tspan, p_Es_v5)
+
+	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol=1e-9);
+	
+	print("done.\n")
+	
+	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, sol_Es_v5=sol_Es_v5, uE=uE)
+	"""
+	res = inputs.res
+	trdf = inputs.trdf
+	solver_options = inputs.solver_options
+	p_Ds_v5 = inputs.p_Ds_v5
+	"""
+	
+	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5)
+	
+	return inputs
+end # End function setup_DEC_SSE
 
 
 

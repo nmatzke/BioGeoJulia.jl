@@ -79,6 +79,66 @@ module Tst2
 	
 	Qmat1_df
 	Qmat2_df
+
+
+
+	tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
+
+	numareas_vec = [2,3,4,5,6,7,8,9,10]
+	numstates_vec = repeat([0.0], length(numareas_vec))
+	calctimes = repeat([0.0], length(numareas_vec))
+	
+	for ind in 1:length(numareas_vec)
+		numareas = numareas_vec[ind]
+		areas_list = collect(1:numareas)
+		
+		@profile inputs = ModelLikes.setup_DEC_SSE(numareas, tr)
+		states_list = areas_list_to_states_list(areas_list, length(areas_list), true)
+		numstates = length(states_list)
+
+		res = inputs.res
+		trdf = inputs.trdf
+		solver_options = inputs.solver_options
+		p_Ds_v5 = inputs.p_Ds_v5
+
+		@profile (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
+
+
+		res.likes_at_each_nodeIndex_branchTop
+		res.sum_likes_at_nodes
+		res.logsum_likes_at_nodes
+		log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0])
+		sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
+
+		total_calctime_in_sec
+		iteration_number
+
+
+# 		print("\n")
+# 		print(res.likes_at_each_nodeIndex_branchTop)
+# 		print("\n")
+# 		print(res.sum_likes_at_nodes)
+# 		print("\n")
+# 		print(res.logsum_likes_at_nodes)
+# 		print("\n")
+		print(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0]))
+		print("\n")
+		print(sum(log.(res.sum_likes_at_nodes[res.sum_likes_at_nodes.!=0.0])))
+		print("\n")
+
+		print("DEC-SSE total_calctime_in_sec:")
+		print(total_calctime_in_sec)
+		print("\n")
+		numstates_vec[ind] = numstates
+		calctimes[ind] = total_calctime_in_sec
+
+	end
+	
+	print("\n\nAll calculation times:\n")
+	calctimes_df = DataFrame(numareas=numareas_vec, numstates=numstates_vec, time=calctimes)
+	print(calctimes_df)
+
+
 end # End of module Tst2
 
 

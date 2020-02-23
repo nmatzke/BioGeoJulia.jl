@@ -1233,7 +1233,8 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 				# Vicariance
 				if (v_wt > min_precision)
 					# Check if the combined vector equals the ancestor vector
-					combined_vector = sort(cat(lstate,rstate; dims=1))
+					tmp_merged_vec = cat(lstate,rstate; dims=1)
+					combined_vector = sort(tmp_merged_vec)
 					if ( combined_vector == sort(ancstate) )
 						smaller_range_size = min(lsize, rsize)
 						tmp_weightval = v_wt * maxent01vic[ancsize,smaller_range_size] * 1.0 * 1.0
