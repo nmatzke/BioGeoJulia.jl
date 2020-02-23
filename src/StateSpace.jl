@@ -13,7 +13,7 @@ using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
 
-export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, setup_DEC_Cmat, update_Cijk_vals
+export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, setup_DEC_Cmat, update_Cijk_vals
 
 
 
@@ -1009,6 +1009,70 @@ function array_in_array(items, collection)
 end
 
 
+
+
+
+
+"""
+ancstate = [1, 2, 3,4];
+lstate = [1, 2];
+rstate = [4];
+is_event_vicariance(ancstate, lstate, rstate)
+
+
+ancstate = [1, 2, 3,4];
+lstate = [1, 2];
+rstate = [2, 4];
+is_event_vicariance(ancstate, lstate, rstate)
+
+ancstate = [1, 2, 3,4];
+lstate = [1, 2];
+rstate = [3, 4];
+is_event_vicariance(ancstate, lstate, rstate)
+
+"""
+
+
+function is_event_vicariance(ancstate, lstate, rstate)
+	ancsize = length(ancstate)
+	lsize = length(lstate)
+	rsize = length(rstate)
+	
+	if (ancsize != lsize+rsize)
+		return false
+	end
+	
+	# If any lstate areas are in rstate, then not vicariance
+	for i in 1:lsize
+		if in(lstate[i], rstate)
+			return false
+		end
+	end
+	
+	# If any lstate areas not in ancstate, then not vicariance
+	for i in 1:lsize
+		if in(lstate[i], ancstate) == false
+			return false
+		end
+	end
+
+	# If any rstate areas not in ancstate, then not vicariance
+	for i in 1:rsize
+		if in(rstate[i], ancstate) == false
+			return false
+		end
+	end
+	
+	# Otherwise, vicariance
+	return true
+	
+end
+
+
+
+
+
+
 """
 areas_list = [1,2,3]
 states_list = areas_list_to_states_list(areas_list, 3, true)
@@ -1093,7 +1157,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 	# k = right state index
 	
 	# Preallocate this vector ONCE, size = numareas * 2
-	tmp_merged_vec = repeat([0], 2*numareas)
+	#tmp_merged_vec = repeat([0], 2*numareas)
 	
 	for i in 1:numstates
 		ancstate = states_list[i]
@@ -1238,13 +1302,13 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 				# Vicariance
 				if (v_wt > min_precision)
 					# Check if the combined vector equals the ancestor vector					
-					tmp_merged_vec .= repeat([0], 2*numareas)
-					combined_size = length(lstate)+length(rstate)
+					#tmp_merged_vec .= repeat([0], 2*numareas)
+					#combined_size = length(lstate)+length(rstate)
 					
-					tmp_merged_vec[1:length(lstate)] = lstate
-					tmp_merged_vec[(length(lstate)+1):(length(lstate)+length(rstate))] = rstate
+					#tmp_merged_vec[1:length(lstate)] = lstate
+					#tmp_merged_vec[(length(lstate)+1):(length(lstate)+length(rstate))] = rstate
 					#combined_vector = sort(tmp_merged_vec)
-					if ( sort(tmp_merged_vec[1:combined_size]) == sort(ancstate) )
+					if ( is_event_vicariance(ancstate, lstate, rstate )
 						smaller_range_size = min(lsize, rsize)
 						tmp_weightval = v_wt * maxent01vic[ancsize,smaller_range_size] * 1.0 * 1.0
 						if (tmp_weightval > min_precision)
