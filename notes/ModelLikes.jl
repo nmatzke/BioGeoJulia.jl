@@ -14,7 +14,7 @@ using Distributed
 using Random					# for MersenneTwister()
 using Dates						# for e.g. DateTime, Dates.now()
 using PhyloNetworks
-
+#using Plots						# for plot
 using DataFrames          # for DataFrame()
 using BioGeoJulia.TrUtils # for flat2() (similar to unlist)
 using BioGeoJulia.StateSpace
@@ -44,94 +44,6 @@ include("tst2.jl")
 
 say_hello2() = println("Hello dude2!")
 
-"""
-using Pkg
-using OrdinaryDiffEq, Sundials, DiffEqDevTools, Plots, ODEInterfaceDiffEq, ODE, LSODA
-Pkg.add(PackageSpec(url="https://github.com/JuliaDiffEq/deSolveDiffEq.jl"))
-using deSolveDiffEq # https://docs.juliadiffeq.org/stable/solvers/ode_solve/index.html
-
-
-using Random
-Random.seed!(123)
-gr()
-
-# 2D Linear ODE
-function f(du,u,p,t)
-  @inbounds for i in eachindex(u)
-    du[i] = 1.01*u[i]
-  end
-end
-function f_analytic(u₀,p,t)
-  u₀*exp(1.01*t)
-end
-tspan = (0.0,10.0)
-prob = ODEProblem(ODEFunction(f,analytic=f_analytic),rand(100,100),tspan)
-
-abstols = 1.0 ./ 10.0 .^ (3:13)
-reltols = 1.0 ./ 10.0 .^ (0:10);
-
-
-
-setups = [Dict(:alg=>DP5())
-          Dict(:alg=>ode45())
-          Dict(:alg=>ARKODE(Sundials.Explicit(),etable=Sundials.DORMAND_PRINCE_7_4_5))
-          Dict(:alg=>Tsit5())]
-solnames = ["OrdinaryDiffEq";"ODE";"Sundials ARKODE";"OrdinaryDiffEq Tsit5"]
-
-results_matrix = ModelLikes.workprecision(prob, setups, abstols, reltols, solnames=solnames, save_everystep=false,numruns=1)
-
-wp = WorkPrecisionSet(prob,abstols,reltols,setups;names=solnames,save_everystep=false,numruns=10)
-plot(wp)
-"""
-
-function workprecision(prob, setups, abstols=1.0 ./ 10.0 .^ (3:13), reltols=1.0 ./ 10.0 .^ (0:10); solnames=string.(collect(1:length(setups))), save_everystep=false, numruns=1)
-	
-	# First column is the tolerances
-	results_matrix = abstols
-	
-	# Go through the dictionary of setups
-	for setup in setups
-		#tmpdict = setups[i]
-		solver = setup[:alg]
-		
-		calctimes = collect(repeat([0.0], length(abstols)))
-		
-		for j in 1:length(abstols)
-			if (j == 1)
-				# Preliminary run to do compiling
-				sol = solve(prob, solver, save_everystep=save_everystep, abstol=abstols[j], reltol=reltols[j]);
-			end
-			
-			diagnostics = collect(repeat([Dates.now()], 3))
-			diagnostics[1] = Dates.now()		
-
-			sol = solve(prob, solver, save_everystep=save_everystep, abstol=abstols[j], reltol=reltols[j]);
-
-			# Final run diagnostics
-			diagnostics[2] = Dates.now()
-			diagnostics[3] = diagnostics[2]-diagnostics[1]
-			total_calctime_in_sec = (diagnostics[2]-diagnostics[1]).value / 1000
-			calctimes[j] = total_calctime_in_sec
-		end
-		results_matrix = hcat(results_matrix, calctimes)
-	end
-	
-	df = DataFrame(results_matrix)
-	solnames2 = deepcopy(solnames)
-	prepend!(solnames2, ["abstol"])
-	rename!(df, solnames2)
-	markershapes = [:circle]
-	markercolors = [:green :black :red]
-	
-	plot(x=df[!,1], y=df[!,2:4], label=solnames[2:4], shape=markershapes, color=markercolors, markersize=10)
-	
-	saveopen("tmpplot.pdf")
-	
-	using StatsPlots
-	@df df plot(:abstol, [:2, :3])
-	
-	return df
-end
 
 
 

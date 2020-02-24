@@ -9,7 +9,8 @@
 
 """
 cd("/GitHub/BioGeoJulia.jl/notes/")
-include("tst2.jl")
+include("tst3.jl")
+
 
 """
 
@@ -21,10 +22,12 @@ include("tst2.jl")
 # Run all of the functions here
 #######################################################
 
-module Tst2
+module Tst3
 	cd("/GitHub/BioGeoJulia.jl/notes/")
 	include("ModelLikes.jl")
 	import .ModelLikes
+	include("WorkPrecision.jl")
+	import .WorkPrecision
 	#using .Tmp
 	
 	using Profile     # for @profile
@@ -35,74 +38,42 @@ module Tst2
 	using BioGeoJulia.TreePass
 	using BioGeoJulia.SSEs
 
-	ModelLikes.say_hello2()
+	WorkPrecision.say_hello3()
 	
-	#######################################################
-	# NEXT:
-	# 1. multiply conditional probabilities by lambda
-	# 2. load some geographic states, and a phylogeny
-	# 3. input into likelihood
-	# 4. maximum likelihood (or speed tests)
-	#######################################################
 	
-	ModelLikes.setup_DEC_SSE(2)
-#	ModelLikes.setup_DEC_SSE(4)
-# 	ModelLikes.setup_DEC_SSE(10)
-# 	ModelLikes.setup_DEC_SSE(20)
-# 	ModelLikes.setup_DEC_SSE(100)
+	numareas = 2
+	tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
+	inputs = ModelLikes.setup_DEC_SSE(numareas, tr)
 	
 	# Update Qij_vals
 	numareas = 3
 	areas_list = collect(1:numareas)
-	states_list = areas_list_to_states_list(areas_list, 3, true)
+	states_list = areas_list_to_states_list(areas_list, numareas, true)
 	numstates = length(states_list)
 	amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
 	dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
 	elist = repeat([0.123], numstates)
 	allowed_event_types=["d","e"]
 
-	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
-	Qarray_ivals = Qmat.Qarray_ivals
-	Qarray_jvals = Qmat.Qarray_jvals
-	Qij_vals = Qmat.Qij_vals
-	event_type_vals = Qmat.event_type_vals
-	Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
-
-	# Update!
-	dmat = reshape(repeat([0.5], numareas^2), (numareas,numareas))
-	Qmat2 = ModelLikes.update_Qij_vals(Qmat, areas_list, states_list, dmat, elist, amat )
-	Qmat2
-	
-	Qarray_ivals = Qmat2.Qarray_ivals
-	Qarray_jvals = Qmat2.Qarray_jvals
-	Qij_vals = Qmat2.Qij_vals
-	event_type_vals = Qmat2.event_type_vals
-	Qmat2_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
-	
-	Qmat1_df
-	Qmat2_df
 
 
-
-	tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
-
-	numareas_vec = [2,3,4,5,6,7,8,9,10,11]
+#	numareas_vec = [2,3,4,5,6,7,8,9,10,11]
 #	numareas_vec = [3]
-	numstates_vec = repeat([0.0], length(numareas_vec))
+#	numstates_vec = repeat([0.0], length(numareas_vec))
 	calctimes = repeat([0.0], length(numareas_vec))
 	ind=1
 	for ind in 1:length(numareas_vec)
 		numareas = numareas_vec[ind]
 		areas_list = collect(1:numareas)
 		
-		inputs = ModelLikes.setup_DEC_SSE(numareas, tr);
+		inputs = WorkPrecision.setup_DEC_SSE(numareas, tr);
 		
 		"""
 		tmpdf = DataFrame(Ci=inputs.p_Ds_v5.p_indices.Carray_ivals, Cj=inputs.p_Ds_v5.p_indices.Carray_jvals, Ck=inputs.p_Ds_v5.p_indices.Carray_kvals, vals=inputs.p_Ds_v5.params.Cijk_vals)
 		showall(tmpdf)
 		"""
 		
-# 		@profile inputs = ModelLikes.setup_DEC_SSE(numareas, tr);
+# 		@profile inputs = WorkPrecision.setup_DEC_SSE(numareas, tr);
 # 		Profile.print()
 		states_list = areas_list_to_states_list(areas_list, length(areas_list), true);
 		numstates = length(states_list);
@@ -154,10 +125,10 @@ module Tst2
 
 
 
-df = ModelLikes.workprecision(prob, setups, abstols, reltols, solnames=solnames, save_everystep=false,numruns=1)
+df = WorkPrecision.workprecision(prob, setups, abstols, reltols, solnames=solnames, save_everystep=false,numruns=1)
 
 
-end # End of module Tst2
+end # End of module Tst3
 
 
 
