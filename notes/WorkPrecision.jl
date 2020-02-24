@@ -142,3 +142,7 @@ function workprecision(prob, setups, abstols=1.0 ./ 10.0 .^ (3:13), reltols=1.0 
 	
 	return df
 end # End function workprecision
+
+
+
+end # End Module
