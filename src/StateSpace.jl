@@ -1205,6 +1205,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 							Carray_kvals[numC] = k
 							Cijk_weights[numC] = tmp_weightval
 							row_weightvals[i] += tmp_weightval
+							continue
 						end # end if tmp_weightval > 0.0
 					end # end if (all([lsize == ancsize, rsize==ancsize, lstate==ancstate, rstate==ancstate])
 				end # end if (y_wt > min_precision)
@@ -1216,7 +1217,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 					# Subset sympatry
 					if (s_wt > min_precision)
 						# Check for subset sympatry: lstate smaller than rstate, lstate inside rstate
-						if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
+						if ((lsize < rsize) && (array_in_array(lstate, rstate) == true) )
 							# Check if the weight > 0.0
 							# lsize is smaller by definition
 							# choose the smaller daughter
@@ -1239,6 +1240,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 								Carray_kvals[numC] = j
 								Cijk_weights[numC] = tmp_weightval
 								row_weightvals[i] += tmp_weightval
+								continue
 							end # end if tmp_weightval > 0.0
 						end # end if ((array_in_array(lstate, rstate) == true) && (lsize < rsize))
 					end # end if (s_wt > min_precision)
@@ -1295,7 +1297,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 								Carray_kvals[numC] = j
 								Cijk_weights[numC] = tmp_weightval
 								row_weightvals[i] += tmp_weightval
-					
+								continue
 							end # if (tmp_weightval > 0.0)
 							# end of jump dispersal
 						end # end if ( (lsize == 1) && (array_in_array(lstate, rstate) == false) )
@@ -1323,7 +1325,7 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cpara
 							Carray_kvals[numC] = k
 							Cijk_weights[numC] = tmp_weightval
 							row_weightvals[i] += tmp_weightval
-
+							continue
 							# Same event, flip left/right descendant states
 							# You won't hit it again, as k >= i
 # 							numC += 1

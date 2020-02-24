@@ -86,12 +86,12 @@ module Tst2
 
 	tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 
-	numareas_vec = [2,3,4,5,6,7,8,9,10,11]
-	#numareas_vec = [8]
+	numareas_vec = [2,3,4,5,6,7,8,9,10]
+	numareas_vec = [8]
 	numstates_vec = repeat([0.0], length(numareas_vec))
 	calctimes = repeat([0.0], length(numareas_vec))
 	ind=1
-	for ind in 1:length(numareas_vec)
+	#for ind in 1:length(numareas_vec)
 		numareas = numareas_vec[ind]
 		areas_list = collect(1:numareas)
 		
