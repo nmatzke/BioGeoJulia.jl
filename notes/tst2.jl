@@ -86,8 +86,8 @@ module Tst2
 
 	tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 
-	numareas_vec = [2,3,4,5,6,7,8,9]
-	numareas_vec = [8]
+	numareas_vec = [2,3,4,5,6,7,8,9,10,11]
+	#numareas_vec = [8]
 	numstates_vec = repeat([0.0], length(numareas_vec))
 	calctimes = repeat([0.0], length(numareas_vec))
 	ind=1
@@ -104,7 +104,7 @@ module Tst2
 		res = inputs.res
 		trdf = inputs.trdf
 		solver_options = inputs.solver_options
-		solver_options.solver=lsoda()
+		solver_options.solver=Tsit5()
 		p_Ds_v5 = inputs.p_Ds_v5
 
 		(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
