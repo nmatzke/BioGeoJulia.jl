@@ -52,10 +52,11 @@ module Tst2
 # 	ModelLikes.setup_DEC_SSE(100)
 	
 	# Update Qij_vals
-	numareas = 3
+	numareas = 7
 	areas_list = collect(1:numareas)
-	states_list = areas_list_to_states_list(areas_list, 3, true)
+	states_list = areas_list_to_states_list(areas_list, numareas, true)
 	numstates = length(states_list)
+	numstates
 	amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
 	dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
 	elist = repeat([0.123], numstates)

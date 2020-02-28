@@ -1,0 +1,1068 @@
+
+<!-- saved from url=(0061)http://www.polymerase.nz/distributions/?d=[Bactrian(0)]&h=400 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Embeddable Distribution</title>
+		
+		
+		<meta name="description" content="A browser-based multispecies coalescent tree visualiser">
+		<meta name="keywords" content="phylogenetics,bayesian,multispecies,coalescent,tree,uglytrees,javascript,svg">
+		<meta name="author" content="Jordan Douglas">
+		<meta name="viewport" content="width=1200">
+		
+		<link rel="icon" href="http://www.polymerase.nz/distributions/images/uglytreeslogo.png">
+		<link rel="stylesheet" href="./styles.css">
+
+		
+	<script type="text/x-mathjax-config;executed=true">
+	  MathJax.Hub.Config({
+	    tex2jax: {
+	      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+	      processEscapes: true
+	    }
+	  });
+	</script>
+		<script src="./MathJax.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./jquery.min.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./velocity.min.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./dropzone.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./chroma.min.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./easypz.latest.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./math.min.js"></script><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style>
+		<script language="JavaScript" type="text/JavaScript" src="./colourPicker.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./distribution.js"></script>
+		<script language="JavaScript" type="text/JavaScript" src="./jquery-ui.js"> </script>
+
+		<script src="./d3.min.js"></script>
+		<script src="./topojson.v2.min.js"></script>
+
+
+
+
+		<script>
+
+
+
+			function init(){
+
+				DISTRIBUTIONS = [InverseGamma, Normal, LogNormalMean, Gamma, 
+								LogNormal, Beta, Bactrian, Uniform, Exponential,
+								Laplace].sort() ;
+				DISTRIBUTION_OBJECTS = [];
+
+				
+				DISTRIBUTION_NUM = 0;
+				AXIS_GAP = [50, 50, 50, 50];
+				NUM_PIECES = 200;
+				ANIMATION_TIME = 500;
+				DEFAULT_COLOURS = [	"#50b2db", "#db506d", "#50db79", "#7950DB", "#b2db50", "#db7950", 
+				"#4e8791", "#ff1919", "#228B22", "#91584e", "#584e91", "#009fe1", "#ffff1a", "#ff8d1a", "#DB5079",
+				"#000000", "#606060", "#707070", "#A0A0A0", "#BEBEBE", "#d3d3d3", "#E0E0E0", "#FFFFFF"];
+
+
+				$(".unemdeddable").hide(0);	
+
+				// Parse distributions from url?
+				// Example: ?d=[LogNormal(2;1|red)]&w=500&h=500&e=true
+				if (location.href.indexOf("?") != -1){
+					var search = location.search.substring(1);
+					var JSONurl = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+
+					// If e=true, then only render the svg
+					if (JSONurl.e == null || JSONurl.e == "false"){
+						$(".unemdeddable").show(0);	
+					} 
+
+					// Width and height
+					var svg = $("#plotSVG");
+					svg.height(JSONurl.h == null ? 450 : parseFloat(JSONurl.h));
+					svg.width(JSONurl.w == null ? 700 : parseFloat(JSONurl.w));
+					svg.html("");
+
+
+					// Parse distributions
+					if (JSONurl.d != null && JSONurl.d.length != 0) { 
+						var d = JSONurl.d.substring(1, JSONurl.d.length-1);
+						var distributionStrings = d.split(",");
+						console.log(d, distributionStrings);
+						for (var i = 0; i < distributionStrings.length; i ++) {
+				
+							// Example: LogNormal(2;1|red). 1st we remove the trailing ')'
+							var distrStr = distributionStrings[i];
+							if (distrStr[distrStr.length-1] == ")") distrStr = distrStr.substring(0, distrStr.length-1);
+
+							// Distribution name
+							var distrName = distrStr.split("(")[0];
+
+							// Colour if available
+							var col = distrStr.split("|")[1];
+
+							// Parameters
+							var params = distrStr.split("(")[1].split("|")[0].split(";");
+							for (var j = 0; j < params.length; j ++){
+								var val = parseFloat(params[j]);
+								params[j] = val;
+							}
+
+							console.log("distrName", distrName);
+							console.log("col", col);
+							console.log("params", params);
+
+							var distrJSON = {distr: distrName, p: params == null ? [] : params, col: col};
+							
+							newDistributionRow(distrJSON);
+						}
+
+						setParams();
+					}
+
+					 
+					setParams();
+					console.log("JSONurl", JSONurl);
+			    
+				} else {
+
+					$(".unemdeddable").show(0);
+				
+					//newDistributionRow({distr: "LogNormal", p: [1, 2], col: "red"});
+					//newDistributionRow({distr: "Bactrian", p: [0.9]});
+					newDistributionRow();
+
+					//$("#select_distribution").val("modal")
+
+					var svg = $("#plotSVG");
+					svg.height(450);
+					svg.width(700);
+					svg.html("");
+				
+
+					//var scaler = getSVGScaler(svg);
+					//drawSVGAxes(svg, scaler);
+
+					setParams();
+
+				}
+
+
+			}
+
+
+
+
+			function setParams(reset = false) {
+
+				
+				var svg = $("#plotSVG");
+				svg.find(".curve").velocity("stop");
+				if (reset) svg.html("");
+
+				var distributions = [];
+				var ymax = -Infinity;
+				var xmin = Infinity;
+				var xmax = -Infinity;
+				for (var distNum = 0; distNum < DISTRIBUTION_NUM; distNum++) {
+
+					var dist = DISTRIBUTION_OBJECTS[distNum];
+					if (dist == null) continue;
+					dist.loadParams();
+
+
+					// Update DOM
+					var ele = $("#distributionRow_" + distNum).find(`[distnum="` + distNum + `"][distr="` + dist.getName() + `"]`);
+					if (ele.length == 0) {
+						$("#distributionRow_" + distNum).find(".paramrow").html("");
+						$("#distributionRow_" + distNum).find(".paramrow").append(dist.getParamHTML());
+					} 
+					$("#distributionRow_" + distNum).attr("title", dist.getDesc());
+					
+
+					//console.log("dist", dist.toJSON());
+
+					ymax = Math.max(ymax, dist.getYMax());
+					xmin = Math.min(xmin, dist.getXRange()[0]);
+					xmax = Math.max(xmax, dist.getXRange()[1]);
+	
+					distributions[distNum] = dist;
+
+
+				}
+					
+
+				var drawn = false;
+				for (var distNum = 0; distNum < DISTRIBUTION_NUM; distNum++) {
+
+					var dist = distributions[distNum];
+					if (dist == null) continue;
+					drawn = true;
+					var scaler = getSVGScaler(svg, xmin, xmax, ymax);
+					drawSVGAxes(svg, scaler);
+
+					drawCurve(svg, "distr_" + distNum, scaler, dist);
+
+				}
+
+
+				if (!drawn) {
+					var scaler = getSVGScaler(svg);
+					drawSVGAxes(svg, scaler);
+				}
+
+
+				
+
+
+			}
+
+
+
+
+
+			function getDistribution(distr, distNum) {
+
+
+				
+				switch (distr) {
+
+
+					case "beta": {
+
+
+						var alpha = parseFloat($("#alpha_input_" + distNum).val());
+						var beta = parseFloat($("#beta_input_" + distNum).val());
+
+
+						if (alpha <= 0) alpha = 0.01;
+						$("#alpha_input_" + distNum).val(alpha)
+
+						if (beta <= 0) beta = 0.01;
+						$("#beta_input_" + distNum).val(beta)
+
+						//console.log(alpha, beta);
+
+
+						var norm = math.gamma(alpha) * math.gamma(beta) / math.gamma(alpha + beta);
+
+						
+						var distribution = function(x) {
+							var density = Math.exp((alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x)) / norm;
+							//console.log(x, alpha, beta);
+							return density;
+						}
+
+						return {distribution: distribution, xmin: 0, xmax: 1};
+						break;
+
+					}
+
+
+					case "bactrian": {
+
+
+						var m = parseFloat($("#bactrian_input_" + distNum).val());
+						if (m >= 1) m = 0.99;
+						$("#bactrian_input_" + distNum).val(m);
+
+						var distribution = function(x) {
+							var density = 1 / (2*Math.sqrt(2*Math.PI*(1-m*m)));
+							density = density * (Math.exp( -(x + m)*(x + m) / (2 * (1-m*m)) ) + Math.exp( -(x - m)*(x - m) / (2 * (1-m*m)) ));
+							return density;
+						}
+
+						return {distribution: distribution, xmin: -2, xmax: 2};
+						break;
+					}
+
+
+					case "modal": {
+
+
+						var s = parseFloat($("#s_input_" + distNum).val());
+						var c = parseFloat($("#c_input_" + distNum).val());
+						if (c <= 0) c = 0.01;
+						if (c >= 1) c = 0.99;
+						$("#c_input_" + distNum).val(c);
+
+						var beta = Math.exp(s);
+						var alpha = (c*(beta-2) + 1) / (1-c);
+
+
+						if (c > 0.5) {
+							alpha = beta; 
+							beta = -(c*(alpha-2) - alpha + 1) / c;
+						}
+
+
+						console.log("CSAB", c, s, alpha, beta);
+
+
+						var norm = Math.log(math.gamma(alpha)) + Math.log(math.gamma(beta)) - Math.log(math.gamma(alpha + beta));
+						
+						var distribution = function(x) {
+							//var density = Math.pow(x, alpha-1) * Math.pow(1-x, beta-1) / norm;
+							var density = Math.exp((alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x) - norm);
+							//console.log(alpha,beta, x, (alpha-1)*Math.log(x) + (beta-1)*Math.log(1-x), density);
+							return density;
+							//if (isNaN(density)) return maxDensity;
+							//return Math.min(density, maxDensity);
+						}
+
+						return {distribution: distribution, xmin: 0, xmax: 1};
+
+						break;
+					}
+
+
+					case "bactrianbeta": {
+
+						var s = parseFloat($("#s_input_" + distNum).val());
+						var c = parseFloat($("#c_input_" + distNum).val());
+						var k = parseFloat($("#k_input_" + distNum).val());
+						if (c <= 0) c = 0.01;
+						if (c >= 1) c = 0.99;
+						$("#c_input_" + distNum).val(c);
+
+
+
+						var d = 0.5; // Math.exp(-s*s*s*k) / (Math.exp(-s*s*s*k) + 1);
+						var gap = Math.min(d*c, d*(1-c));
+						//var c1 = c - d*c;  //Math.pow(c, 1+d);
+						//var c2 = c + d*(1-c)//Math.pow(c, 1-d);
+
+						var c1 = c-gap;
+						var c2 = c+gap;
+
+						
+						//var c1 = Math.pow(c, 1+d);
+						//var c2 = Math.pow(c, 1-d);
+
+
+						var beta1 = Math.exp(s + s*Math.abs(0.5-c1)*k);
+						var beta2 = Math.exp(s + s*Math.abs(0.5-c2)*k);
+						var alpha1 = (c1*(beta1-2) + 1) / (1-c1);
+						var alpha2 = (c2*(beta2-2) + 1) / (1-c2);
+						if (c1 > 0.5) {
+							alpha1 = beta1; 
+							beta1 = -(c1*(alpha1-2) - alpha1 + 1) / c1;
+						}
+						if (c2 > 0.5) {
+							alpha2 = beta2; 
+							beta2 = -(c2*(alpha2-2) - alpha2 + 1) / c2;
+						}
+
+
+						//console.log("c=", c, "c1=", c1, "c2=", c2,"s=", s, "k=",k,"d=", d, "a1=",alpha1,"b1=", beta1, "a2=", alpha2, "b2=", beta2);
+
+						var norm1 = math.gamma(alpha1) * math.gamma(beta1) / math.gamma(alpha1 + beta1);
+						var norm2 = math.gamma(alpha2) * math.gamma(beta2) / math.gamma(alpha2 + beta2);
+						distribution = function(x) {
+							var density = 0.5 * Math.pow(x, alpha1-1) * Math.pow(1-x, beta1-1) / norm1;
+							density += 0.5 * Math.pow(x, alpha2-1) * Math.pow(1-x, beta2-1) / norm2;
+							return density;
+						}
+
+						return {distribution: distribution, xmin: 0, xmax: 1};
+						
+						break;
+					}
+
+
+
+				}
+
+				return null;
+
+
+			}
+
+
+			
+			function getDefaultColour(num) {
+				return DEFAULT_COLOURS[num % DEFAULT_COLOURS.length];
+			}
+
+
+
+
+
+			function drawCurve(svg, id, scaler, distribution) {
+
+
+				var col = distribution.getColour();
+				var x2 = scaler.xmin + 1*(scaler.xmax - scaler.xmin)/NUM_PIECES; 
+				var x1;
+				for (var i = 2; i < NUM_PIECES; i ++){
+
+					var x1 = x2;
+					var x2 = scaler.xmin + i*(scaler.xmax - scaler.xmin)/NUM_PIECES; 
+					var y1 = distribution.getDensity(x1);
+					var y2 = distribution.getDensity(x2);
+
+
+					if (y1 > scaler.ymax || y2 > scaler.ymax) {
+						//$("#" + curveID).remove();
+						//continue;
+					}
+
+
+					if (isNaN(y1)) y1 = 0;
+					if (isNaN(y2)) y2 = 0;
+
+					if (y1 == Infinity) y1 = scaler.ymax;
+					if (y2 == Infinity) y2 = scaler.ymax;
+
+
+					var curveID = "curve_" + id + "_" + i;
+					if ($("#" + curveID).length == 0) {
+
+						
+					
+						drawSVGobj(svg, "line", {class: "curve curve" + id, id: curveID,
+								x1: scaler.scaleX(x1), 
+								y1: scaler.scaleY(y1), 
+								x2: scaler.scaleX(x2),
+								y2: scaler.scaleY(y2), 
+								style: "stroke:" + col + "; stroke-width:2px;stroke-linecap:round" });
+
+					}else {
+						var element = $("#" + curveID);
+						element.velocity({x1: scaler.scaleX(x1), x2: scaler.scaleX(x2), y1: scaler.scaleY(y1), y2: scaler.scaleY(y2)}, ANIMATION_TIME );
+						element.css("stroke", col);
+					}
+
+				}
+
+			}
+
+			function getSVGScaler(svg, xmin = 0, xmax = 1, ymax = 10) {
+				var scaler = scaleRanges(xmin, 0, xmax, ymax, AXIS_GAP[3], svg.height() - AXIS_GAP[2], svg.width() - AXIS_GAP[1], AXIS_GAP[0]);
+				return scaler;
+			}
+
+
+			function drawSVGAxes(svg, scaler){
+
+
+				svg.find(".axis").remove();
+
+
+				var x_axis = planAxis("X", scaler.xmin, scaler.xmax);
+				drawAxis(svg, svg, x_axis, 3, scaler);
+
+				//console.log("x_axis", x_axis);
+
+				var y_axis = planAxis("Y", scaler.ymin, scaler.ymax);
+				drawAxis(svg, svg, y_axis, 4, scaler);
+
+				//console.log("y_axis", y_axis);
+
+			}
+
+
+			// Scales from the current (c) into the target (t) interval
+			function scaleRanges(c_minX, c_minY, c_maxX, c_maxY, t_minX, t_minY, t_maxX, t_maxY) {
+				
+				
+				
+				var scaleX = function(x) {
+					return (x - c_minX) / (c_maxX - c_minX) * (t_maxX - t_minX) + t_minX;
+				}
+				
+				var scaleY = function(y) {
+					return (y - c_minY) / (c_maxY - c_minY) * (t_maxY - t_minY) + t_minY;
+				}
+				
+				var scaler = {scaleX: scaleX, scaleY: scaleY, ymax: c_maxY, xmax: c_maxX, ymin: c_minY, xmin: c_minX};
+				return scaler;
+				
+			}
+
+
+
+
+			// Plan axes
+			function planAxis(label, min, max, minAtZero = min == 0, zeroLabel = true, niceBinSizes = [1, 5]){
+
+				if (min > max) max = min+1;
+
+				var maxNumLabels = 8;
+				var nLabels = maxNumLabels;
+
+				var niceBinSizeID = niceBinSizes.length - 1;
+				var basePower = Math.floor(log(max, base = 10));
+				
+				var binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
+
+
+				if (minAtZero) min = 0;
+
+				var numLoops = 0;	
+				if (min != max) {
+					while(true){
+
+
+						if (numLoops > 50 || (max - min) / binSize - nLabels > 0) break;
+						niceBinSizeID --;
+						if (niceBinSizeID < 0) {
+							niceBinSizeID = niceBinSizes.length - 1;
+							basePower --;
+						}
+						binSize = niceBinSizes[niceBinSizeID] * Math.pow(10, basePower);
+						numLoops++;
+
+					}
+
+
+
+					if (!minAtZero){
+						if (min > 0) min = min - min % binSize;
+						else		 min = min - (binSize + min % binSize);
+					}
+
+					if (max > 0) max = max + binSize - max % binSize;
+					else		 max = max + binSize - (binSize + max % binSize);
+
+
+					nLabels = Math.ceil((max - min) / binSize);
+
+					
+
+
+				}else{
+					binSize = 1;
+					if (!minAtZero) min--;
+					max++;
+					nLabels = Math.ceil((max - min) / binSize);
+				}
+				
+
+
+				var vals = [];
+				var tooBigByFactorOf = Math.max(Math.ceil(nLabels / maxNumLabels), 1)
+				for(var labelID = 0; labelID < nLabels; labelID ++){
+					if (labelID == 0 && !zeroLabel) continue;
+					if (labelID % tooBigByFactorOf == 0 /*&& labelID * binSize / (max - min) < 0.95*/) vals.push(roundToSF(labelID * binSize + min));
+				}
+
+
+
+
+				return {label: label, min: min, max: max, vals: vals};
+				
+
+
+			}
+
+
+
+
+			// Draw an axis. Sides: 1, 2, 3, 4 correspond to top, right, bottom, left
+			function drawAxis(svg, axisGroup, axis, side, scaler, tickSize = 5){
+
+				var axisMargin = AXIS_GAP[side-1];
+				axisGroup.find(".axis_" + side).remove();
+				
+				if (axis == null) return;
+
+				var stroke = "black";
+
+				var tx, tx1, tx2, ty, ty1, ty2;
+
+
+					
+				if (side == 3){
+					tx1 = axisMargin;
+					tx2 = svg.width() - axisMargin;
+					ty1 = svg.height() - axisMargin;
+					ty2 = svg.height() - axisMargin;
+				}
+
+				else if (side == 4) {
+					tx1 = axisMargin;
+					tx2 = axisMargin;
+					ty1 = axisMargin;
+					ty2 = svg.height() - axisMargin;
+				}
+
+
+				drawSVGobj(axisGroup, "line", {class: "axis axis_" + side ,id: "axis_" + side, 
+						x1: tx1, 
+						y1: ty1, 
+						x2: tx2,
+						y2: ty2, 
+						axis_val: val,
+						style: "stroke:" + stroke + "; stroke-width:1px;stroke-linecap:round" });
+				
+
+				
+				// Draw the ticks
+				for (var i = 0; i < axis.vals.length; i++){
+					var val = axis.vals[i];
+
+					if (side == 1 || side == 3){
+						
+						ty = (side == 3 ? svg.height() - axisMargin : axisMargin);
+						ty2 = ty + tickSize;
+						ty1 = ty - tickSize;
+						tx = scaler.scaleX(val);
+						tx1 = tx;
+						tx2 = tx;
+
+					}
+					else {
+						tx =  (side == 4 ? axisMargin : svg.width() - axisMargin);
+						tx1 = tx + tickSize;
+						tx2 = tx - tickSize;
+						ty = scaler.scaleY(val);
+						ty1 = ty;
+						ty2 = ty;
+
+					} 
+
+
+					if (tx < AXIS_GAP[3] || tx > svg.width() - AXIS_GAP[1] || ty < AXIS_GAP[0] || ty > svg.height() - AXIS_GAP[2]) continue;
+
+
+					
+					drawSVGobj(axisGroup, "line", {class: "axis axis_" + side ,id: "axis_" + side + "_" + i, 
+							x1: tx1, 
+							y1: ty1, 
+							x2: tx2,
+							y2: ty2, 
+							axis_val: val,
+							style: "stroke:" + stroke + "; stroke-width:1px;stroke-linecap:round" });
+
+
+					drawSVGobj(axisGroup, "text", {class: "axis axis_" + side ,id: "axisText_" + side + "_" + i, 
+							x: (side == 4 ? tx - 3*tickSize : tx),
+							y: (side == 3 ? ty + 3*tickSize : ty),
+							axis_val: val,
+							style: "text-anchor:" + (side == 2 ? "start" : side == 4 ? "end" : "middle")}, val);
+
+
+
+					
+
+
+				}
+
+
+			}
+
+
+
+
+			function drawSVGobj(svg, type, attr, val = null, isNode = false, addBackground = false){
+
+				//console.log("attr", attr);
+				var newObj = document.createElementNS('http://www.w3.org/2000/svg', type);
+
+
+	
+
+				for (var a in attr){
+					if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
+					else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
+					else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
+					else newObj.setAttribute(a, attr[a]);
+				}
+				if (val != null) newObj.innerHTML = val;
+				newObj.setAttribute("animatable", "true");
+
+
+				// Set some of the styles as attributes because safari and IE do not like styles for svgs
+				var styles = getComputedStyle(newObj);
+				//if (styles.fill != null) newObj.setAttribute("fill", styles.fill);
+				if (styles.stroke != null) newObj.setAttribute("stroke", styles.stroke);
+				if (styles["stroke-width"] != null) newObj.setAttribute("stroke-width", styles["stroke-width"]);
+				if (isNode) newObj.setAttribute("class", "node");
+				//console.log(styles["stroke-width"]);
+
+				//window.requestAnimationFrame(function() {
+				svg.append(newObj);
+
+				
+				
+				
+				return newObj;
+
+			}	
+
+
+
+
+
+			function roundToSF(val, sf=2, ceilOrFloor = "none", precise = true){
+				
+				var magnitude = Math.floor(log(val, 10));
+
+				if (val < 0 && ceilOrFloor == "ceil") ceilOrFloor = "floor";
+				else if (val < 0 && ceilOrFloor == "floor") ceilOrFloor = "ceil";
+
+				var num = val * tenToThePowerOf(sf-magnitude, precise);
+				if (ceilOrFloor == "ceil") num = Math.ceil(num)
+				else if (ceilOrFloor == "floor") num = Math.floor(num)
+				else num = Math.round(num);
+
+				num = num * tenToThePowerOf(magnitude-sf, precise);
+				
+				// Sometimes this picks up a trailing .00000000001 which we want to remove
+
+				var expectedStringLength = 0;
+				if (magnitude >= 0) expectedStringLength = magnitude >= sf ? magnitude+1 : sf+2; // Add 1 for the decimal point
+				else expectedStringLength = 2 -magnitude + sf;
+				if (num < 0) expectedStringLength++; // Also need the negative symbol
+
+
+
+				num = parseFloat(num.toString().substring(0, expectedStringLength+1));
+				
+				return num;
+					
+			}
+
+
+
+
+			// Compute 10^n without using Math.pow for negative n which presents numerical instabilities
+			function tenToThePowerOf(n, precise = true){
+
+				if (!precise) return Math.pow(10, n);
+
+				if (n == Infinity || n == -Infinity) return n;
+
+				if (n == 0) return 1;
+				var val = "1";
+				if (n < 0) {
+				
+				
+					for (var index = -1; index > n; index --){
+						val = "0" + val;
+					}
+					val = "." + val;
+				}
+
+				else if (n > 0) {
+					return Math.pow(10, n);
+
+				}
+				else {
+					return 1;
+				}
+				//console.log(n, "->", parseFloat(val));
+				return parseFloat(val);
+
+
+			}
+
+
+			function log(num, base = null){
+				
+				if (num == 0) return 0;
+				if (base == null) return Math.log(Math.abs(num));
+				return Math.log(Math.abs(num)) / Math.log(base);
+				
+				
+			}
+
+
+
+			function newDistributionRow(distrJSON = null){
+				
+				
+
+				var distr;
+				var prevDistributions = $(".distributionRow");
+
+				try {
+
+					// If a distribution is specified then add that one
+					if (distrJSON != null) { 
+						distr = new (eval(distrJSON.distr))(DISTRIBUTION_NUM);
+						distr.parseFromJSON(distrJSON);
+					}
+
+					// Otherwise, set the distribution to that of the previously added distribution (if there is one)
+					else if (prevDistributions.length > 0) {
+						var ele = $(prevDistributions[prevDistributions.length-1]);
+						var prevDistrName = ele.find(".dropdown").val();
+						distr = new (eval(prevDistrName))(DISTRIBUTION_NUM);
+					}
+
+					// If this is the first distribution, default it to uniform
+					else {
+						var randNum = Math.floor(Math.random() * DISTRIBUTIONS.length);
+						distr = new (eval(DISTRIBUTIONS[randNum]))(DISTRIBUTION_NUM);
+					}
+				} 
+				catch (error) {
+					alert("Unable to parse distribution " + (distrJSON == null ? "" : JSON.stringify(distrJSON)));
+					return;
+				}
+
+
+				DISTRIBUTION_OBJECTS[DISTRIBUTION_NUM] = distr;
+				
+				
+				$("#distributionsDiv").append(getDistributionTemplate(DISTRIBUTION_NUM, distr.getColour()));
+
+				// Append distributions to dropdown
+				for (var i = 0; i < DISTRIBUTIONS.length; i ++){
+					var dist_i = DISTRIBUTIONS[i];
+					$("#select_distribution_" + DISTRIBUTION_NUM).append(`<option value="` + dist_i.name + `" >` + dist_i.name + `</option>`);
+				}
+
+				
+				
+				$("#select_distribution_" + DISTRIBUTION_NUM).val(distr.getName());
+
+				var distrNum = DISTRIBUTION_NUM;
+				var addColourPicked = function() {
+					getColourPicker($("#distributionRow_" + distrNum).find(".colourbox"), distrNum, distr.getColour(), function(col, distNum) {
+						setCol(parseFloat(distNum), col);
+					});
+				}
+				$("#distributionRow_" + DISTRIBUTION_NUM).find(".colourbox").click(addColourPicked);
+
+
+				DISTRIBUTION_NUM ++;
+
+			}
+
+
+			function setDistribution(distrNum) {
+				if (DISTRIBUTION_OBJECTS[distrNum] == null) return;
+				var distrName = $("#select_distribution_" + distrNum).val();
+				DISTRIBUTION_OBJECTS[distrNum] = new (eval(distrName))(distrNum);
+				setParams();
+			}
+
+
+
+			// Sets the colour of a distribution
+			function setCol(distrNum, col) {
+				if (DISTRIBUTION_OBJECTS[distrNum] == null) return;
+				DISTRIBUTION_OBJECTS[distrNum].setColour(col);
+				$("#distributionRow_" + distrNum).find(".colourbox").css("background-color", col);
+				setParams();
+			}
+
+
+			function deleteDistribution(num) {
+				$("#distributionRow_" + num).remove();
+				DISTRIBUTION_OBJECTS[num] = null;
+				setParams(true);
+			}
+
+
+
+			function getDistributionTemplate(num, col) {
+
+
+
+				return `
+
+					<tr class="distributionRow" id="distributionRow_` + num + `">
+						<td>
+							Distribution:
+							<select class="dropdown" id="select_distribution_` + num + `" onchange="setDistribution(` + num + `);">
+							</select>	
+						</td>
+					
+						<td class="paramrow">
+						
+						</td>
+
+
+						<td>
+							<span class="colourbox" title="` + col + `" style="background-color:` + col + `"></span>	
+						</td>
+
+						<td>
+							<span class="btn" title="Delete distribution" onclick="deleteDistribution(` + num + `)">&times;</span>	
+						</td>
+
+
+
+					</tr>`;
+
+			}
+
+
+
+			
+
+
+		</script>
+
+	<style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+	<body onload="init()">
+
+
+
+		<div id="main" style="text-align:center">
+
+			<svg id="plotSVG" style="height: 400px; width: 700px;"><line class="curve curvedistr_0" id="curve_distr_0_2" x1="53" y1="349.17075694458583" x2="56.00000000000001" y2="348.9777676712378" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_3" x1="56.00000000000001" y1="348.9777676712378" x2="59.00000000000001" y2="348.7450233100946" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_4" x1="59.00000000000001" y1="348.7450233100946" x2="62.000000000000014" y2="348.465595067649" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_5" x1="62.000000000000014" y1="348.465595067649" x2="65.00000000000001" y2="348.13163126379976" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_6" x1="65.00000000000001" y1="348.13163126379976" x2="68.00000000000001" y2="347.7342944095174" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_7" x1="68.00000000000001" y1="347.7342944095174" x2="71.00000000000001" y2="347.2637067442987" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_8" x1="71.00000000000001" y1="347.2637067442987" x2="73.99999999999999" y2="346.70890754538857" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_9" x1="73.99999999999999" y1="346.70890754538857" x2="76.99999999999999" y2="346.05782586021354" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_10" x1="76.99999999999999" y1="346.05782586021354" x2="80" y2="345.29727259353064" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_11" x1="80" y1="345.29727259353064" x2="83" y2="344.4129560776995" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_12" x1="83" y1="344.4129560776995" x2="86" y2="343.38952534327893" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_13" x1="86" y1="343.38952534327893" x2="89" y2="342.2106452626836" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_14" x1="89" y1="342.2106452626836" x2="92" y2="340.85910753774766" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_15" x1="92" y1="340.85910753774766" x2="95" y2="339.3169811209282" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_16" x1="95" y1="339.3169811209282" x2="98" y2="337.5658050816351" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_17" x1="98" y1="337.5658050816351" x2="101.00000000000001" y2="335.586826141341" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_18" x1="101.00000000000001" y1="335.586826141341" x2="103.99999999999997" y2="333.3612820983311" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_19" x1="103.99999999999997" y1="333.3612820983311" x2="106.99999999999999" y2="330.87073114838006" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_20" x1="106.99999999999999" y1="330.87073114838006" x2="109.99999999999999" y2="328.09742569433956" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_21" x1="109.99999999999999" y1="328.09742569433956" x2="112.99999999999999" y2="325.02472764950346" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_22" x1="112.99999999999999" y1="325.02472764950346" x2="115.99999999999999" y2="321.637560512081" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_23" x1="115.99999999999999" y1="321.637560512081" x2="119" y2="317.9228916680741" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_24" x1="119" y1="317.9228916680741" x2="122" y2="313.87023652530917" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_25" x1="122" y1="313.87023652530917" x2="125" y2="309.4721742601629" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_26" x1="125" y1="309.4721742601629" x2="128" y2="304.7248632465419" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_27" x1="128" y1="304.7248632465419" x2="131" y2="299.62854271532024" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_28" x1="131" y1="299.62854271532024" x2="134" y2="294.1880059454758" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_29" x1="134" y1="294.1880059454758" x2="137" y2="288.413029398031" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_30" x1="137" y1="288.413029398031" x2="140" y2="282.31874174763516" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_31" x1="140" y1="282.31874174763516" x2="143" y2="275.92591681157495" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_32" x1="143" y1="275.92591681157495" x2="146" y2="269.2611749755173" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_33" x1="146" y1="269.2611749755173" x2="149.00000000000003" y2="262.35707890470246" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_34" x1="149.00000000000003" y1="262.35707890470246" x2="152.00000000000003" y2="255.25211112231824" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_35" x1="152.00000000000003" y1="255.25211112231824" x2="155" y2="247.99052342268698" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_36" x1="155" y1="247.99052342268698" x2="158" y2="240.62205102869456" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_37" x1="158" y1="240.62205102869456" x2="161" y2="233.20148783662756" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_38" x1="161" y1="233.20148783662756" x2="164" y2="225.7881229269795" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_39" x1="164" y1="225.7881229269795" x2="167" y2="218.44504264225316" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_40" x1="167" y1="218.44504264225316" x2="170" y2="211.23830680684682" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_41" x1="170" y1="211.23830680684682" x2="172.99999999999997" y2="204.23601193814702" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_42" x1="172.99999999999997" y1="204.23601193814702" x2="175.99999999999997" y2="197.50725841009285" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_43" x1="175.99999999999997" y1="197.50725841009285" x2="178.99999999999997" y2="191.12104231542006" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_44" x1="178.99999999999997" y1="191.12104231542006" x2="181.99999999999997" y2="185.14509606920413" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_45" x1="181.99999999999997" y1="185.14509606920413" x2="185" y2="179.64470445451067" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_46" x1="185" y1="179.64470445451067" x2="188" y2="174.68152470033965" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_47" x1="188" y1="174.68152470033965" x2="191" y2="170.31244019806596" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_48" x1="191" y1="170.31244019806596" x2="194" y2="166.58847753261622" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_49" x1="194" y1="166.58847753261622" x2="197" y2="163.55381559260272" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_50" x1="197" y1="163.55381559260272" x2="200" y2="161.24491363293703" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_51" x1="200" y1="161.24491363293703" x2="203" y2="159.68978233798313" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_52" x1="203" y1="159.68978233798313" x2="206" y2="158.90741825663395" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_53" x1="206" y1="158.90741825663395" x2="209" y2="158.90741757311227" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_54" x1="209" y1="158.90741757311227" x2="212" y2="159.68978019109613" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_55" x1="212" y1="159.68978019109613" x2="215" y2="161.24490972184796" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_56" x1="215" y1="161.24490972184796" x2="218.00000000000003" y2="163.55380937511083" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_57" x1="218.00000000000003" y1="163.55380937511083" x2="220.99999999999997" y2="166.588468159511" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_58" x1="220.99999999999997" y1="166.588468159511" x2="224" y2="170.31242641197198" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_59" x1="224" y1="170.31242641197198" x2="227" y2="174.6815046888976" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_60" x1="227" y1="174.6815046888976" x2="230" y2="179.64467564348885" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_61" x1="230" y1="179.64467564348885" x2="233" y2="185.14505483576872" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_62" x1="233" y1="185.14505483576872" x2="236" y2="191.12098359494485" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_63" x1="236" y1="191.12098359494485" x2="239" y2="197.50717516112033" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_64" x1="239" y1="197.50717516112033" x2="242" y2="204.23589441889197" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_65" x1="242" y1="204.23589441889197" x2="245" y2="211.23814160231882" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_66" x1="245" y1="211.23814160231882" x2="248" y2="218.44481136290275" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_67" x1="248" y1="218.44481136290275" x2="251" y2="225.78780047683014" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_68" x1="251" y1="225.78780047683014" x2="254.00000000000003" y2="233.2010401200656" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_69" x1="254.00000000000003" y1="233.2010401200656" x2="257" y2="240.6214319292048" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_70" x1="257" y1="240.6214319292048" x2="260" y2="247.98967084239257" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_71" x1="260" y1="247.98967084239257" x2="263" y2="255.25094181657238" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_72" x1="263" y1="255.25094181657238" x2="266" y2="262.355481779347" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_73" x1="266" y1="262.355481779347" x2="269" y2="269.25900243374923" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_74" x1="269" y1="269.25900243374923" x2="272" y2="275.92297364046306" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_75" x1="272" y1="275.92297364046306" x2="275" y2="282.3147709189189" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_76" x1="275" y1="282.3147709189189" x2="278" y2="288.4076940215733" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_77" x1="278" y1="288.4076940215733" x2="281" y2="294.18086645434727" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_78" x1="281" y1="294.18086645434727" x2="284" y2="299.6190281768581" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_79" x1="284" y1="299.6190281768581" x2="287" y2="304.7122354820914" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_80" x1="287" y1="304.7122354820914" x2="290" y2="309.4554832163468" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_81" x1="290" y1="309.4554832163468" x2="293" y2="313.8482650711576" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_82" x1="293" y1="313.8482650711576" x2="296" y2="317.8940876958191" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_83" x1="296" y1="317.8940876958191" x2="299" y2="321.59995389692676" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_84" x1="299" y1="321.59995389692676" x2="302" y2="324.97582927902073" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_85" x1="302" y1="324.97582927902073" x2="305" y2="328.03410541725543" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_86" x1="305" y1="328.03410541725543" x2="308" y2="330.7890711239303" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_87" x1="308" y1="330.7890711239303" x2="311" y2="333.256401662438" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_88" x1="311" y1="333.256401662438" x2="314" y2="335.45267395939464" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_89" x1="314" y1="335.45267395939464" x2="317" y2="337.3949140479" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_90" x1="317" y1="337.3949140479" x2="320" y2="339.1001812136861" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_91" x1="320" y1="339.1001812136861" x2="323" y2="340.58519167319406" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_92" x1="323" y1="340.58519167319406" x2="326" y2="341.86598313907115" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_93" x1="326" y1="341.86598313907115" x2="329" y2="342.95762036302017" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_94" x1="329" y1="342.95762036302017" x2="332" y2="343.8739407151313" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_95" x1="332" y1="343.8739407151313" x2="335" y2="344.62733807778153" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_96" x1="335" y1="344.62733807778153" x2="338" y2="345.2285828047994" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_97" x1="338" y1="345.2285828047994" x2="341" y2="345.6866752166264" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_98" x1="341" y1="345.6866752166264" x2="344" y2="346.0087300543933" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_99" x1="344" y1="346.0087300543933" x2="347" y2="346.19988947716644" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_100" x1="347" y1="346.19988947716644" x2="350" y2="346.26326252759947" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_101" x1="350" y1="346.26326252759947" x2="353" y2="346.19988947716644" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_102" x1="353" y1="346.19988947716644" x2="356" y2="346.0087300543933" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_103" x1="356" y1="346.0087300543933" x2="359" y2="345.6866752166264" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_104" x1="359" y1="345.6866752166264" x2="362" y2="345.2285828047994" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_105" x1="362" y1="345.2285828047994" x2="365" y2="344.62733807778153" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_106" x1="365" y1="344.62733807778153" x2="368" y2="343.8739407151313" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_107" x1="368" y1="343.8739407151313" x2="371" y2="342.95762036302017" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_108" x1="371" y1="342.95762036302017" x2="374" y2="341.86598313907115" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_109" x1="374" y1="341.86598313907115" x2="377" y2="340.585191673194" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_110" x1="377" y1="340.585191673194" x2="380" y2="339.1001812136861" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_111" x1="380" y1="339.1001812136861" x2="383.00000000000006" y2="337.3949140479" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_112" x1="383.00000000000006" y1="337.3949140479" x2="386.00000000000006" y2="335.4526739593946" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_113" x1="386.00000000000006" y1="335.4526739593946" x2="388.99999999999994" y2="333.256401662438" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_114" x1="388.99999999999994" y1="333.256401662438" x2="391.99999999999994" y2="330.78907112393034" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_115" x1="391.99999999999994" y1="330.78907112393034" x2="395" y2="328.0341054172555" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_116" x1="395" y1="328.0341054172555" x2="398" y2="324.9758292790208" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_117" x1="398" y1="324.9758292790208" x2="401" y2="321.5999538969268" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_118" x1="401" y1="321.5999538969268" x2="404" y2="317.89408769581917" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_119" x1="404" y1="317.89408769581917" x2="407" y2="313.8482650711576" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_120" x1="407" y1="313.8482650711576" x2="410" y2="309.4554832163468" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_121" x1="410" y1="309.4554832163468" x2="413" y2="304.7122354820914" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_122" x1="413" y1="304.7122354820914" x2="416" y2="299.6190281768581" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_123" x1="416" y1="299.6190281768581" x2="419" y2="294.18086645434727" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_124" x1="419" y1="294.18086645434727" x2="422" y2="288.4076940215733" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_125" x1="422" y1="288.4076940215733" x2="425" y2="282.3147709189189" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_126" x1="425" y1="282.3147709189189" x2="428" y2="275.92297364046306" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_127" x1="428" y1="275.92297364046306" x2="431" y2="269.25900243374923" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_128" x1="431" y1="269.25900243374923" x2="434" y2="262.355481779347" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_129" x1="434" y1="262.355481779347" x2="437" y2="255.25094181657238" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_130" x1="437" y1="255.25094181657238" x2="440" y2="247.98967084239257" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_131" x1="440" y1="247.98967084239257" x2="443" y2="240.6214319292048" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_132" x1="443" y1="240.6214319292048" x2="446" y2="233.20104012006553" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_133" x1="446" y1="233.20104012006553" x2="449" y2="225.78780047683006" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_134" x1="449" y1="225.78780047683006" x2="452" y2="218.44481136290267" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_135" x1="452" y1="218.44481136290267" x2="455" y2="211.23814160231873" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_136" x1="455" y1="211.23814160231873" x2="458.00000000000006" y2="204.23589441889192" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_137" x1="458.00000000000006" y1="204.23589441889192" x2="461.00000000000006" y2="197.50717516112027" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_138" x1="461.00000000000006" y1="197.50717516112027" x2="463.99999999999994" y2="191.12098359494487" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_139" x1="463.99999999999994" y1="191.12098359494487" x2="466.99999999999994" y2="185.1450548357688" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_140" x1="466.99999999999994" y1="185.1450548357688" x2="470" y2="179.64467564348888" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_141" x1="470" y1="179.64467564348888" x2="473" y2="174.68150468889763" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_142" x1="473" y1="174.68150468889763" x2="476" y2="170.312426411972" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_143" x1="476" y1="170.312426411972" x2="479" y2="166.58846815951102" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_144" x1="479" y1="166.58846815951102" x2="482" y2="163.55380937511083" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_145" x1="482" y1="163.55380937511083" x2="485" y2="161.24490972184796" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_146" x1="485" y1="161.24490972184796" x2="488" y2="159.68978019109613" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_147" x1="488" y1="159.68978019109613" x2="491" y2="158.90741757311227" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_148" x1="491" y1="158.90741757311227" x2="494" y2="158.90741825663395" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_149" x1="494" y1="158.90741825663395" x2="497" y2="159.68978233798313" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_150" x1="497" y1="159.68978233798313" x2="500" y2="161.24491363293703" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_151" x1="500" y1="161.24491363293703" x2="503" y2="163.55381559260272" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_152" x1="503" y1="163.55381559260272" x2="506" y2="166.58847753261622" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_153" x1="506" y1="166.58847753261622" x2="509" y2="170.31244019806596" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_154" x1="509" y1="170.31244019806596" x2="512" y2="174.68152470033965" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_155" x1="512" y1="174.68152470033965" x2="515" y2="179.64470445451067" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_156" x1="515" y1="179.64470445451067" x2="518" y2="185.14509606920413" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_157" x1="518" y1="185.14509606920413" x2="521" y2="191.12104231542006" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_158" x1="521" y1="191.12104231542006" x2="524" y2="197.50725841009285" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_159" x1="524" y1="197.50725841009285" x2="527" y2="204.23601193814702" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_160" x1="527" y1="204.23601193814702" x2="530" y2="211.2383068068469" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_161" x1="530" y1="211.2383068068469" x2="533" y2="218.4450426422532" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_162" x1="533" y1="218.4450426422532" x2="536" y2="225.78812292697955" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_163" x1="536" y1="225.78812292697955" x2="539" y2="233.20148783662748" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_164" x1="539" y1="233.20148783662748" x2="542" y2="240.62205102869447" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_165" x1="542" y1="240.62205102869447" x2="545" y2="247.9905234226869" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_166" x1="545" y1="247.9905234226869" x2="548" y2="255.25211112231824" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_167" x1="548" y1="255.25211112231824" x2="551" y2="262.35707890470246" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_168" x1="551" y1="262.35707890470246" x2="554" y2="269.2611749755173" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_169" x1="554" y1="269.2611749755173" x2="557" y2="275.92591681157495" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_170" x1="557" y1="275.92591681157495" x2="560" y2="282.31874174763516" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_171" x1="560" y1="282.31874174763516" x2="563" y2="288.413029398031" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_172" x1="563" y1="288.413029398031" x2="566" y2="294.1880059454758" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_173" x1="566" y1="294.1880059454758" x2="569" y2="299.62854271532024" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_174" x1="569" y1="299.62854271532024" x2="572" y2="304.7248632465419" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_175" x1="572" y1="304.7248632465419" x2="575" y2="309.4721742601629" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_176" x1="575" y1="309.4721742601629" x2="578" y2="313.87023652530917" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_177" x1="578" y1="313.87023652530917" x2="581" y2="317.9228916680741" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_178" x1="581" y1="317.9228916680741" x2="584" y2="321.637560512081" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_179" x1="584" y1="321.637560512081" x2="587" y2="325.02472764950346" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_180" x1="587" y1="325.02472764950346" x2="590" y2="328.09742569433956" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_181" x1="590" y1="328.09742569433956" x2="593" y2="330.87073114838006" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_182" x1="593" y1="330.87073114838006" x2="596" y2="333.3612820983311" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_183" x1="596" y1="333.3612820983311" x2="599" y2="335.5868261413411" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_184" x1="599" y1="335.5868261413411" x2="602" y2="337.5658050816351" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_185" x1="602" y1="337.5658050816351" x2="605" y2="339.3169811209282" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_186" x1="605" y1="339.3169811209282" x2="608" y2="340.85910753774766" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_187" x1="608" y1="340.85910753774766" x2="611" y2="342.2106452626836" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_188" x1="611" y1="342.2106452626836" x2="614" y2="343.3895253432789" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_189" x1="614" y1="343.3895253432789" x2="617" y2="344.4129560776995" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_190" x1="617" y1="344.4129560776995" x2="620" y2="345.29727259353064" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_191" x1="620" y1="345.29727259353064" x2="623" y2="346.05782586021354" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_192" x1="623" y1="346.05782586021354" x2="626" y2="346.70890754538857" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_193" x1="626" y1="346.70890754538857" x2="629" y2="347.2637067442987" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_194" x1="629" y1="347.2637067442987" x2="632" y2="347.7342944095174" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_195" x1="632" y1="347.7342944095174" x2="635" y2="348.13163126379976" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_196" x1="635" y1="348.13163126379976" x2="638" y2="348.465595067649" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_197" x1="638" y1="348.465595067649" x2="641" y2="348.7450233100946" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_198" x1="641" y1="348.7450233100946" x2="644" y2="348.9777676712378" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_0" id="curve_distr_0_199" x1="644" y1="348.9777676712378" x2="647" y2="349.17075694458583" style="stroke:#50b2db; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_2" x1="53" y1="349.9990146169919" x2="56.00000000000001" y2="349.9983753780747" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_3" x1="56.00000000000001" y1="349.9983753780747" x2="59.00000000000001" y2="349.9973483711348" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_4" x1="59.00000000000001" y1="349.9973483711348" x2="62.000000000000014" y2="349.99571563608237" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_5" x1="62.000000000000014" y1="349.99571563608237" x2="65.00000000000001" y2="349.99314711955526" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_6" x1="65.00000000000001" y1="349.99314711955526" x2="68.00000000000001" y2="349.9891489155276" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_7" x1="68.00000000000001" y1="349.9891489155276" x2="71.00000000000001" y2="349.982990704719" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_8" x1="71.00000000000001" y1="349.982990704719" x2="73.99999999999999" y2="349.9736055459227" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_9" x1="73.99999999999999" y1="349.9736055459227" x2="76.99999999999999" y2="349.959453606195" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_10" x1="76.99999999999999" y1="349.959453606195" x2="80" y2="349.93833979397624" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_11" x1="80" y1="349.93833979397624" x2="83" y2="349.90717373081674" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_12" x1="83" y1="349.90717373081674" x2="86" y2="349.86165928773426" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_13" x1="86" y1="349.86165928773426" x2="89" y2="349.79590032841844" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_14" x1="89" y1="349.79590032841844" x2="92" y2="349.70190973614086" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_15" x1="92" y1="349.70190973614086" x2="95" y2="349.5690107239741" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_16" x1="95" y1="349.5690107239741" x2="98" y2="349.38312336121885" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_17" x1="98" y1="349.38312336121885" x2="101.00000000000001" y2="349.1259357240271" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_18" x1="101.00000000000001" y1="349.1259357240271" x2="103.99999999999997" y2="348.77396856846076" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_19" x1="103.99999999999997" y1="348.77396856846076" x2="106.99999999999999" y2="348.2975552556178" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_20" x1="106.99999999999999" y1="348.2975552556178" x2="109.99999999999999" y2="347.6597749004759" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_21" x1="109.99999999999999" y1="347.6597749004759" x2="112.99999999999999" y2="346.815396061407" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_22" x1="112.99999999999999" y1="346.815396061407" x2="115.99999999999999" y2="345.70990993375835" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_23" x1="115.99999999999999" y1="345.70990993375835" x2="119" y2="344.27875456512925" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_24" x1="119" y1="344.27875456512925" x2="122" y2="342.446853036022" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_25" x1="122" y1="342.446853036022" x2="125" y2="340.12860618781923" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_26" x1="125" y1="340.12860618781923" x2="128" y2="337.2284911603198" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_27" x1="128" y1="337.2284911603198" x2="131" y2="333.64241726676937" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_28" x1="131" y1="333.64241726676937" x2="134" y2="329.2599771831325" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_29" x1="134" y1="329.2599771831325" x2="137" y2="323.96770115782107" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_30" x1="137" y1="323.96770115782107" x2="140" y2="317.6533730739127" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_31" x1="140" y1="317.6533730739127" x2="143" y2="310.2113993890809" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_32" x1="143" y1="310.2113993890809" x2="146" y2="301.54913694824285" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_33" x1="146" y1="301.54913694824285" x2="149.00000000000003" y2="291.5939875005467" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_34" x1="149.00000000000003" y1="291.5939875005467" x2="152.00000000000003" y2="280.30096204198503" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_35" x1="152.00000000000003" y1="280.30096204198503" x2="155" y2="267.66031574158126" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_36" x1="155" y1="267.66031574158126" x2="158" y2="253.704764855374" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_37" x1="158" y1="253.704764855374" x2="161" y2="238.5157322249572" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_38" x1="161" y1="238.5157322249572" x2="164" y2="222.22803890485415" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_39" x1="164" y1="222.22803890485415" x2="167" y2="205.03247564305215" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_40" x1="167" y1="205.03247564305215" x2="170" y2="187.17575565073324" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_41" x1="170" y1="187.17575565073324" x2="172.99999999999997" y2="168.95747116485214" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_42" x1="172.99999999999997" y1="168.95747116485214" x2="175.99999999999997" y2="150.7238471407114" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_43" x1="175.99999999999997" y1="150.7238471407114" x2="178.99999999999997" y2="132.85829661249468" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_44" x1="178.99999999999997" y1="132.85829661249468" x2="181.99999999999997" y2="115.76901890764006" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_45" x1="181.99999999999997" y1="115.76901890764006" x2="185" y2="99.87412457744583" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_46" x1="185" y1="99.87412457744583" x2="188" y2="85.58499740837544" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_47" x1="188" y1="85.58499740837544" x2="191" y2="73.28879147080437" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_48" x1="191" y1="73.28879147080437" x2="194" y2="63.33108911951473" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_49" x1="194" y1="63.33108911951473" x2="197" y2="55.99979798797381" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_50" x1="197" y1="55.99979798797381" x2="200" y2="51.51133180815043" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_51" x1="200" y1="51.51133180815043" x2="203" y2="50" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_52" x1="203" y1="50" x2="206" y2="51.51133180815043" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_53" x1="206" y1="51.51133180815043" x2="209" y2="55.99979798797381" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_54" x1="209" y1="55.99979798797381" x2="212" y2="63.33108911951473" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_55" x1="212" y1="63.33108911951473" x2="215" y2="73.28879147080437" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_56" x1="215" y1="73.28879147080437" x2="218.00000000000003" y2="85.58499740837544" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_57" x1="218.00000000000003" y1="85.58499740837544" x2="220.99999999999997" y2="99.87412457744566" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_58" x1="220.99999999999997" y1="99.87412457744566" x2="224" y2="115.76901890763986" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_59" x1="224" y1="115.76901890763986" x2="227" y2="132.85829661249448" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_60" x1="227" y1="132.85829661249448" x2="230" y2="150.72384714071117" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_61" x1="230" y1="150.72384714071117" x2="233" y2="168.9574711648519" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_62" x1="233" y1="168.9574711648519" x2="236" y2="187.17575565073324" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_63" x1="236" y1="187.17575565073324" x2="239" y2="205.03247564305212" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_64" x1="239" y1="205.03247564305212" x2="242" y2="222.2280389048541" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_65" x1="242" y1="222.2280389048541" x2="245" y2="238.5157322249571" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_66" x1="245" y1="238.5157322249571" x2="248" y2="253.70476485537378" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_67" x1="248" y1="253.70476485537378" x2="251" y2="267.6603157415807" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_68" x1="251" y1="267.6603157415807" x2="254.00000000000003" y2="280.3009620419839" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_69" x1="254.00000000000003" y1="280.3009620419839" x2="257" y2="291.59398750054396" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_70" x1="257" y1="291.59398750054396" x2="260" y2="301.5491369482367" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_71" x1="260" y1="301.5491369482367" x2="263" y2="310.2113993890673" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_72" x1="263" y1="310.2113993890673" x2="266" y2="317.653373073883" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_73" x1="266" y1="317.653373073883" x2="269" y2="323.96770115775684" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_74" x1="269" y1="323.96770115775684" x2="272" y2="329.2599771829947" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_75" x1="272" y1="329.2599771829947" x2="275" y2="333.6424172664769" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_76" x1="275" y1="333.6424172664769" x2="278" y2="337.22849115970536" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_77" x1="278" y1="337.22849115970536" x2="281" y2="340.12860618654133" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_78" x1="281" y1="340.12860618654133" x2="284" y2="342.44685303339077" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_79" x1="284" y1="342.44685303339077" x2="287" y2="344.27875455976596" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_80" x1="287" y1="344.27875455976596" x2="290" y2="345.7099099229362" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_81" x1="290" y1="345.7099099229362" x2="293" y2="346.8153960397893" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_82" x1="293" y1="346.8153960397893" x2="296" y2="347.65977485772754" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_83" x1="296" y1="347.65977485772754" x2="299" y2="348.29755517193377" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_84" x1="299" y1="348.29755517193377" x2="302" y2="348.7739684062876" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_85" x1="302" y1="348.7739684062876" x2="305" y2="349.1259354129068" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_86" x1="305" y1="349.1259354129068" x2="308" y2="349.3831227703502" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_87" x1="308" y1="349.3831227703502" x2="311" y2="349.56900961309503" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_88" x1="311" y1="349.56900961309503" x2="314" y2="349.70190766859207" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_89" x1="314" y1="349.70190766859207" x2="317" y2="349.7958965190064" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_90" x1="317" y1="349.7958965190064" x2="320" y2="349.8616523395181" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_91" x1="320" y1="349.8616523395181" x2="323" y2="349.90716118491514" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_92" x1="323" y1="349.90716118491514" x2="326" y2="349.93831736839957" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_93" x1="326" y1="349.93831736839957" x2="329" y2="349.9594139237383" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_94" x1="329" y1="349.9594139237383" x2="332" y2="349.97353603282056" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_95" x1="332" y1="349.97353603282056" x2="335" y2="349.9828701600592" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_96" x1="335" y1="349.9828701600592" x2="338" y2="349.9889419764693" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_97" x1="338" y1="349.9889419764693" x2="341" y2="349.992795437549" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_98" x1="341" y1="349.992795437549" x2="344" y2="349.995123977709" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_99" x1="344" y1="349.995123977709" x2="347" y2="349.9963629881267" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_100" x1="347" y1="349.9963629881267" x2="350" y2="349.99675075614937" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_101" x1="350" y1="349.99675075614937" x2="353" y2="349.9963629881267" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_102" x1="353" y1="349.9963629881267" x2="356" y2="349.995123977709" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_103" x1="356" y1="349.995123977709" x2="359" y2="349.992795437549" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_104" x1="359" y1="349.992795437549" x2="362" y2="349.9889419764693" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_105" x1="362" y1="349.9889419764693" x2="365" y2="349.9828701600592" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_106" x1="365" y1="349.9828701600592" x2="368" y2="349.97353603282056" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_107" x1="368" y1="349.97353603282056" x2="371" y2="349.9594139237383" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_108" x1="371" y1="349.9594139237383" x2="374" y2="349.93831736839957" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_109" x1="374" y1="349.93831736839957" x2="377" y2="349.90716118491514" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_110" x1="377" y1="349.90716118491514" x2="380" y2="349.8616523395181" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_111" x1="380" y1="349.8616523395181" x2="383.00000000000006" y2="349.7958965190064" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_112" x1="383.00000000000006" y1="349.7958965190064" x2="386.00000000000006" y2="349.70190766859207" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_113" x1="386.00000000000006" y1="349.70190766859207" x2="388.99999999999994" y2="349.56900961309503" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_114" x1="388.99999999999994" y1="349.56900961309503" x2="391.99999999999994" y2="349.3831227703502" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_115" x1="391.99999999999994" y1="349.3831227703502" x2="395" y2="349.1259354129068" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_116" x1="395" y1="349.1259354129068" x2="398" y2="348.7739684062876" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_117" x1="398" y1="348.7739684062876" x2="401" y2="348.29755517193377" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_118" x1="401" y1="348.29755517193377" x2="404" y2="347.65977485772754" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_119" x1="404" y1="347.65977485772754" x2="407" y2="346.8153960397893" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_120" x1="407" y1="346.8153960397893" x2="410" y2="345.7099099229362" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_121" x1="410" y1="345.7099099229362" x2="413" y2="344.27875455976596" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_122" x1="413" y1="344.27875455976596" x2="416" y2="342.44685303339077" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_123" x1="416" y1="342.44685303339077" x2="419" y2="340.12860618654133" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_124" x1="419" y1="340.12860618654133" x2="422" y2="337.22849115970536" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_125" x1="422" y1="337.22849115970536" x2="425" y2="333.6424172664769" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_126" x1="425" y1="333.6424172664769" x2="428" y2="329.2599771829947" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_127" x1="428" y1="329.2599771829947" x2="431" y2="323.96770115775684" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_128" x1="431" y1="323.96770115775684" x2="434" y2="317.653373073883" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_129" x1="434" y1="317.653373073883" x2="437" y2="310.2113993890673" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_130" x1="437" y1="310.2113993890673" x2="440" y2="301.5491369482367" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_131" x1="440" y1="301.5491369482367" x2="443" y2="291.59398750054396" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_132" x1="443" y1="291.59398750054396" x2="446" y2="280.3009620419838" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_133" x1="446" y1="280.3009620419838" x2="449" y2="267.6603157415806" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_134" x1="449" y1="267.6603157415806" x2="452" y2="253.70476485537364" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_135" x1="452" y1="253.70476485537364" x2="455" y2="238.51573222495693" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_136" x1="455" y1="238.51573222495693" x2="458.00000000000006" y2="222.22803890485386" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_137" x1="458.00000000000006" y1="222.22803890485386" x2="461.00000000000006" y2="205.03247564305192" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_138" x1="461.00000000000006" y1="205.03247564305192" x2="463.99999999999994" y2="187.17575565073344" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_139" x1="463.99999999999994" y1="187.17575565073344" x2="466.99999999999994" y2="168.95747116485214" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_140" x1="466.99999999999994" y1="168.95747116485214" x2="470" y2="150.7238471407114" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_141" x1="470" y1="150.7238471407114" x2="473" y2="132.85829661249468" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_142" x1="473" y1="132.85829661249468" x2="476" y2="115.76901890764006" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_143" x1="476" y1="115.76901890764006" x2="479" y2="99.87412457744583" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_144" x1="479" y1="99.87412457744583" x2="482" y2="85.58499740837544" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_145" x1="482" y1="85.58499740837544" x2="485" y2="73.28879147080437" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_146" x1="485" y1="73.28879147080437" x2="488" y2="63.33108911951473" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_147" x1="488" y1="63.33108911951473" x2="491" y2="55.99979798797381" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_148" x1="491" y1="55.99979798797381" x2="494" y2="51.51133180815043" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_149" x1="494" y1="51.51133180815043" x2="497" y2="50" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_150" x1="497" y1="50" x2="500" y2="51.51133180815043" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_151" x1="500" y1="51.51133180815043" x2="503" y2="55.99979798797381" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_152" x1="503" y1="55.99979798797381" x2="506" y2="63.33108911951473" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_153" x1="506" y1="63.33108911951473" x2="509" y2="73.28879147080437" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_154" x1="509" y1="73.28879147080437" x2="512" y2="85.58499740837544" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_155" x1="512" y1="85.58499740837544" x2="515" y2="99.87412457744583" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_156" x1="515" y1="99.87412457744583" x2="518" y2="115.76901890764006" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_157" x1="518" y1="115.76901890764006" x2="521" y2="132.85829661249468" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_158" x1="521" y1="132.85829661249468" x2="524" y2="150.7238471407114" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_159" x1="524" y1="150.7238471407114" x2="527" y2="168.95747116485214" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_160" x1="527" y1="168.95747116485214" x2="530" y2="187.17575565073344" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_161" x1="530" y1="187.17575565073344" x2="533" y2="205.03247564305235" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_162" x1="533" y1="205.03247564305235" x2="536" y2="222.22803890485432" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_163" x1="536" y1="222.22803890485432" x2="539" y2="238.51573222495702" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_164" x1="539" y1="238.51573222495702" x2="542" y2="253.70476485537387" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_165" x1="542" y1="253.70476485537387" x2="545" y2="267.6603157415811" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_166" x1="545" y1="267.6603157415811" x2="548" y2="280.30096204198503" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_167" x1="548" y1="280.30096204198503" x2="551" y2="291.5939875005467" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_168" x1="551" y1="291.5939875005467" x2="554" y2="301.54913694824285" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_169" x1="554" y1="301.54913694824285" x2="557" y2="310.2113993890809" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_170" x1="557" y1="310.2113993890809" x2="560" y2="317.6533730739127" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_171" x1="560" y1="317.6533730739127" x2="563" y2="323.96770115782107" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_172" x1="563" y1="323.96770115782107" x2="566" y2="329.2599771831325" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_173" x1="566" y1="329.2599771831325" x2="569" y2="333.64241726676937" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_174" x1="569" y1="333.64241726676937" x2="572" y2="337.2284911603198" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_175" x1="572" y1="337.2284911603198" x2="575" y2="340.12860618781923" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_176" x1="575" y1="340.12860618781923" x2="578" y2="342.446853036022" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_177" x1="578" y1="342.446853036022" x2="581" y2="344.27875456512925" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_178" x1="581" y1="344.27875456512925" x2="584" y2="345.70990993375835" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_179" x1="584" y1="345.70990993375835" x2="587" y2="346.815396061407" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_180" x1="587" y1="346.815396061407" x2="590" y2="347.6597749004759" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_181" x1="590" y1="347.6597749004759" x2="593" y2="348.2975552556178" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_182" x1="593" y1="348.2975552556178" x2="596" y2="348.77396856846076" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_183" x1="596" y1="348.77396856846076" x2="599" y2="349.1259357240271" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_184" x1="599" y1="349.1259357240271" x2="602" y2="349.38312336121885" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_185" x1="602" y1="349.38312336121885" x2="605" y2="349.5690107239741" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_186" x1="605" y1="349.5690107239741" x2="608" y2="349.70190973614086" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_187" x1="608" y1="349.70190973614086" x2="611" y2="349.79590032841844" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_188" x1="611" y1="349.79590032841844" x2="614" y2="349.86165928773426" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_189" x1="614" y1="349.86165928773426" x2="617" y2="349.90717373081674" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_190" x1="617" y1="349.90717373081674" x2="620" y2="349.93833979397624" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_191" x1="620" y1="349.93833979397624" x2="623" y2="349.959453606195" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_192" x1="623" y1="349.959453606195" x2="626" y2="349.9736055459227" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_193" x1="626" y1="349.9736055459227" x2="629" y2="349.982990704719" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_194" x1="629" y1="349.982990704719" x2="632" y2="349.9891489155276" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_195" x1="632" y1="349.9891489155276" x2="635" y2="349.99314711955526" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_196" x1="635" y1="349.99314711955526" x2="638" y2="349.99571563608237" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_197" x1="638" y1="349.99571563608237" x2="641" y2="349.9973483711348" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_198" x1="641" y1="349.9973483711348" x2="644" y2="349.9983753780747" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="curve curvedistr_1" id="curve_distr_1_199" x1="644" y1="349.9983753780747" x2="647" y2="349.9990146169919" style="stroke:#db506d; stroke-width:2px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="axis axis_3" id="axis_3" x1="50" y1="350" x2="650" y2="350" axis_val="undefined" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="axis axis_3" id="axis_3_0" x1="50" y1="345" x2="50" y2="355" axis_val="-2" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_0" x="50" y="365" axis_val="-2" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">-2</text><line class="axis axis_3" id="axis_3_1" x1="125" y1="345" x2="125" y2="355" axis_val="-1.5" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_1" x="125" y="365" axis_val="-1.5" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">-1.5</text><line class="axis axis_3" id="axis_3_2" x1="200" y1="345" x2="200" y2="355" axis_val="-1" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_2" x="200" y="365" axis_val="-1" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">-1</text><line class="axis axis_3" id="axis_3_3" x1="275" y1="345" x2="275" y2="355" axis_val="-0.5" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_3" x="275" y="365" axis_val="-0.5" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">-0.5</text><line class="axis axis_3" id="axis_3_4" x1="350" y1="345" x2="350" y2="355" axis_val="0" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_4" x="350" y="365" axis_val="0" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">0</text><line class="axis axis_3" id="axis_3_5" x1="425" y1="345" x2="425" y2="355" axis_val="0.5" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_5" x="425" y="365" axis_val="0.5" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">0.5</text><line class="axis axis_3" id="axis_3_6" x1="500" y1="345" x2="500" y2="355" axis_val="1" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_6" x="500" y="365" axis_val="1" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">1</text><line class="axis axis_3" id="axis_3_7" x1="575" y1="345" x2="575" y2="355" axis_val="1.5" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_3" id="axisText_3_7" x="575" y="365" axis_val="1.5" style="text-anchor:middle" animatable="true" stroke="" stroke-width="">1.5</text><line class="axis axis_4" id="axis_4" x1="50" y1="50" x2="50" y2="350" axis_val="undefined" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><line class="axis axis_4" id="axis_4_0" x1="55" y1="350" x2="45" y2="350" axis_val="0" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_4" id="axisText_4_0" x="35" y="350" axis_val="0" style="text-anchor:end" animatable="true" stroke="" stroke-width="">0</text><line class="axis axis_4" id="axis_4_1" x1="55" y1="290.14247257390184" x2="45" y2="290.14247257390184" axis_val="0.2" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_4" id="axisText_4_1" x="35" y="290.14247257390184" axis_val="0.2" style="text-anchor:end" animatable="true" stroke="" stroke-width="">0.2</text><line class="axis axis_4" id="axis_4_2" x1="55" y1="230.28494514780365" x2="45" y2="230.28494514780365" axis_val="0.4" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_4" id="axisText_4_2" x="35" y="230.28494514780365" axis_val="0.4" style="text-anchor:end" animatable="true" stroke="" stroke-width="">0.4</text><line class="axis axis_4" id="axis_4_3" x1="55" y1="170.4274177217055" x2="45" y2="170.4274177217055" axis_val="0.6" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_4" id="axisText_4_3" x="35" y="170.4274177217055" axis_val="0.6" style="text-anchor:end" animatable="true" stroke="" stroke-width="">0.6</text><line class="axis axis_4" id="axis_4_4" x1="55" y1="110.56989029560731" x2="45" y2="110.56989029560731" axis_val="0.8" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_4" id="axisText_4_4" x="35" y="110.56989029560731" axis_val="0.8" style="text-anchor:end" animatable="true" stroke="" stroke-width="">0.8</text><line class="axis axis_4" id="axis_4_5" x1="55" y1="50.71236286950915" x2="45" y2="50.71236286950915" axis_val="1" style="stroke:black; stroke-width:1px;stroke-linecap:round" animatable="true" stroke="" stroke-width=""></line><text class="axis axis_4" id="axisText_4_5" x="35" y="50.71236286950915" axis_val="1" style="text-anchor:end" animatable="true" stroke="" stroke-width="">1</text></svg>
+
+
+			
+			<table id="distributionsDiv" class="unemdeddable" style="margin: auto;" cellspacing="1"> 
+
+				
+			
+
+					<tr class="distributionRow" id="distributionRow_0" title="A bimodal normal distribution with a mean of 0 and a standard deviation of 1-m^2.">
+						<td>
+							Distribution:
+							<select class="dropdown" id="select_distribution_0" onchange="setDistribution(0);">
+							<option value="Bactrian">Bactrian</option><option value="Beta">Beta</option><option value="Exponential">Exponential</option><option value="Gamma">Gamma</option><option value="InverseGamma">InverseGamma</option><option value="Laplace">Laplace</option><option value="LogNormal">LogNormal</option><option value="LogNormalMean">LogNormalMean</option><option value="Normal">Normal</option><option value="Uniform">Uniform</option></select>	
+						</td>
+					
+						<td class="paramrow"><div distr="Bactrian" distnum="0"><span class="distr" distnum="0" param="m">
+					m = <input type="number" step="0.02" min="0" max="1" class="numberinput cranberry" onclick="$(this).select()" style="width:5em;" value="0" onchange="setParams();"> 
+			 </span></div></td>
+
+
+						<td>
+							<span class="colourbox" title="#50b2db" style="background-color:#50b2db"></span>	
+						</td>
+
+						<td>
+							<span class="btn" title="Delete distribution" onclick="deleteDistribution(0)">×</span>	
+						</td>
+
+
+
+					</tr>
+
+					<tr class="distributionRow" id="distributionRow_1" title="A bimodal normal distribution with a mean of 0 and a standard deviation of 1-m^2.">
+						<td>
+							Distribution:
+							<select class="dropdown" id="select_distribution_1" onchange="setDistribution(1);">
+							<option value="Bactrian">Bactrian</option><option value="Beta">Beta</option><option value="Exponential">Exponential</option><option value="Gamma">Gamma</option><option value="InverseGamma">InverseGamma</option><option value="Laplace">Laplace</option><option value="LogNormal">LogNormal</option><option value="LogNormalMean">LogNormalMean</option><option value="Normal">Normal</option><option value="Uniform">Uniform</option></select>	
+						</td>
+					
+						<td class="paramrow"><div distr="Bactrian" distnum="1"><span class="distr" distnum="1" param="m">
+					m = <input type="number" step="0.02" min="0" max="1" class="numberinput cranberry" onclick="$(this).select()" style="width:5em;" value="0.9" onchange="setParams();"> 
+			 </span></div></td>
+
+
+						<td>
+							<span class="colourbox" title="#db506d" style="background-color:#db506d"></span>	
+						</td>
+
+						<td>
+							<span class="btn" title="Delete distribution" onclick="deleteDistribution(1)">×</span>	
+						</td>
+
+
+
+					</tr></table>
+
+			<span class="unemdeddable btn" style="" title="Add new distribution" onclick="newDistributionRow(); setParams();">+ Distribution</span>	
+			<div class="unemdeddable" style="">Hover over a table row for more information on the distribution.</div>
+
+		</div>
+
+
+
+	
+
+
+
+
+
+</body></html>

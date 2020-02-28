@@ -131,7 +131,7 @@ function paste(array_of_strings, delim)
 end
 
 # paste0
-function paste0(array_of_strings, delim=0)
+function paste0(array_of_strings, delim="")
 	newtxt = join(array_of_strings, delim)
 	return(newtxt)
 end
@@ -184,7 +184,14 @@ end
 # Save a julia DataFrame to an R data.frame
 # as an Rdata file that can be easily loaded.
 # Source: https://stackoverflow.com/questions/28084403/saving-julia-dataframe-to-read-in-r-using-hdf5/57903489#57903489
-using DataFrames
+
+#######################################################
+# NOTE: YOU MAY HAVE TO PASTE THE FUNCTION DEFINITION
+# OF df_to_Rdata(), ALONG WITH THE "using" STATEMENTS,
+# INTO YOUR MAIN ENVIRONMENT FOR IT TO WORK!!!
+#######################################################
+
+#using DataFrames
 #using RCall
 function df_to_Rdata(df; fn="dfjulia.RData", path=expanduser("~"))
 	# Create the output fn

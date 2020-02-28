@@ -1,0 +1,242 @@
+
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+
+
+
+body {
+	font-family: "Source Sans Pro", "Arial"; 
+	background-color:white;
+	width:100%;
+	min-width:500px;
+	min-height:100%;
+	margin:0;
+	padding:0;
+	
+
+	@media screen and (orientation:portrait) {
+		text-size-adjust: 160%;
+	}
+	@media screen and (orientation:landscape) {
+		text-size-adjust: 100%;
+	}
+
+	
+}
+
+
+
+#main {
+
+	width: 80%;
+	margin-left:10%;
+	text-align:center;
+	line-height:2em;
+
+}
+
+
+#plotSVG {
+
+	%border-style:solid;
+	%border-width:0.5px;
+	text-align:center;
+
+
+}
+
+
+
+.numberinput{
+
+	background: transparent;
+	background-color:white;
+	color:black;
+	border-color:black;
+	border-style:solid;
+	border-width:1px;
+	min-width:10px!important;
+	max-width:99.99%!important;
+	transition: width 0s;
+	padding: 5;
+}
+
+.numberinput.cranberry{
+	background-color:#398684;
+	border: none;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	color:white;
+}
+
+
+.numberinput.disabled {
+	background-color:#696969;
+	cursor:auto;
+	color:white;
+}
+
+.numberinput:disabled {
+	background-color:#696969;
+	cursor:auto;
+	color:white;
+}
+
+
+@media only screen and (max-width: 1200px) {
+	.numberinput{
+		text-size-adjust:150%;	
+		width:10em;
+	}
+}
+
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=number] {
+	-moz-appearance:textfield; /* Firefox */
+}
+
+
+
+
+.distr{
+	margin-left:1em;
+	margin-right:1em;
+}
+
+
+.dropdown{
+	background-color:#398684;
+	padding:5;
+	color:white;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+
+}
+
+
+.dropdown:after{
+	width: 0; 
+	height: 0; 
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 6px solid #f00;
+	position: absolute;
+	top: 40%;
+	right: 5px;
+	content: "";
+	z-index: 98;
+}
+
+.dropdown select{
+	width: 220px;
+	border: 0;
+	position: relative;
+	z-index: 99;
+	background: none;
+}
+
+.thicklines {
+	line-height:3em;
+
+}
+
+.sideNavSetting .dropdown{
+	width:100%;
+}
+
+
+.flex-container {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	%text-align:left;
+
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+
+	-webkit-flex-flow: row wrap;
+	justify-content: space-around;
+	%vertical-align:bottom;
+	justify-content: left;
+	margin-left:0.5em;
+	margin-right:0.1em;
+}
+
+.flex-item {
+	%width: 33%;
+	%text-align:left;
+	%margin-left:0.5em;
+}
+
+.flex-container.center{
+	justify-content: space-around;
+}
+
+
+.colourbox{
+	%height: 40px;
+	padding-left:1.6em;
+	padding-top:5px;
+	padding-top:5px;
+	margin-right:3px;
+	border-radius: 2px;
+	border-color: black; 
+	border-style:solid;
+	border-width:1px;
+	cursor:pointer;
+
+}
+
+.colourbox.selected{
+	border-width:3px;
+}
+
+.colourbox.dashed{
+	border-style:dotted;
+}
+
+.colourpickerrow{
+
+	position:absolute;
+	padding: 5 5;
+	width: 200px;
+	border-radius: 2px;
+	border-color: black; 
+	border-style:solid;
+	border-width:2px;
+	background-color:white;
+	z-index:20;
+}
+
+.paramrow{
+	text-align:right;
+}
+
+span.btn{
+	background-color:#398684;
+	color:white;
+	padding: 0 0.3em;
+	font-size:120%;
+	cursor:pointer;
+	margin: 0 0.5em;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
