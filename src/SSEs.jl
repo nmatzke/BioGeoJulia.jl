@@ -241,42 +241,6 @@ parameterized_ClaSSE_Es_v5 = (du,u,p,t) -> begin
   end
 end
 
-parameterized_ClaSSE_Ds_v5 = (du,u,p,t) -> begin
-
-  # Possibly varying parameters
-  n = p.n
-  mu = p.params.mu_vals
-  Qij_vals = p.params.Qij_vals
-  Cijk_vals = p.params.Cijk_vals
-	
-	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
-	Qarray_ivals = p.p_indices.Qarray_ivals
-	Qarray_jvals = p.p_indices.Qarray_jvals
-	Carray_ivals = p.p_indices.Carray_ivals
-	Carray_jvals = p.p_indices.Carray_jvals
-	Carray_kvals = p.p_indices.Carray_kvals
-	
-	# Pre-calculated solution of the Es
-	sol_Es = p.sol_Es_v5
-	uE = p.uE
-	uE = sol_Es(t)
-	
-	two = 1.0
-  @inbounds for i in 1:n
-		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
-		Qi_sub_i = p.p_TFs.Qi_sub_i[i]
-		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
-		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
-		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
-
-		# Calculation of "D" (likelihood of tip data)
-		du[i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 1: no event
-			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 	# case 2	
-			(sum(Cijk_vals[Ci_sub_i] .*                                               # case 34: change + eventual extinction
-				 (u[Ck_sub_i].*uE[Cj_sub_i] 
-			 .+ u[Cj_sub_i].*uE[Ck_sub_i]) ))
-  end
-end
 
 
 

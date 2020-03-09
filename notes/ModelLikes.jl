@@ -70,9 +70,9 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	e_val = 0.001
 	j_val = 0.0
 	
-	dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
-	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
-	elist = repeat([1.0], length(areas_list))
+	dmat=reshape(repeat([0.034], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	amat=reshape(repeat([0.035], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	elist = repeat([0.021], length(areas_list))
 	
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 	print("\n")
@@ -145,8 +145,10 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	# Solutions to the E vector
 	u0_Es = repeat([0.0], 1*n)
 	uE = repeat([0.0], n)
-	Es_tspan = (0.0, 1.2*trdf[tr.root,:node_age]) # 110% of tree root age
-
+	max_t = 1.2*trdf[tr.root,:node_age]
+	Es_tspan = (0.0, max_t) # 110% of tree root age
+	#by_t = max_t / 10.0
+	#Es_tspan = collect(0.0:by_t:max_t)
 
 	#######################################################
 	# Downpass with ClaSSE
