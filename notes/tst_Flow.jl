@@ -41,7 +41,7 @@ module Tst_Flow
 	using RCall       # for df_to_Rdata, reval, g = globalEnv
 
 
-	inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:1,human:1):1,gorilla:2);"))
+	inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 # 	for i in 1:length(inputs.p_Ds_v5.params.Qij_vals)
 # 		inputs.p_Ds_v5.params.Qij_vals[i] = inputs.p_Ds_v5.params.Qij_vals[i] / 100
 # 	end
@@ -74,11 +74,14 @@ module Tst_Flow
 
 	
 	
+	include("Flow.jl")
+	import .Flow
 	
 	# build an A
 	n = p_Ds_v5.n
 	tmpzero = repeat([0.0], n^2)
 	A = reshape(tmpzero, (n,n))
+	A_orig = deepcopy(A)
 	#parameterized_ClaSSE_As_v5 = (dA,p,t)
 	
 	sol_Es = p_Ds_v5.sol_Es_v5
@@ -93,8 +96,6 @@ module Tst_Flow
 	end
 	
 	
-	include("Flow.jl")
-	import .Flow
 	t = 0.01
 	Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
 	t = 0.1
@@ -102,6 +103,7 @@ module Tst_Flow
 	t = 1.0
 	Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
 	
+	A = A_orig
 	pG = (p_Ds_v5=p_Ds_v5, A=A)
 
 	tmpzero = repeat([0.0], n^2)
@@ -109,14 +111,37 @@ module Tst_Flow
 	for i in 1:n
 		G0[i,i] = 1.0
 	end
-
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, tspan, pG)
-	sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	sol = solve(prob_Gs_v5, BS5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	sol = solve(prob_Gs_v5, Rosenbrock23(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	sol = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 	
+	G0
+	
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 10.0), pG)
+	sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	u1 = sol.u
+	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
 
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, (0, 10), pG)
+	sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	u2 = sol.u
+	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+
+
+#	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+#	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+	
+	sol.u ./ (sum.(sol.u))
+	
+	
+# 	# SLOWWW
+# 	sol = solve(prob_Gs_v5, BS5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+# 	u2 = sol.u
+# 	
+# 	@benchmark sol = solve(prob_Gs_v5, BS5(), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+# 	
+# 	sol = solve(prob_Gs_v5, Rosenbrock23(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+# 	sol = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+# 	u3 = sol.u
+
+	hcat(sum.(u1), sum.(u2), sum.(u3))
 	
 	tmpzero = repeat([0.0], n^2)
 	A = reshape(tmpzero, (n,n))

@@ -1,5 +1,6 @@
 module Flow
 print("\n\nStarting module 'ModelLikes'...loading dependencies...\n")
+using LinearAlgebra  # for mul! (matrix multiplication)
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
 using LSODA
@@ -15,7 +16,7 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
-export parameterized_ClaSSE_As_v5, calc_Gs_SSE, run_Gs
+export parameterized_ClaSSE_As_v5, calc_Gs_SSE, calc_Gs_SSE!, run_Gs
 
 
 # Construct interpolation function for calculating linear dynamics A, 
@@ -82,17 +83,30 @@ parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
 # 			 .+ u[Cj_sub_i].*uE[Ck_sub_i]) ))
 
   end # End @inbounds for i in 1:n
-  return(A)
+ 	return(A)
 end
 
 
 calc_Gs_SSE = (dG, G, pG, t) -> begin
-	display(G)
 	A = pG.A
 	p_Ds_v5 = pG.p_Ds_v5
 	A = parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
 	#display(A)
-	dG = A * G
+	#dG = A * G
+	#display(G)
+	mul!(dG, A, G)
+	#display(dG)
+	return(dG)
+end # End calc_Gs_SSE
+
+# Doesn't match, risky
+calc_Gs_SSE! = (dG, G, pG, t) -> begin
+	A = pG.A
+	p_Ds_v5 = pG.p_Ds_v5
+	A = parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+	#display(A)
+	#dG = A * G
+	mul!(dG, A, G)
 	#display(dG)
 	return(dG)
 end # End calc_Gs_SSE
