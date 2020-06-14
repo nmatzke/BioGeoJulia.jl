@@ -106,29 +106,38 @@ module Tst_Flow
 	A = A_orig
 	pG = (p_Ds_v5=p_Ds_v5, A=A)
 
-	tmpzero = repeat([0.0], n^2)
-	G0 = reshape(tmpzero, (n,n))
-	for i in 1:n
-		G0[i,i] = 1.0
-	end
-	
-	G0
-	
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 10.0), pG)
-	sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	u1 = sol.u
-	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+# 	tmpzero = repeat([0.0], n^2)
+# 	G0 = reshape(tmpzero, (n,n))
+# 	for i in 1:n
+# 		G0[i,i] = 1.0
+# 	end
 
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, (0, 10), pG)
-	sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	u2 = sol.u
-	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+	# Start with an identity matrix
+	G0 = Matrix{Float64}(I, n, n)
+	
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 0.1), pG)
+	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	u1 = sol1.u
+	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
 
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, (0.0, 0.1), pG)
+	sol2 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	u2 = sol2.u
+	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+	
+	sol1(0.01)
+	sol2(0.01)
+	
+	
+	u1[length(u1)]
+	u2[length(u2)]
+	
 
 #	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 #	@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
 	
-	sol.u ./ (sum.(sol.u))
+# 	u1 ./ (sum.(u1))
+# 	u2 ./ (sum.(u2))
 	
 	
 # 	# SLOWWW

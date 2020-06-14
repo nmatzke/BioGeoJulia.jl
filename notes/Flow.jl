@@ -94,7 +94,18 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	#display(A)
 	#dG = A * G
 	#display(G)
-	mul!(dG, A, G)
+#	mul!(dG, A, G)
+	mul!(dG, G, A)
+	display(cond(G))
+	print("\n")
+	
+	# https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/
+	# When p=2, the operator norm is the spectral norm, equal to the largest singular value of A
+	# When p=1, much faster, seems to always be bigger
+	display(opnorm(A,1))
+	display(opnorm(A,2))
+	#display(opnorm(A,Inf))
+	
 	#display(dG)
 	return(dG)
 end # End calc_Gs_SSE

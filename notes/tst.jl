@@ -26,6 +26,9 @@ module Tst
 	import .Tmp
 	#using .Tmp
 
+	include("Flow.jl")
+	import .Flow
+
 	using BioGeoJulia.StateSpace 
 	using DataFrames  # for DataFrame
 

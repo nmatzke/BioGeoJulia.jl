@@ -18,7 +18,7 @@ Calculation of A(t), the linear dynamics at time t, given precalculated Es and m
 	//   dX/dt = X(t)*A(t) (if inverse==true)
 	// note that, in principle, A may also depend on the current state X, i.e. A=A(t,X(t))
 	// The returned A must be in row-major format
-	void  (double age, std::vector<double> &A) const{
+	void getLinearDynamics (double age, std::vector<double> &A) const{
 		const MuSSEstateE current_E = E(age);
 		// The mapping A is essentially the transition_matrix, plus some additional terms on the diagonal
 		A = transition_rates;
