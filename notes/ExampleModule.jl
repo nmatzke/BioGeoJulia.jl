@@ -13,7 +13,7 @@ function example1()
 end
 
 function example2()
-	print("\n\nRunning example2()\n")	
+	print("\n\nRunning example2 again()\n")	
 end
 
 

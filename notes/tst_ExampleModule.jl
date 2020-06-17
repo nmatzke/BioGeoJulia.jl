@@ -15,6 +15,7 @@ include("tst_ExampleModule.jl")
 
 module tst_ExampleModule
 	# SETUP	
+	cd("/GitHub/BioGeoJulia.jl/notes/")
 	include("ModelLikes.jl")
 	import .ModelLikes
 	#using .Tmp
@@ -43,9 +44,9 @@ module tst_ExampleModule
 	
 	
 	# RUN THE FUNCTIONS YOU ARE WORKING ON
-	example1()
+	ExampleModule.example1()
 	
-	example2()
+	ExampleModule.example2()
 	
 	
 end # End module
