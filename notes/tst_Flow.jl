@@ -29,7 +29,8 @@ module Tst_Flow
 	using BioGeoJulia.StateSpace
 	using BioGeoJulia.TreePass
 	using BioGeoJulia.SSEs
-
+	
+	using DifferentialEquations
 	using OrdinaryDiffEq, Sundials, DiffEqDevTools, Plots, ODEInterfaceDiffEq, ODE, LSODA
 	#Pkg.add(PackageSpec(url="https://github.com/JuliaDiffEq/deSolveDiffEq.jl"))
 	#using deSolveDiffEq 
@@ -67,6 +68,7 @@ module Tst_Flow
 	Rcbind(Qarray_ivals, Qarray_jvals, Qij_vals)
 	Rcbind(Carray_ivals, Carray_jvals, Carray_kvals, Cijk_vals)
 	
+	n = 10
 	u0 = collect(repeat([0.0], n))
 	u0[2] = 1.0
 	tspan = (0, 2.5)
@@ -115,10 +117,20 @@ module Tst_Flow
 	# Start with an identity matrix
 	G0 = Matrix{Float64}(I, n, n)
 	
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 0.1), pG)
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 1.1), pG)
 	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	u1 = sol1.u
+	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+
 	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+	u1 = sol1.u
+	u1 ./ (sum.(u1))
+	
+	for i in 1:length(u1)
+		print(sum(all.(u1[i] .>= 0.0)))
+		print("\n")
+	end
+	all.(u1[1] .>= 0.0)
+
 
 	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, (0.0, 0.1), pG)
 	sol2 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
