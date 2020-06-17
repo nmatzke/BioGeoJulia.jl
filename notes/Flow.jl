@@ -1,5 +1,5 @@
 module Flow
-print("\n\nStarting module 'ModelLikes'...loading dependencies...\n")
+print("\n\nStarting module 'Flow'...loading dependencies...\n")
 using LinearAlgebra  # for mul! (matrix multiplication)
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
