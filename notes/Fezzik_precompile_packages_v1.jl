@@ -1,6 +1,6 @@
 
 
-# Fizzik_setup
+# Fezzik_setup
 # https://github.com/TsurHerman/Fezzik
 
 # FIRST TIME:
@@ -28,6 +28,7 @@ using Random					# for MersenneTwister()
 using Dates						# for e.g. DateTime, Dates.now()
 using DifferentialEquations # for ODEProblem (THE SLOWEST ONE)
 using PhyloNetworks
+Pkg.resolve()					# Resolve package dependencies
 
 blacklist("BioGeoJulia")
 Fezzik.brute_build_julia()

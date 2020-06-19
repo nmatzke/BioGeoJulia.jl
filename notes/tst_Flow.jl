@@ -21,7 +21,8 @@ module Tst_Flow
 	include("Flow.jl")
 	import .Flow
 
-
+	using LinearAlgebra  # for "I" in: Matrix{Float64}(I, 2, 2)
+											 # https://www.reddit.com/r/Julia/comments/9cfosj/identity_matrix_in_julia_v10/
 	using Profile     # for @profile
 	using DataFrames  # for DataFrame
 	using PhyloNetworks
@@ -94,7 +95,9 @@ module Tst_Flow
 	sol_Es.(tvals)
 	
 	for t in tvals
-		show(Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5))
+		A_at_t = Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+		display(A_at_t)
+#		print("\n")
 	end
 	
 	
@@ -115,8 +118,19 @@ module Tst_Flow
 # 	end
 
 	# Start with an identity matrix
-	G0 = Matrix{Float64}(I, n, n)
+	# The "I" requires "include NumericAlgebra"
+	G0 = Matrix{Float64}(I, n, n) 
+
+	# Matrix norms
+	# See: 
+	# Lambers, Jim (2009). Vector Norms & Matrix Norms. pp. 1-16.
+	# https://www.math.usm.edu/lambers/mat610/sum10/lecture2.pdf
+	# These notes have the inequalities between norm forms
 	
+	# https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/
+	# When p=1, much faster, seems to always be bigger
+	# When p=2, the operator norm is the spectral norm, equal to the largest singular value of A
+
 	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 1.1), pG)
 	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
@@ -162,7 +176,7 @@ module Tst_Flow
 # 	sol = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 # 	u3 = sol.u
 
-	hcat(sum.(u1), sum.(u2), sum.(u3))
+	hcat(sum.(u1), sum.(u2))
 	
 	tmpzero = repeat([0.0], n^2)
 	A = reshape(tmpzero, (n,n))

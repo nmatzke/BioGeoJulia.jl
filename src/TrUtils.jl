@@ -3,7 +3,7 @@ using DataFrames
 using Plots  # for savefig
 #using RCall
 
-export getwd, Rgetwd, setwd, recursive_find, include_jls, source, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
+export getwd, Rgetwd, setwd, recursive_find, include_jls, source, dim, Rdim, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
 
 # R-like utilities, and other short functions
 
@@ -99,6 +99,25 @@ function source(str)
 	include(str)
 end
 
+
+# dimensions
+"""
+A = ones(3,3)
+dim(A)
+Rdim(A)
+dim(A)[1]
+dim(A)[2]
+"""
+function dim(A)
+	size(A)
+end
+
+# dimensions
+function Rdim(A)
+	size(A)
+end
+
+
 # seq
 function seq(from, to, by=1)
 	return(collect(from:by:to))
@@ -125,13 +144,13 @@ function Rrbind(A...)
 end
 
 # paste
-function paste(array_of_strings, delim)
+function paste(array_of_strings; delim)
 	newtxt = join(array_of_strings, delim)
 	return(newtxt)
 end
 
 # paste0
-function paste0(array_of_strings, delim="")
+function paste0(array_of_strings; delim="")
 	newtxt = join(array_of_strings, delim)
 	return(newtxt)
 end

@@ -68,6 +68,8 @@ Pkg.resolve()
 #######################################################
 # FROM FRESH JULIA: Load the BioGeoJulia package
 #######################################################
+# Running startup here:
+# '~/.julia/config/startup.jl
 import Pkg
 using Pkg
 Pkg.rm("BioGeoJulia")
@@ -332,8 +334,8 @@ solver_options = construct_SolverOpt()
 solver_options.solver=Tsit5()
 solver_options.abstol = 1.0e-6
 solver_options.reltol = 1.0e-6
-(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
 
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res, trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=solver_options, max_iterations=10^10);
 
 res.likes_at_each_nodeIndex_branchTop
 res.sum_likes_at_nodes
