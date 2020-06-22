@@ -131,13 +131,25 @@ module Tst_Flow
 	# When p=1, much faster, seems to always be bigger
 	# When p=2, the operator norm is the spectral norm, equal to the largest singular value of A
 
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 1.1), pG)
-	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	sol1 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, (0.0, 0.1), pG)
+#	Gflow = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	Gflow = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
+
+	display(Gflow.u[1])
+	display(Gflow.u[2])
+
+	# OK, we now have an equation that calculates the flow, G, down any timespan
+	
+
+
+
+
 
 	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
-	u1 = sol1.u
-	u1 ./ (sum.(u1))
+	u1 = Gflow.u
+	normalized_u1 = u1 ./ (sum.(u1))
+	display(normalized_u1[1])
+	display(normalized_u1[2])
 	
 	for i in 1:length(u1)
 		print(sum(all.(u1[i] .>= 0.0)))
@@ -145,13 +157,13 @@ module Tst_Flow
 	end
 	all.(u1[1] .>= 0.0)
 
-
+	# Doesn't seem to work?
 	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, (0.0, 0.1), pG)
 	sol2 = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 	u2 = sol2.u
 	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
 	
-	sol1(0.01)
+	Gflow(0.01)
 	sol2(0.01)
 	
 	
