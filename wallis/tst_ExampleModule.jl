@@ -8,18 +8,18 @@
 # Setup:
 
 """
-cd("/GitHub/BioGeoJulia.jl/notes/")
+cd("/GitHub/BioGeoJulia.jl/wallis/")
 include("tst_ExampleModule.jl")
 
 """
 
 module tst_ExampleModule
 	# SETUP	
-	cd("/GitHub/BioGeoJulia.jl/notes/")
-	include("ModelLikes.jl")
+	include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 	import .ModelLikes
 	#using .Tmp
 
+	cd("/GitHub/BioGeoJulia.jl/wallis/")
 	include("ExampleModule.jl")
 	import .ExampleModule
 
@@ -47,6 +47,10 @@ module tst_ExampleModule
 	ExampleModule.example1()
 	
 	ExampleModule.example2()
+
+	ExampleModule.example3()
+
+	ExampleModule.PUTTHISHERE()
 	
 	
 end # End module
