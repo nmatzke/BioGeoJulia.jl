@@ -183,6 +183,65 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	# [So and Thompson (2000) Singular values of Matrix Exponentials. Theorem 2.1]
 	# 
 	
+	# From Louca & Pennell:
+	# max_condition_number,	
+	# // (INPUT) unitless number, the maximum acceptable condition number for the Gmap 
+	# (as estimated from the linearized dynamics), when choosing the integration 
+	# interval size. A larger max_condition number leads to fewer age-splits, thus 
+	# faster computation but also lower accuracy. Hence, this number controls the 
+	# trade-off between speed and accuracy. Typical values are 1e4 (slower, more accurate) 
+	# up to 1e8 (faster, less accurate).
+	#
+	# The comparison is done in:
+	# const double DeltaT 		= max(root_age/max_Nintervals, 
+	# min(1.0000001*root_age,log(max_condition_number)/max_kappa_rate));
+	# 
+	# If the maximum observed kappa was 20, and the max condition number
+	# was 
+	# 
+
+# Rescaling after Delta_int time interval:
+#
+# Just take mean of the vector:
+#
+# inline double vector_mean(const std::vector<double> &values){
+# 	double S = 0;
+# 	for(long i=0; i<values.size(); ++i) S += values[i];
+# 	return (S/values.size());
+# }
+# 
+# 		const double initial_mean = vector_mean(initial);
+# 		if(initial_mean<=0) return false;
+# 		scale = log(initial_mean);
+# 		shape = initial/initial_mean;
+# 		return true; 
+# 	}
+# 
+# 	// record a new time series point, provided by the numerical solver
+# 	void registerState(double age, const MuSSEstateD &state){
+# 		trajectory.push_back(state); 
+# 		ages.push_back(age); 
+# 
+# 		// make sure entries are in [0,1]
+# 		const long i = trajectory.size()-1;
+# 		for(long s=0; s<trajectory[i].size(); ++s) trajectory[i][s] = max(0.0, min(1.0, trajectory[i][s]));
+# 	}
+# 	
+# 	
+# 	// record a new trajectory point, provided by the numerical solver
+# 	// The state X to be recorded is provided in rescaled format, i.e. state = exp(scale) * shape
+# 	// You can either record shape and scale separately, or combine them to obtain the actual state
+# 	void registerScaledState(double age, const MuSSEstateD &shape, const double scale){
+# 		trajectory_shape.push_back(shape);
+# 		trajectory_scale.push_back(scale);
+# 		ages.push_back(age); 
+
+
+
+
+
+
+	
 	print("\nopnorms(A, p=1, p=2, p=Inf, sqrt(nrow(A))*||A||Inf:\n")
 	display(opnorm(A,1))
 	display(opnorm(A,2))
@@ -200,9 +259,10 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	
 
 
+	# No return needed, what is returned is G (as .u)
 	
 	#display(dG)
-	return(dG)
+	#return(dG)
 end # End calc_Gs_SSE
 
 # Doesn't match, risky
