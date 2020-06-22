@@ -108,7 +108,7 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	condG1 = cond(G,1)
 	condG2 = cond(G,2)
 	condGInf = cond(G,Inf)
-	tmpstr = paste0(["\nAt time t=", string(round(t, digits=6)), ", Condition number=", string(round(condG1, digits=6)), ", ", string(round(condG2, digits=6)), ", ", string(round(condGInf, digits=6))])
+	tmpstr = paste0(["\nAt time t=", string(round(t, digits=6)), ", Condition number of G=", string(round(condG1, digits=6)), ", ", string(round(condG2, digits=6)), ", ", string(round(condGInf, digits=6))])
 	print(tmpstr)
 	#display(cond(G))
 	
@@ -183,7 +183,7 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	# [So and Thompson (2000) Singular values of Matrix Exponentials. Theorem 2.1]
 	# 
 	
-	print("\nopnorms p=1 & p=2:\n")
+	print("\nopnorms(A, p=1, p=2, p=Inf, sqrt(nrow(A))*||A||Inf:\n")
 	display(opnorm(A,1))
 	display(opnorm(A,2))
 	display(opnorm(transpose(A),2))
@@ -194,7 +194,7 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	sigma1_of_A = opnorm(A,1)
 	upper_bound_condition_number = exp(2*t*sigma1_of_A)
 	upper_bound_kappa_growth_rate = 2*sigma1_of_A
-	tmpstr = paste0(["\nupper_bound_condition_number=", string(upper_bound_condition_number), ", upper_bound_kappa_growth_rate=", string(upper_bound_kappa_growth_rate)])
+	tmpstr = paste0(["\nupper_bound_condition_number of A=", string(upper_bound_condition_number), "\nupper_bound_kappa_growth_rate=", string(upper_bound_kappa_growth_rate)])
 	print(tmpstr)
 	print("\n")
 	
