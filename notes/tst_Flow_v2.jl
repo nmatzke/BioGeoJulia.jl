@@ -145,7 +145,7 @@ module Tst_Flow
 	# When p=2, the operator norm is the spectral norm, equal to the largest singular value of A
 	
 	tspan = (0.0, 0.009930575252259348)
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, tspan, pG)
+	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
 #	Gflow = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 	Gflow_to_01g  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 	display(Gflow_to_01g.u[1])
