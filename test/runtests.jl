@@ -64,12 +64,13 @@ end
 	great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 	tr = readTopology(great_ape_newick_string)
 	@test type(tr) == answer
-
+	
+	setwd("/Users/")
 	@test setwd("/Users/") == cd("/Users/")
 	@test getwd() == pwd()
-	@test getwd() == "/Users/"
+	@test getwd() == "/Users"
 	@test Rgetwd() == pwd()
-	@test Rgetwd() == "/Users/"
+	@test Rgetwd() == "/Users"
 
 	# How to test these?
 	# @test recursive_find("/GitHub/BioGeoJulia.jl")
@@ -106,6 +107,10 @@ end
 	#is there a reason slashslash() has the internal code repeated several times?
 	@test slashslash("//GitHub/BioGeoJulia.jl//src//BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
 	@test addslash("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl/"
+
+	# @test df_to_Rdata
+
+
 
 end
 
