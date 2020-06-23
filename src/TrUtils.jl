@@ -303,7 +303,7 @@ Rtypes(obj)
 Rcbind(Rnames(obj), Rtypes(obj))
 ont(obj)
 """
-ont = function(obj)
+function ont(obj)
 	Rcbind(Rnames(obj), Rtypes(obj))
 end
 
