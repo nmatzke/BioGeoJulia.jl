@@ -64,6 +64,49 @@ end
 	great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 	tr = readTopology(great_ape_newick_string)
 	@test type(tr) == answer
+
+	@test setwd("/Users/") == cd("/Users/")
+	@test getwd() == pwd()
+	@test getwd() == "/Users/"
+	@test Rgetwd() == pwd()
+	@test Rgetwd() == "/Users/"
+
+	# How to test these?
+	# @test recursive_find("/GitHub/BioGeoJulia.jl")
+	# @test include_jls("/GitHub/BioGeoJulia.jl")
+
+	# @test source("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == include("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl")
+
+	A = ones(3,3)
+	B = ones(3,3)
+	@test dim(A) == size(A)
+	@test Rdim(A) == size(A)
+
+	# tmpstr = "Array{Int64, 1}: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+	C = Int64[1,2,3,4,5,6,7,8,9,10]
+	@test seq(1, 10, 1) == C
+	@test Rchoose(10,5) == 252
+
+	D = ones(3,6)
+	@test Rcbind(A, B) == hcat(A,B)
+	@test Rcbind(A, B) == D
+	E = ones(6,3)
+	@test Rrbind(A, B) == vcat(A,B)
+	@test Rrbind(A, B) == E
+
+	# @test paste(array_of_strings; delim) == ?
+	# @test paste0(array_of_strings; delim="") == ?
+
+	F = "tester"
+	@test type(F) == String
+	@test class(F) == "String"
+	# RCLASS NOT EXPORTED!!
+	# @test Rclass(F) == "String"
+
+	#is there a reason slashslash() has the internal code repeated several times?
+	@test slashslash("//GitHub/BioGeoJulia.jl//src//BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
+	@test addslash("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl/"
+
 end
 
 @testset "TreePass" begin
