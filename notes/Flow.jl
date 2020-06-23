@@ -16,7 +16,7 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
-export parameterized_ClaSSE_As_v5, calc_Gs_SSE, calc_Gs_SSE!, run_Gs
+export parameterized_ClaSSE_As_v5, check_linearDynamics_of_As, calc_Gs_SSE_condnums, calc_Gs_SSE, calc_Gs_SSE!, run_Gs
 
 
 # Construct interpolation function for calculating linear dynamics A, 
@@ -95,10 +95,49 @@ parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
  	return(A)
 end
 
-#
-calc_Gs_SSE = (dG, G, pG, t) -> begin
-	A = pG.A
-	p_Ds_v5 = pG.p_Ds_v5
+
+# Check the linear dynamics (matrix A) for timespans where the kappa rate
+# exceeds log(max_condition_number). max_condition_number is usually between
+# 1e4 (slower) and 1e8 (faster)
+# 
+# "exponential growth rate of the condition number ("kappa_rate") based on the 
+#  largest singular value of the dynamics A" 
+
+function check_linearDynamics_of_As(tvals, p_Ds_v5; max_condition_number=1e8)
+
+	# build an A matrix to hold the linear dynamics
+	n = p_Ds_v5.n
+	tmpzero = repeat([0.0], n^2)
+	A = reshape(tmpzero, (n,n))
+	
+	# build arrays to hold the output for each t
+	upper_bound_kappa_rates_A = collect(repeat([0.0], length(tvals)))
+	cond_num_too_big_TF = collect(repeat([false], length(tvals)))
+	
+	for i in 1:length(tvals)
+		t = tvals[i]
+		A_at_t = Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+		sigma1_of_A = opnorm(A,1)  # the 1-norm should be adequate here (fastest calc.)
+		upper_bound_kappa_rates_A[i] = 2*sigma1_of_A
+		if (upper_bound_kappa_rates_A[i] > log(max_condition_number))
+			cond_num_too_big_TF[i] = true
+		end
+	end
+	
+	
+	# Creat dataframe
+	kappa_Arates_df = DataFrames.DataFrame(tvals=tvals, ub_kappa_ratesA=upper_bound_kappa_rates_A, cond_num_too_big=cond_num_too_big_TF)
+
+	return(kappa_Arates_df)
+end
+
+# Calculate G flow matrix down time series, outputting various
+# condition numbers and kappa rates
+calc_Gs_SSE_condnums = (dG, G, pG, t) -> begin
+	A = pG.A             # Initial A
+	p_Ds_v5 = pG.p_Ds_v5 # Calculate Ds down a timespan
+	
+	# A as a function of time t
 	A = parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
 	#display(A)
 	#dG = A * G
@@ -197,7 +236,7 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	# min(1.0000001*root_age,log(max_condition_number)/max_kappa_rate));
 	# 
 	# If the maximum observed kappa was 20, and the max condition number
-	# was 
+	# was 1e8, log(1e8) would be 18.4
 	# 
 
 # Rescaling after Delta_int time interval:
@@ -263,7 +302,29 @@ calc_Gs_SSE = (dG, G, pG, t) -> begin
 	
 	#display(dG)
 	#return(dG)
+end # End calc_Gs_SSE_condnums
+
+
+
+# Calculate G flow matrix down time series
+# (no printed outputs)
+calc_Gs_SSE = (dG, G, pG, t; max_condition_number=1e8) -> begin
+	#A = pG.A
+	p_Ds_v5 = pG.p_Ds_v5
+	A = parameterized_ClaSSE_As_v5(t, pG.A, p_Ds_v5)
+	#display(A)
+	#dG = A * G
+	#display(G)
+
+	# The new dG is A %*% G
+	mul!(dG, A, G)
+
+	# No return needed, what is returned is G (as .u)
+	return(dG)
 end # End calc_Gs_SSE
+
+
+
 
 # Doesn't match, risky
 calc_Gs_SSE! = (dG, G, pG, t) -> begin

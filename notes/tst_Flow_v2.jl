@@ -69,7 +69,7 @@ module Tst_Flow
 	Rcbind(Qarray_ivals, Qarray_jvals, Qij_vals)
 	Rcbind(Carray_ivals, Carray_jvals, Carray_kvals, Cijk_vals)
 	
-	n = 10
+	n = 3
 	u0 = collect(repeat([0.0], n))
 	u0[2] = 1.0
 	tspan = (0, 2.5)
@@ -144,12 +144,33 @@ module Tst_Flow
 	# When p=1, much faster, seems to always be bigger
 	# When p=2, the operator norm is the spectral norm, equal to the largest singular value of A
 	
-	tspan = (0.0, 0.01120114144178123)
+	tspan = (0.0, 0.009930575252259348)
 	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE, G0, tspan, pG)
 #	Gflow = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	Gflow_to_01  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
-	display(Gflow_to_01.u[1])
-	display(Gflow_to_01.u[2])
+	Gflow_to_01g  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	display(Gflow_to_01g.u[1])
+	display(Gflow_to_01g.u[2])
+	display(Gflow_to_01g.u[6050])
+	Gflow_to_01g(0.00005)
+
+	Gflow_to_01t  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	display(Gflow_to_01t.u[1])
+	display(Gflow_to_01t.u[2])
+	display(Gflow_to_01t.u[6050])
+
+	
+	Gflow_to_01l  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+	Gflow_to_01g(0.000005)
+	Gflow_to_01t(0.000005)
+	Gflow_to_01l(0.000005)
+
+	Gflow_to_01g(0.000001)
+	Gflow_to_01t(0.000001)
+	Gflow_to_01l(0.000001)
+
+
+	
 	mean(Gflow_to_01.u[1])
 	mean(Gflow_to_01.u[2])
 
@@ -167,7 +188,7 @@ module Tst_Flow
 	#######################################################
 	
 	# Ground truth:
-	factored_G = factorize(Gflow_to_25.u[2])
+	factored_G = factorize(Gflow_to_01.u[2])
 	# Solve for imaginary X0 at t=0 that would produce
 	X0 = factored_G \ u0
 
