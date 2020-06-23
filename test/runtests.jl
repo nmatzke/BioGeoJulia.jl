@@ -64,6 +64,88 @@ end
 	great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 	tr = readTopology(great_ape_newick_string)
 	@test type(tr) == answer
+	
+	setwd("/Users/")
+	@test setwd("/Users/") == cd("/Users/")
+	@test getwd() == pwd()
+	@test getwd() == "/Users"
+	@test Rgetwd() == pwd()
+	@test Rgetwd() == "/Users"
+
+	A = ones(3,3)
+	B = ones(3,3)
+	@test dim(A) == size(A)
+	@test Rdim(A) == size(A)
+
+	C = Int64[1,2,3,4,5,6,7,8,9,10]
+	@test seq(1, 10, 1) == C
+	@test Rchoose(10,5) == 252
+
+	D = ones(3,6)
+	@test Rcbind(A, B) == hcat(A,B)
+	@test Rcbind(A, B) == D
+	E = ones(6,3)
+	@test Rrbind(A, B) == vcat(A,B)
+	@test Rrbind(A, B) == E
+
+	F = "tester"
+	@test type(F) == String
+	@test class(F) == "String"
+	
+
+	#is there a reason slashslash() has the internal code repeated several times?
+	@test slashslash("//GitHub/BioGeoJulia.jl//src//BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
+	@test addslash("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl/"
+
+	
+
+	tmpmatrix = [3 1; 3 2; 5 3; 5 4; 7 5; 7 6]
+	tmpstr = repr(tmpmatrix)
+	tmpstr2 = eval(Meta.parse(tmpstr))
+	@test Reval(tmpstr) == tmpstr2
+
+	tmpstr = "Array{Any,1}[[1], [2], [3], [1, 2], [1, 3], [2, 3], [1, 2, 3]]"
+	tmpstr2 = tmpstr
+	states_list = Reval(tmpstr)
+	@test Rdput(states_list) == tmpstr2
+
+	@test Rnrow(A) == 3
+	@test Rncol(A) == 3
+	@test Rsize(A) == (3,3)
+	
+	tmparray = (1)
+	@test single_element_array_to_scalar(tmparray) == 1
+	
+	# How to test these?
+	# @test recursive_find("/GitHub/BioGeoJulia.jl")
+	# @test include_jls("/GitHub/BioGeoJulia.jl")
+	# @test paste(array_of_strings; delim) == ?
+	# @test paste0(array_of_strings; delim="") == ?
+	# RCLASS NOT EXPORTED!!
+	# @test Rclass(F) == "String"
+	# @test df_to_Rdata
+	# @test source("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == include("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl")
+	# @test Rnames
+	# @test Rtypes
+	
+	# @test ont 
+	# In TrUtils: ont is currently listed as:
+	"""
+	ont = function(obj)
+		Rcbind(Rnames(obj), Rtypes(obj))
+	end
+	"""
+	# Shouldn't this be:
+	"""
+	function ont(obj)?
+	"""
+	# @test Rorder(A) ==
+	# @test headLR(df, num_startcols=4, num_endcols=4) ==
+	# @test flat2(arr) ==
+	# @test single_element_array_to_scalar(tmparray) ==  
+
+
+
 end
 
 @testset "TreePass" begin
