@@ -40,74 +40,67 @@ module Tst_Flow
 	using Profile     # for @profile
 	using DataFrames  # for DataFrame
 	using PhyloNetworks
-	using RCall       # for df_to_Rdata, reval, g = globalEnv
+#	using RCall       # for df_to_Rdata, reval, g = globalEnv
 
-
-	inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
-# 	for i in 1:length(inputs.p_Ds_v5.params.Qij_vals)
-# 		inputs.p_Ds_v5.params.Qij_vals[i] = inputs.p_Ds_v5.params.Qij_vals[i] / 100
-# 	end
-	
-	
+	# Set up a DEC-like model; will calculate Es over 120% of root depth
+	#inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+	inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 	res = inputs.res
 	trdf = inputs.trdf
+	root_age = maximum(trdf[!, :node_age])
 	solver_options = inputs.solver_options
+	solver_options.save_everystep
 	p_Ds_v5 = inputs.p_Ds_v5
+	Rnames(p_Ds_v5)
 	
+	# Check that the E interpolator flatted out at large times
+	sol_Es = p_Ds_v5.sol_Es_v5
+	sol_Es(seq(1.0, root_age, 1.0) )
 	
-	p_Ds_v5.sol_Es_v5
+	# Look at the model parameters (Q and C matrix)
+	Rcbind(p_Ds_v5.p_indices.Qarray_ivals, p_Ds_v5.p_indices.Qarray_jvals, p_Ds_v5.params.Qij_vals)
+	Rcbind(p_Ds_v5.p_indices.Carray_ivals, p_Ds_v5.p_indices.Carray_jvals, p_Ds_v5.p_indices.Carray_kvals, p_Ds_v5.params.Cijk_vals)
 	
-	mu_vals = p_Ds_v5.params.mu_vals
-	Qarray_ivals = p_Ds_v5.p_indices.Qarray_ivals
-	Qarray_jvals = p_Ds_v5.p_indices.Qarray_jvals
-	Carray_ivals = p_Ds_v5.p_indices.Carray_ivals
-	Carray_jvals = p_Ds_v5.p_indices.Carray_jvals
-	Carray_kvals = p_Ds_v5.p_indices.Carray_kvals
-  Qij_vals = p_Ds_v5.params.Qij_vals
-  Cijk_vals = p_Ds_v5.params.Cijk_vals
-	
-	Rcbind(Qarray_ivals, Qarray_jvals, Qij_vals)
-	Rcbind(Carray_ivals, Carray_jvals, Carray_kvals, Cijk_vals)
-	
-	n = 3
+
+	# Run numerical integration of the Ds, for ground truth
+	# Creates an interpolator, ground_truth_Ds_interpolator, to produce
+	# Ds at any timepoint
+	n = inputs.p_Ds_v5.n
 	u0 = collect(repeat([0.0], n))
 	u0[2] = 1.0
-	tspan = (0, 2.5)
+	tspan = (0.0, 1.2*root_age)
 	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
-	ground_truth_Ds = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	ground_truth_Ds[length(ground_truth_Ds)]
+	ground_truth_Ds_interpolator = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	ground_truth_Ds_interpolator = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	ground_truth_Ds_interpolator[length(ground_truth_Ds_interpolator)]
 	
 	# Now, do this calculation with the "Flow" calculation
 	include("Flow.jl")
 	import .Flow
 	
-	# build an A
-	n = p_Ds_v5.n
+	# build an A (the linear dynamics, i.e. Q and C matrices combined into a square matrix)
 	tmpzero = repeat([0.0], n^2)
 	A = reshape(tmpzero, (n,n))
-	A_orig = deepcopy(A)
-	#parameterized_ClaSSE_As_v5 = (dA,p,t)
 	
-	sol_Es = p_Ds_v5.sol_Es_v5
 	
-	# A(t) is just a function of t, given the parameters and the Es
-	
-	tvals = [0.01, 0.1, 1.0, 10.0, 100.0]
+	tvals = [0.01, 0.1, 1.0, 10.0]
 	sol_Es.(tvals)
 	
+	# A(t) is just a function of t, given the parameters and the Es
+	# Using  A[:,:] is required, so that the starting "A" doesn't mutate
 	for t in tvals
-		A_at_t = Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+		A_at_t = Flow.parameterized_ClaSSE_As_v5(t, A[:,:], p_Ds_v5)
 		display(A_at_t)
 #		print("\n")
 	end
 	
-	
+	# Using  A[:,:] is required, so that the starting "A" doesn't mutate
 	t = 0.01
-	Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+	Flow.parameterized_ClaSSE_As_v5(t, A[:,:], p_Ds_v5)
 	t = 0.1
-	Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+	Flow.parameterized_ClaSSE_As_v5(t, A[:,:], p_Ds_v5)
 	t = 1.0
-	Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
+	Flow.parameterized_ClaSSE_As_v5(t, A[:,:], p_Ds_v5)
 
 
 	# Check the linear dynamics (matrix A) for timespans where the kappa rate
@@ -116,91 +109,49 @@ module Tst_Flow
 	# 
 	# "exponential growth rate of the condition number ("kappa_rate") based on the 
 	#  largest singular value of the dynamics A" 
-	tvals = collect(0:0.1:20)
+	tvals = collect(0:0.1:root_age)
 	kappa_Arates_df = Flow.check_linearDynamics_of_As(tvals, p_Ds_v5; max_condition_number=1e8)
-
-
 	
-	A = A_orig
-	pG = (p_Ds_v5=p_Ds_v5, A=A)
-	pG.A
-	
-# 	tmpzero = repeat([0.0], n^2)
-# 	G0 = reshape(tmpzero, (n,n))
-# 	for i in 1:n
-# 		G0[i,i] = 1.0
-# 	end
+	# Are there any condition numbers too big?
+	seq(1,nrow(kappa_Arates_df),1)[kappa_Arates_df[!,:condbigTF]]
 
+	# Map the likelihood "flow" of Ds, G (or Gmap or Psi).
 	# Start with an identity matrix
 	# The "I" requires "include NumericAlgebra"
 	G0 = Matrix{Float64}(I, n, n) 
 
-	# Matrix norms
-	# See: 
-	# Lambers, Jim (2009). Vector Norms & Matrix Norms. pp. 1-16.
-	# https://www.math.usm.edu/lambers/mat610/sum10/lecture2.pdf
-	# These notes have the inequalities between norm forms
-	
-	# https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/
-	# When p=1, much faster, seems to always be bigger
-	# When p=2, the operator norm is the spectral norm, equal to the largest singular value of A
-	pG = (n=n, p_Ds_v5=p_Ds_v5, A=A, A_orig=A_orig)
-	tspan = (0.0, 0.009930575252259348)
+	pG = (n=n, p_Ds_v5=p_Ds_v5, A=A)
+	tspan = (0.0, 20.0)
 	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
-#	Gflow = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 
-	pG = (n=n, p_Ds_v5=p_Ds_v5, A=A, A_orig=A_orig)
-	tspan = (0.0, 0.009930575252259348)
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
 	Gflow_to_01g  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-# 	display(Gflow_to_01g.u[1])
-# 	display(Gflow_to_01g.u[2])
-# 	display(Gflow_to_01g.u[6050])
-# 	Gflow_to_01g(0.00005)
-	pG = (n=n, p_Ds_v5=p_Ds_v5, A=A, A_orig=A_orig)
-	tspan = (0.0, 0.009930575252259348)
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
 	Gflow_to_01t  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-# 	display(Gflow_to_01t.u[1])
-# 	display(Gflow_to_01t.u[2])
-# 	display(Gflow_to_01t.u[6050])
-
-	pG = (n=n, p_Ds_v5=p_Ds_v5, A=A, A_orig=A_orig)
-	tspan = (0.0, 0.009930575252259348)
-	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
 	Gflow_to_01l  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-
-	Gflow_to_01g(0.000005)
-	Gflow_to_01t(0.000005)
-	Gflow_to_01l(0.000005)
-
-	Gflow_to_01g(0.000001)
-	Gflow_to_01t(0.000001)
-	Gflow_to_01l(0.000001)
-
+	
+	# Check that the different interpolators match
 	Gflow_to_01g(0.001)
 	Gflow_to_01t(0.001)
 	Gflow_to_01l(0.001)
 
-	Gflow_to_01g(0.009)
-	Gflow_to_01t(0.009)
-	Gflow_to_01l(0.009)
+	Gflow_to_01g(0.01)
+	Gflow_to_01t(0.01)
+	Gflow_to_01l(0.01)
+
+	Gflow_to_01g(0.1)
+	Gflow_to_01t(0.1)
+	Gflow_to_01l(0.1)
+
+	Gflow_to_01g(1.0)
+	Gflow_to_01t(1.0)
+	Gflow_to_01l(1.0)
+
+	Gflow_to_01g(10.0)
+	Gflow_to_01t(10.0)
+	Gflow_to_01l(10.0)
 
 	
 	mean(Gflow_to_01.u[1])
 	mean(Gflow_to_01.u[2])
-
-	tspan = (0.0, 2.5)
-	Gflow_to_25  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
-	display(Gflow_to_25.u[1])
-	display(Gflow_to_25.u[2])
-	mean(Gflow_to_25.u[1])
-	mean(Gflow_to_25.u[2])
-
-	tspan = (0.0, 2.5)
-	prob_Gs_v5_condnums = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE_condnums!, G0, tspan, pG)
-	Gflow_to_25_condnums  = solve(prob_Gs_v5_condnums, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)
-
 
 	
 	# OK, we now have an equation that calculates the flow, G, down any timespan
@@ -209,10 +160,10 @@ module Tst_Flow
 	# TEST the flow calculation, on a single branch
 	#######################################################
 	
-	# Ground truth:
-	factored_G = factorize(Gflow_to_25.u[2])
+	# Calculate Ds at t=10
+	factored_G = factorize(Gflow_to_01l(10.0))
 	# Solve for imaginary X0 at t=0 that would produce
-	Xc = ground_truth_Ds[length(ground_truth_Ds)]
+	Xc = ground_truth_Ds_interpolator(10.0)
 	X0 = factored_G \ Xc
 	
 	X0_v2 = similar(Xc)
@@ -222,13 +173,79 @@ module Tst_Flow
 	
 	
 	# Matrix x vector product, stored in Xc_v2
-	Xc_v2 = Gflow_to_25.u[2] * X0
+	Xc_v2 = Gflow_to_01l(10.0) * X0
 	Xc_v2
 	Xc
 	
 	
 	X0_v3 = similar(Xc)
-	mul!(X0_v3, Gflow_to_25.u[2], X0)
+	mul!(X0_v3, Gflow_to_01l(10.0), X0)
+	
+	
+	
+	
+	#######################################################
+	# KEY IDEA
+	
+	# To get from the likelihoods at:
+	# Xchild  at time tc
+	# ...to...
+	# Xparent at time tp
+	# ...normally you would integrate the SSE equation down 
+	# the branch, with the starting value of Xchild.
+	
+	# HOWEVER, if you have the flow (G or Gmap or psi(tc, tp))
+	# then you can just go 
+	# psi(t0, tp) / psi(t0,tc) * Xc
+	# which is equivalent to 
+	# psi(t0, tp) * fakeX0
+	# Gmap(tp) * fakeX0
+	#
+	# ...because Gmap(tc) * fakeX0 = Xc
+	# Solve for fakeX0 with G(tc) \ Xc = fakeX0
+	#######################################################
+	
+	# Let's calculate Xc, starting from a tip
+	X0 = [0.0, 1.0, 0.0]
+	
+	tc = 1.0
+	Xc_from_flow = similar(X0)
+	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
+	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	ground_truth_Ds_interpolator(tc)
+
+	tc = 2.0
+	Xc_from_flow = similar(X0)
+	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
+	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	ground_truth_Ds_interpolator(tc)
+
+	tc = 3.0
+	Xc_from_flow = similar(X0)
+	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
+	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	ground_truth_Ds_interpolator(tc)
+	Xc_from_flow2 ./ ground_truth_Ds_interpolator(tc) 
+
+
+	tc = 10.0
+	Xc_from_flow = similar(X0)
+	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
+	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	ground_truth_Ds_interpolator(tc)
+	Xc_from_flow2 ./ ground_truth_Ds_interpolator(tc) 
+	log.(Xc_from_flow2 ./ ground_truth_Ds_interpolator(tc))
+
+
+
+	factored_G = factorize(Gflow_to_01l(0.0))
+	fakeX0 = factored_G \ X0
+	Xc_from_flow3 = Gflow_to_011(10.0) * fakeX0
+
+	
+	factored_G = factorize(Gflow_to_01l(10.0))
+	fakeX0 = factored_G \ X0
+	Xc_from_flow3 = Gflow_to_01g(10.0) * fakeX0
 	
 	
 	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)

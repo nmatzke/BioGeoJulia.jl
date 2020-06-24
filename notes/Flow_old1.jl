@@ -67,24 +67,23 @@ parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
 		# Calculation of "A" (the from-to probabilities between every pair of states)
 		# Pull out the Q transitions - diagonal
 		# case 1: no event
-		#A[i,i] = A[i,i]  + -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i]) # *u[i]  
-		A[i,i] = A[i,i] - sum(Qij_vals[Qi_sub_i]) - sum(Cijk_vals[Ci_sub_i]) - mu[i] + 2*sum(Cijk_vals[Ci_sub_i])*uE[i]
+		A[i,i] = A[i,i]  + -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i]) # *u[i]  
 		
-		# case 2: anagenetic change (non-diagonal)
+		# case 2: anagenetic change
 		@inbounds for m in 1:length(Qi_sub_i)
 			A[Qi_sub_i[m],Qj_sub_i[m]] = A[Qi_sub_i[m],Qj_sub_i[m]] + Qij_vals[Qi_sub_i[m]] #* u[Qj_sub_i[m]])
 		end
 		
-		# case 34: change + eventual extinction (non-diagonal)
-# 		@inbounds for m in 1:length(Ci_sub_i)
-# 			# each cladogenesis event puts probability in 2 places
-# 			# excluding the u[], i.e. the Ds, i.e. the Xs, just as is done in 
-# 			# 2*speciation_rates[r]*current_E[r]
-# 			#rate_sp_then_ex = Cijk_vals[Ci_sub_i] * ((u[Ck_sub_i] * uE[Cj_sub_i]) + (u[Cj_sub_i] * uE[Ck_sub_i]))
-# 			rate_sp_then_ex = Cijk_vals[Ci_sub_i[m]] * (uE[Cj_sub_i[m]] + uE[Ck_sub_i[m]])
-# 			A[Ci_sub_i[m],Cj_sub_i[m]] = A[Ci_sub_i[m],Cj_sub_i[m]] + rate_sp_then_ex
-# 			A[Ci_sub_i[m],Ck_sub_i[m]] = A[Ci_sub_i[m],Ck_sub_i[m]] + rate_sp_then_ex
-# 		end
+		# case 34: change + eventual extinction
+		@inbounds for m in 1:length(Ci_sub_i)
+			# each cladogenesis event puts probability in 2 places
+			# excluding the u[], i.e. the Ds, i.e. the Xs, just as is done in 
+			# 2*speciation_rates[r]*current_E[r]
+			#rate_sp_then_ex = Cijk_vals[Ci_sub_i] * ((u[Ck_sub_i] * uE[Cj_sub_i]) + (u[Cj_sub_i] * uE[Ck_sub_i]))
+			rate_sp_then_ex = Cijk_vals[Ci_sub_i[m]] * (uE[Cj_sub_i[m]] + uE[Ck_sub_i[m]])
+			A[Ci_sub_i[m],Cj_sub_i[m]] = A[Ci_sub_i[m],Cj_sub_i[m]] + rate_sp_then_ex
+			A[Ci_sub_i[m],Ck_sub_i[m]] = A[Ci_sub_i[m],Ck_sub_i[m]] + rate_sp_then_ex
+		end
 		
 # 		du[i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 1: no event
 # 			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 	# case 2	
@@ -103,9 +102,7 @@ end
 # 
 # "exponential growth rate of the condition number ("kappa_rate") based on the 
 #  largest singular value of the dynamics A" 
-#
-# Using  A[:,:] is required, so that "A" doesn't mutate
-# 
+
 function check_linearDynamics_of_As(tvals, p_Ds_v5; max_condition_number=1e8)
 
 	# build an A matrix to hold the linear dynamics
@@ -115,44 +112,24 @@ function check_linearDynamics_of_As(tvals, p_Ds_v5; max_condition_number=1e8)
 	
 	# build arrays to hold the output for each t
 	upper_bound_kappa_rates_A = collect(repeat([0.0], length(tvals)))
-	condbigTF = collect(repeat([false], length(tvals)))
+	cond_num_too_big_TF = collect(repeat([false], length(tvals)))
 	
 	for i in 1:length(tvals)
 		t = tvals[i]
-		A_at_t = Flow.parameterized_ClaSSE_As_v5(t, A[:,:], p_Ds_v5)
+		A_at_t = Flow.parameterized_ClaSSE_As_v5(t, A, p_Ds_v5)
 		sigma1_of_A = opnorm(A,1)  # the 1-norm should be adequate here (fastest calc.)
 		upper_bound_kappa_rates_A[i] = 2*sigma1_of_A
 		if (upper_bound_kappa_rates_A[i] > log(max_condition_number))
-			condbigTF[i] = true
+			cond_num_too_big_TF[i] = true
 		end
 	end
 	
 	
 	# Creat dataframe
-	# condbigTF = Is the growth rathe of condition number too big, i.e. bigger than log(max_condition_number)
-	kappa_Arates_df = DataFrames.DataFrame(tvals=tvals, ub_kappa_ratesA=upper_bound_kappa_rates_A, condbigTF=condbigTF)
+	kappa_Arates_df = DataFrames.DataFrame(tvals=tvals, ub_kappa_ratesA=upper_bound_kappa_rates_A, cond_num_too_big=cond_num_too_big_TF)
 
 	return(kappa_Arates_df)
 end
-
-
-
-# Map the likelihood "flow" of Ds, G (or Gmap or Psi).
-# Start with an identity matrix
-calc_Gs_SSE! = (dG, G, pG, t) -> begin
-	# Have to use pG.A[:,:] to avoid overwriting A, which screws everything up!
-	#A = parameterized_ClaSSE_As_v5(t, pG.A[:,:], pG.p_Ds_v5)
-	#display(A)
-	#dG = A * G
-	# Have to use pG.A[:,:] to avoid overwriting A, which screws everything up!
-	#mul!(dG, A(t), G(t))  # Equation 20
-	mul!(dG, parameterized_ClaSSE_As_v5(t, pG.A[:,:], pG.p_Ds_v5), G)
-	#display(dG)
-	#return(dG)
-end # End calc_Gs_SSE
-
-
-
 
 # Calculate G flow matrix down time series, outputting various
 # condition numbers and kappa rates
@@ -349,6 +326,24 @@ calc_Gs_SSE = (dG, G, pG, t; max_condition_number=1e8) -> begin
 	return(dG)
 end # End calc_Gs_SSE
 
+
+
+
+# Doesn't match, risky
+calc_Gs_SSE! = (dG, G, pG, t) -> begin
+# 	n = pG.n
+# 	tmpzero = repeat([0.0], n^2)
+# 	A = reshape(tmpzero, (n,n))
+	#tmpA = pG.A[:,:]
+
+	p_Ds_v5 = pG.p_Ds_v5
+	#A = parameterized_ClaSSE_As_v5(t, tmpA, p_Ds_v5)
+	#display(A)
+	#dG = A * G
+	mul!(dG, parameterized_ClaSSE_As_v5(t, pG.A[:,:], p_Ds_v5), G)
+	#display(dG)
+	#return(dG)
+end # End calc_Gs_SSE
 
 
 
