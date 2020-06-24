@@ -3,7 +3,7 @@ using DataFrames
 using Plots  # for savefig
 #using RCall
 
-export getwd, Rgetwd, setwd, recursive_find, include_jls, source, dim, Rdim, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
+export getwd, Rgetwd, setwd, recursive_find, include_jls, source, dim, Rdim, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, Rclass, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
 
 # R-like utilities, and other short functions
 

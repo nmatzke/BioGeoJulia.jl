@@ -72,6 +72,9 @@ end
 	@test Rgetwd() == pwd()
 	@test Rgetwd() == "/Users"
 
+	tmparray = recursive_find("/GitHub/BioGeoJulia.jl")
+	@test tmparray[1] == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
+
 	A = ones(3,3)
 	B = ones(3,3)
 	@test dim(A) == size(A)
@@ -91,13 +94,11 @@ end
 	F = "tester"
 	@test type(F) == String
 	@test class(F) == "String"
+	@test Rclass(F) == "String"
 	
-
 	#is there a reason slashslash() has the internal code repeated several times?
 	@test slashslash("//GitHub/BioGeoJulia.jl//src//BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
 	@test addslash("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl/"
-
-	
 
 	tmpmatrix = [3 1; 3 2; 5 3; 5 4; 7 5; 7 6]
 	tmpstr = repr(tmpmatrix)
@@ -117,12 +118,9 @@ end
 	@test single_element_array_to_scalar(tmparray) == 1
 	
 	# How to test these?
-	# @test recursive_find("/GitHub/BioGeoJulia.jl")
 	# @test include_jls("/GitHub/BioGeoJulia.jl")
 	# @test paste(array_of_strings; delim) == ?
 	# @test paste0(array_of_strings; delim="") == ?
-	# RCLASS NOT EXPORTED!!
-	# @test Rclass(F) == "String"
 	# @test df_to_Rdata
 	# @test source("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == include("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl")
 	# @test Rnames
@@ -145,7 +143,7 @@ end
 	# @test single_element_array_to_scalar(tmparray) ==  
 
 
-
+	
 end
 
 @testset "TreePass" begin
