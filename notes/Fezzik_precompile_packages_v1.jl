@@ -9,28 +9,46 @@ using Pkg
 Pkg.add(PackageSpec(url="https://github.com/TsurHerman/Fezzik"))
 using Fezzik
 Fezzik.auto_trace()
+# NOTE: To clear old Fezziks, use Fezzik.revert()
+
 
 # CLOSE, THEN OPEN JULIA:
 using Fezzik
 using Pkg
+
+Fezzik.blacklist("BioGeoJulia")
+Fezzik.blacklist("AbstractPlotting")
+Fezzik.blacklist("Interact")
+
+# Faster/smaller packages
 #using Revise
 using LSODA          # for lsoda()
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
+using DataFrames      # for e.g. DataFrame()
 using Distributed     # for @spawn
 using Distributions  # for quantile
 using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 using Combinatorics  # for e.g. combinations()
 using DataFrames     # for e.g. DataFrame()
-
 using Random					# for MersenneTwister()
 using Dates						# for e.g. DateTime, Dates.now()
+using Statistics			# for e.g. mean()
+using RCall       # for df_to_Rdata, reval, g = globalEnv
+	
+# For SSE stuff
+using OrdinaryDiffEq
+using DiffEqDevTools
+using ODEInterfaceDiffEq
+using ODE
+
+# Large and slow...
+using Plots						# basic plots
 using DifferentialEquations # for ODEProblem (THE SLOWEST ONE)
-using PhyloNetworks
+using PhyloNetworks		# for phylogenetic trees
 Pkg.resolve()					# Resolve package dependencies
 
-blacklist("BioGeoJulia")
 Fezzik.brute_build_julia()
 # Activating environment at `~/.julia/environments/v1.3/Project.toml`
 # [ArrayInterface] already loaded
@@ -183,3 +201,12 @@ Fezzik.brute_build_julia()
 
 # The next time you open Julia, the packages are pre-compiled!!
 
+
+# To undo:
+# remove itself from the startup.jl and deletes previous traces
+# Fezzik.auto_trace(false)
+
+# every now and then you'll want to start over , just call
+# 
+# Fezzik.revert()
+# to go back to the beginning

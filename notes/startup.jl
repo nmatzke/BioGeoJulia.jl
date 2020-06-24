@@ -71,6 +71,7 @@ using Dates						# for e.g. DateTime, Dates.now()
 using LSODA          # for lsoda()
 using BenchmarkTools # for @time
 using InvertedIndices # for Not
+using Statistics			# for e.g. mean()
 
 print("...done loading basic default packages.\n\n")
 
@@ -101,6 +102,9 @@ print("\n")
 print("\n")
 print("Loading slow packages...\n")
 print("\n")
+
+print("Plots...\n")
+using Plots						# basic plots
 print("DifferentialEquations...\n")
 using DifferentialEquations # for ODEProblem
 print("PhyloNetworks...\n")
