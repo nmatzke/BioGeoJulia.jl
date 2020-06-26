@@ -4,7 +4,7 @@ using Dates									# for e.g. Dates.now(), DateTime
 using PhyloNetworks					# most maintained, emphasize; for HybridNetwork
 using Distributed						# for e.g. @spawn
 using Combinatorics					# for e.g. combinations()
-
+using DataFrames
 
 # List each BioGeoJulia code file prefix here
 using BioGeoJulia.Example
@@ -116,6 +116,13 @@ end
 	states_list = Reval(tmpstr)
 	@test Rdput(states_list) == tmpstr2
 
+	great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+	tr = readTopology(great_ape_newick_string)
+	@test Rnames(tr)[1] == :numTaxa
+	@test Rtypes(tr)[1] == Int64
+	@test ont(tr) == Any[:numTaxa Int64; :numNodes Int64; :numEdges Int64; :node Array{PhyloNetworks.Node,1}; :edge Array{PhyloNetworks.Edge,1}; :root Int64; :names Array{String,1}; :hybrid Array{PhyloNetworks.Node,1}; :numHybrids Int64; :cladewiseorder_nodeIndex Array{Int64,1}; :visited Array{Bool,1}; :edges_changed Array{PhyloNetworks.Edge,1}; :nodes_changed Array{PhyloNetworks.Node,1}; :leaf Array{PhyloNetworks.Node,1}; :ht Array{Float64,1}; :numht Array{Int64,1}; :numBad Int64; :hasVeryBadTriangle Bool; :index Array{Int64,1}; :loglik Float64; :blacklist Array{Int64,1}; :partition Array{PhyloNetworks.Partition,1}; :cleaned Bool; :isRooted Bool]
+
+
 	@test Rnrow(A) == 3
 	@test Rncol(A) == 3
 	@test Rsize(A) == (3,3)
@@ -126,20 +133,6 @@ end
 	# How to test these?
 	# @test df_to_Rdata
 	# @test source("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == include("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl")
-	# @test Rnames
-	# @test Rtypes
-	
-	# @test ont 
-	# In TrUtils: ont is currently listed as:
-	"""
-	ont = function(obj)
-		Rcbind(Rnames(obj), Rtypes(obj))
-	end
-	"""
-	# Shouldn't this be:
-	"""
-	function ont(obj)?
-	"""
 	# @test Rorder(A) ==
 	# @test headLR(df, num_startcols=4, num_endcols=4) ==
 	# @test flat2(arr) ==
