@@ -75,6 +75,9 @@ end
 	tmparray = recursive_find("/GitHub/BioGeoJulia.jl")
 	@test tmparray[1] == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
 
+	tmparray = include_jls("/GitHub/BioGeoJulia.jl")
+	@test tmparray[1] == "/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"
+
 	A = ones(3,3)
 	B = ones(3,3)
 	@test dim(A) == size(A)
@@ -90,6 +93,9 @@ end
 	E = ones(6,3)
 	@test Rrbind(A, B) == vcat(A,B)
 	@test Rrbind(A, B) == E
+
+	@test paste(1:12, delim="") == "123456789101112"
+	@test paste0(1:12) == "123456789101112"
 
 	F = "tester"
 	@test type(F) == String
@@ -118,9 +124,6 @@ end
 	@test single_element_array_to_scalar(tmparray) == 1
 	
 	# How to test these?
-	# @test include_jls("/GitHub/BioGeoJulia.jl")
-	# @test paste(array_of_strings; delim) == ?
-	# @test paste0(array_of_strings; delim="") == ?
 	# @test df_to_Rdata
 	# @test source("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == include("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl")
 	# @test Rnames
@@ -142,8 +145,6 @@ end
 	# @test flat2(arr) ==
 	# @test single_element_array_to_scalar(tmparray) ==  
 
-
-	
 end
 
 @testset "TreePass" begin
