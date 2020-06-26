@@ -126,17 +126,43 @@ end
 	@test Rnrow(A) == 3
 	@test Rncol(A) == 3
 	@test Rsize(A) == (3,3)
+
+	tmpDF = DataFrame(A = 1:4, B = ["M", "F", "F", "M"], C = 5:8)
+	tmparray = [1,2,3,4]
+	@test Rorder(tmpDF) == tmparray
+	
+	# tmpDF2 = DataFrame(A = 1:4, C = 5:8)
+	# headLR(tmpDF, 1, 1) == tmpDF2
+	# false?
+	
+"""
+	A note! Even when the dataframes are identical, 
+	pulling the left and right collumns seems to twist them?
+	In this case there are ONLY 2 collumns? so the outcome should be identical to itself?
+
+	Something to do with it being flattened? 
+	Unsure on how to test atm
+
+	tmptmp = DataFrame(A = 1:4, B = ["M", "F", "F", "M"])
+	tmptmp2 = DataFrame(A = 1:4, B = ["M", "F", "F", "M"])
+	headLR(tmptmp, 1, 1) == tmptmp2
+
+	FALSE
+"""
 	
 	tmparray = (1)
 	@test single_element_array_to_scalar(tmparray) == 1
-	
+
+	tmpline = print("1 module BioGeoJulia")
+	@test headf("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl"; numlines=1) == tmpline
+
 	# How to test these?
 	# @test df_to_Rdata
 	# @test source("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl") == include("/GitHub/BioGeoJulia.jl/src/BioGeoJulia.jl")
-	# @test Rorder(A) ==
 	# @test headLR(df, num_startcols=4, num_endcols=4) ==
 	# @test flat2(arr) ==
-	# @test single_element_array_to_scalar(tmparray) ==  
+	# @test moref(fn) ==
+	# @test scr2str ==
 
 end
 
