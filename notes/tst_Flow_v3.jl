@@ -249,13 +249,43 @@ module Tst_Flow
 	# 5. Pass 1, 2, 4 to downpass algorithm, then to branchOp
 	#######################################################
 
+	tvals = [0.1 0.2 0.3 1.0 1.5]
+	Gflows = Gflow_to_01g.(tvals)
+	factored_Gs = factorize.(Gflows)
+	fakeX0s = Matrix{Float64}(undef, length(tvals), length(X0))
+	fakeX0s[:,:] .= 0.0
+	tmp_Xc_vals = similar(X0)
+	Xc_vals = similar(fakeX0s)
+	Xc_vals[:,:] .= 0.0
+	X0 = [0.0; 1.0; 0.0]
+
+	for i in 1:length(tvals)
+		display("\n")
+		display(i)
+		if (i == 1)
+			#mul!(tmp_Xc_vals, Gflow_to_01l(tvals[i]), X0)
+			Xc_vals[i,:] = Gflow_to_01l(tvals[i]) * X0
+			fakeX0s[i,:] = X0
+		else
+			fakeX0s[i,:] = factorize(Gflow_to_01l(tvals[i-1])) \ Xc_vals[i-1,:] # Divide Gflow to t_i by Xc(i) to 
+			                                         # get fake X0 representing psi(0,t_i)^-1
+			display("\n")
+			#show(mul!(tmp_Xc_vals, Gflow_to_01l(tvals[i]), fakeX0s[i-1,:]))
+			
+			#show(mul!(tmp_Xc_vals, Gflow_to_01l(tvals[i]), Xc_vals[i-1,:]))
+			Xc_vals[i,:] = Gflow_to_01l(tvals[i]) * fakeX0s[i,:]
+		end
+		#show(tmp_Xc_vals)
+	end
+	Xc_vals
+	fakeX0s
+
+	Xc_vals[i,:] = [1 2 3]
+	Xc_vals
 
 
-
-
-
-
-
+	Gflow_to_01l(1.5) * [0.0; 1.0; 0.0]
+	ground_truth_Ds_interpolator(1.5)
 
 
 	factored_G = factorize(Gflow_to_01l(0.0))
