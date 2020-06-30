@@ -561,6 +561,10 @@ projection.matrix.classe <- function(pars, k)
 		}
 	A[idx.q] <- A[idx.q] + pars.q # Add the Q rates
 	diag(A) <- 0
+	
+	# For 4 states, nsum = 10 descendant combinations possible
+	# sum(pars.lam[seq((i-1) * nsum + 1, i * nsum)]) means:
+	# sum lambdas 1-10, 11-20, etc.
 	diag(A) <- -colSums(A) + unlist(lapply(kseq, function(i) sum(pars.lam[seq((i-1) * nsum + 1, i * nsum)]) - pars.mu[i]))
 	A
 	}

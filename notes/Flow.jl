@@ -68,7 +68,7 @@ parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
 		# Pull out the Q transitions - diagonal
 		# case 1: no event
 		#A[i,i] = A[i,i]  + -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i]) # *u[i]  
-		A[i,i] = A[i,i] - sum(Qij_vals[Qi_sub_i]) - sum(Cijk_vals[Ci_sub_i]) - mu[i] + 2*sum(Cijk_vals[Ci_sub_i])*uE[i]
+		A[i,i] = A[i,i] - sum(Qij_vals[Qi_sub_i]) - sum(Cijk_vals[Ci_sub_i]) - mu[i] #+ 2*sum(Cijk_vals[Ci_sub_i])*uE[i]
 		
 		# case 2: anagenetic change (non-diagonal)
 		@inbounds for m in 1:length(Qi_sub_i)
@@ -76,15 +76,34 @@ parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
 		end
 		
 		# case 34: change + eventual extinction (non-diagonal)
-# 		@inbounds for m in 1:length(Ci_sub_i)
-# 			# each cladogenesis event puts probability in 2 places
-# 			# excluding the u[], i.e. the Ds, i.e. the Xs, just as is done in 
-# 			# 2*speciation_rates[r]*current_E[r]
-# 			#rate_sp_then_ex = Cijk_vals[Ci_sub_i] * ((u[Ck_sub_i] * uE[Cj_sub_i]) + (u[Cj_sub_i] * uE[Ck_sub_i]))
-# 			rate_sp_then_ex = Cijk_vals[Ci_sub_i[m]] * (uE[Cj_sub_i[m]] + uE[Ck_sub_i[m]])
-# 			A[Ci_sub_i[m],Cj_sub_i[m]] = A[Ci_sub_i[m],Cj_sub_i[m]] + rate_sp_then_ex
-# 			A[Ci_sub_i[m],Ck_sub_i[m]] = A[Ci_sub_i[m],Ck_sub_i[m]] + rate_sp_then_ex
-# 		end
+		@inbounds for m in 1:length(Ci_sub_i)
+			# each cladogenesis event puts probability in 2 places
+			# excluding the u[], i.e. the Ds, i.e. the Xs, just as is done in 
+			# 2*speciation_rates[r]*current_E[r]
+			#rate_sp_then_ex = Cijk_vals[Ci_sub_i] * ((u[Ck_sub_i] * uE[Cj_sub_i]) + (u[Cj_sub_i] * uE[Ck_sub_i]))
+			rate_sp_then_ex = Cijk_vals[Ci_sub_i[m]] * uE[i]#(uE[Cj_sub_i[m]] + uE[Ck_sub_i[m]])
+			A[Ci_sub_i[m],Cj_sub_i[m]] = A[Ci_sub_i[m],Cj_sub_i[m]] + rate_sp_then_ex
+			A[Ci_sub_i[m],Ck_sub_i[m]] = A[Ci_sub_i[m],Ck_sub_i[m]] + rate_sp_then_ex
+			
+			# WORKS for DEC-SSE, 2020-06-25
+			# julia> mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
+			# 3-element Array{Float64,1}:
+			#  0.0010385611333310657
+			#  0.5288136426527802   
+			#  0.03387280014939652  
+			# 
+			# julia> Xc_from_flow2 = Gflow_to_01g(tc) * X0
+			# 3-element Array{Float64,1}:
+			#  0.0010385159443680523
+			#  0.5287977443578      
+			#  0.033874388008434016 
+			# 
+			# julia> ground_truth_Ds_interpolator(tc)
+			# 3-element Array{Float64,1}:
+			#  0.0010385159929410246
+			#  0.528797722695622    
+			#  0.03387438254182548  			
+		end
 		
 # 		du[i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 1: no event
 # 			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 	# case 2	

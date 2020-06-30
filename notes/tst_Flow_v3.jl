@@ -43,8 +43,8 @@ module Tst_Flow
 #	using RCall       # for df_to_Rdata, reval, g = globalEnv
 
 	# Set up a DEC-like model; will calculate Es over 120% of root depth
-	#inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
-	inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+	inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+	#inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 	res = inputs.res
 	trdf = inputs.trdf
 	root_age = maximum(trdf[!, :node_age])
