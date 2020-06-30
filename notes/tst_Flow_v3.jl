@@ -238,6 +238,26 @@ module Tst_Flow
 
 
 
+
+	#######################################################
+	# 1. Get the node times t from a tree
+	#    (including degree-1 nodes, to represent direct
+	#     ancestors or breakpoints)
+	# 2. Interpolate Gflow for each time t
+	# 3. Factorize each Gflow for each time t
+	# 4. Calculate fakeX0 for each time t (represents likes*Gflow(t)^-1
+	# 5. Pass 1, 2, 4 to downpass algorithm, then to branchOp
+	#######################################################
+
+
+
+
+
+
+
+
+
+
 	factored_G = factorize(Gflow_to_01l(0.0))
 	fakeX0 = factored_G \ X0
 	Xc_from_flow3 = Gflow_to_011(10.0) * fakeX0
