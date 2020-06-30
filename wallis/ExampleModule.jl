@@ -21,7 +21,15 @@ function example3()
 end
 
 function PUTTHISHERE()
-	print("lalalalalala")
+	for a in 5:15
+		if a > 10
+			println("a is greater than 10")
+		elseif a < 10
+			println("a is less than 10")
+		else
+			println("a is equal to 10")
+		end
+	end
 end
 
 end # end of module
