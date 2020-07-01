@@ -277,11 +277,26 @@ current_nodeIndex = 1
 
 (tmp_threadID, sol_Ds, fakeX0s, spawned_nodeIndex, calc_start_time) = Flow.branchOp_ClaSSE_Gs_v5(current_nodeIndex, trdf; u0=u0, tspan=tspan, Gflow=Gflow, solver_options=solver_options)
 
+# Calculate ClaSSE likelihood with "using the Flow, man"
 # Modifies inputs into object "res"
 (total_calctime_in_sec, iteration_number) = Flow.iterative_downpass_nonparallel_FlowClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, Gflow=Gflow, solver_options=construct_SolverOpt(), max_iterations=10^10)
-res.likes_at_each_nodeIndex_branchTop
-res.logsum_likes_at_nodes
-sum(res.logsum_likes_at_nodes)
+resFlow = deepcopy(res)
+resFlow.likes_at_each_nodeIndex_branchTop
+resFlow.logsum_likes_at_nodes
+sum(resFlow.logsum_likes_at_nodes)
+
+# Compare to "standard" ClaSSE
+(total_calctime_in_sec, iteration_number) = Flow.iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+resClaSSE = deepcopy(res)
+resClaSSE.likes_at_each_nodeIndex_branchTop
+resClaSSE.logsum_likes_at_nodes
+sum(resClaSSE.logsum_likes_at_nodes)
+
+# Compare
+sum(resFlow.logsum_likes_at_nodes)
+sum(resClaSSE.logsum_likes_at_nodes)
+sum(resFlow.logsum_likes_at_nodes) - sum(resClaSSE.logsum_likes_at_nodes)
+
 """
 
 function branchOp_ClaSSE_Gs_v5(current_nodeIndex, trdf; u0, tspan, Gflow, solver_options=solver_options)
