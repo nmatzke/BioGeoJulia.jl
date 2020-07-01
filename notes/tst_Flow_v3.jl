@@ -124,30 +124,30 @@ module Tst_Flow
 	tspan = (0.0, 20.0)
 	prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
 
-	Gflow_to_01g  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	Gflow_to_01t  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-	Gflow_to_01l  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	Gflow_to_01_Cvode  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	Gflow_to_01_Tsit5  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	Gflow_to_01_Lsoda  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 	
 	# Check that the different interpolators match
-	Gflow_to_01g(0.001)
-	Gflow_to_01t(0.001)
-	Gflow_to_01l(0.001)
+	Gflow_to_01_Cvode(0.001)
+	Gflow_to_01_Tsit5(0.001)
+	Gflow_to_01_Lsoda(0.001)
 
-	Gflow_to_01g(0.01)
-	Gflow_to_01t(0.01)
-	Gflow_to_01l(0.01)
+	Gflow_to_01_Cvode(0.01)
+	Gflow_to_01_Tsit5(0.01)
+	Gflow_to_01_Lsoda(0.01)
 
-	Gflow_to_01g(0.1)
-	Gflow_to_01t(0.1)
-	Gflow_to_01l(0.1)
+	Gflow_to_01_Cvode(0.1)
+	Gflow_to_01_Tsit5(0.1)
+	Gflow_to_01_Lsoda(0.1)
 
-	Gflow_to_01g(1.0)
-	Gflow_to_01t(1.0)
-	Gflow_to_01l(1.0)
+	Gflow_to_01_Cvode(1.0)
+	Gflow_to_01_Tsit5(1.0)
+	Gflow_to_01_Lsoda(1.0)
 
-	Gflow_to_01g(10.0)
-	Gflow_to_01t(10.0)
-	Gflow_to_01l(10.0)
+	Gflow_to_01_Cvode(10.0)
+	Gflow_to_01_Tsit5(10.0)
+	Gflow_to_01_Lsoda(10.0)
 
 	
 	mean(Gflow_to_01.u[1])
@@ -161,7 +161,7 @@ module Tst_Flow
 	#######################################################
 	
 	# Calculate Ds at t=10
-	factored_G = factorize(Gflow_to_01l(10.0))
+	factored_G = factorize(Gflow_to_01_Lsoda(10.0))
 	# Solve for imaginary X0 at t=0 that would produce
 	Xc = ground_truth_Ds_interpolator(10.0)
 	X0 = factored_G \ Xc
@@ -173,13 +173,13 @@ module Tst_Flow
 	
 	
 	# Matrix x vector product, stored in Xc_v2
-	Xc_v2 = Gflow_to_01l(10.0) * X0
+	Xc_v2 = Gflow_to_01_Lsoda(10.0) * X0
 	Xc_v2
 	Xc
 	
 	
 	X0_v3 = similar(Xc)
-	mul!(X0_v3, Gflow_to_01l(10.0), X0)
+	mul!(X0_v3, Gflow_to_01_Lsoda(10.0), X0)
 	
 	
 	
@@ -210,28 +210,28 @@ module Tst_Flow
 	
 	tc = 1.0
 	Xc_from_flow = similar(X0)
-	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
-	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	mul!(Xc_from_flow, Gflow_to_01_Lsoda(tc), X0)
+	Xc_from_flow2 = Gflow_to_01_Cvode(tc) * X0
 	ground_truth_Ds_interpolator(tc)
 
 	tc = 2.0
 	Xc_from_flow = similar(X0)
-	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
-	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	mul!(Xc_from_flow, Gflow_to_01_Lsoda(tc), X0)
+	Xc_from_flow2 = Gflow_to_01_Cvode(tc) * X0
 	ground_truth_Ds_interpolator(tc)
 
 	tc = 3.0
 	Xc_from_flow = similar(X0)
-	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
-	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	mul!(Xc_from_flow, Gflow_to_01_Lsoda(tc), X0)
+	Xc_from_flow2 = Gflow_to_01_Cvode(tc) * X0
 	ground_truth_Ds_interpolator(tc)
 	Xc_from_flow2 ./ ground_truth_Ds_interpolator(tc) 
 
 
 	tc = 10.0
 	Xc_from_flow = similar(X0)
-	mul!(Xc_from_flow, Gflow_to_01l(tc), X0)
-	Xc_from_flow2 = Gflow_to_01g(tc) * X0
+	mul!(Xc_from_flow, Gflow_to_01_Lsoda(tc), X0)
+	Xc_from_flow2 = Gflow_to_01_Cvode(tc) * X0
 	ground_truth_Ds_interpolator(tc)
 	Xc_from_flow2 ./ ground_truth_Ds_interpolator(tc) 
 	log.(Xc_from_flow2 ./ ground_truth_Ds_interpolator(tc))
@@ -250,7 +250,7 @@ module Tst_Flow
 	#######################################################
 
 	tvals = [0.1 0.2 0.3 1.0 1.5]
-	Gflows = Gflow_to_01g.(tvals)
+	Gflows = Gflow_to_01_Cvode.(tvals)
 	factored_Gs = factorize.(Gflows)
 	fakeX0s = Matrix{Float64}(undef, length(tvals), length(X0))
 	fakeX0s[:,:] .= 0.0
@@ -263,17 +263,17 @@ module Tst_Flow
 		display("\n")
 		display(i)
 		if (i == 1)
-			#mul!(tmp_Xc_vals, Gflow_to_01l(tvals[i]), X0)
-			Xc_vals[i,:] = Gflow_to_01l(tvals[i]) * X0
+			#mul!(tmp_Xc_vals, Gflow_to_01_Lsoda(tvals[i]), X0)
+			Xc_vals[i,:] = Gflow_to_01_Lsoda(tvals[i]) * X0
 			fakeX0s[i,:] = X0
 		else
-			fakeX0s[i,:] = factorize(Gflow_to_01l(tvals[i-1])) \ Xc_vals[i-1,:] # Divide Gflow to t_i by Xc(i) to 
+			fakeX0s[i,:] = factorize(Gflow_to_01_Lsoda(tvals[i-1])) \ Xc_vals[i-1,:] # Divide Gflow to t_i by Xc(i) to 
 			                                         # get fake X0 representing psi(0,t_i)^-1
 			display("\n")
-			#show(mul!(tmp_Xc_vals, Gflow_to_01l(tvals[i]), fakeX0s[i-1,:]))
+			#show(mul!(tmp_Xc_vals, Gflow_to_01_Lsoda(tvals[i]), fakeX0s[i-1,:]))
 			
-			#show(mul!(tmp_Xc_vals, Gflow_to_01l(tvals[i]), Xc_vals[i-1,:]))
-			Xc_vals[i,:] = Gflow_to_01l(tvals[i]) * fakeX0s[i,:]
+			#show(mul!(tmp_Xc_vals, Gflow_to_01_Lsoda(tvals[i]), Xc_vals[i-1,:]))
+			Xc_vals[i,:] = Gflow_to_01_Lsoda(tvals[i]) * fakeX0s[i,:]
 		end
 		#show(tmp_Xc_vals)
 	end
@@ -284,18 +284,18 @@ module Tst_Flow
 	Xc_vals
 
 
-	Gflow_to_01l(1.5) * [0.0; 1.0; 0.0]
+	Gflow_to_01_Lsoda(1.5) * [0.0; 1.0; 0.0]
 	ground_truth_Ds_interpolator(1.5)
 
 
-	factored_G = factorize(Gflow_to_01l(0.0))
+	factored_G = factorize(Gflow_to_01_Lsoda(0.0))
 	fakeX0 = factored_G \ X0
 	Xc_from_flow3 = Gflow_to_011(10.0) * fakeX0
 
 	
-	factored_G = factorize(Gflow_to_01l(10.0))
+	factored_G = factorize(Gflow_to_01_Lsoda(10.0))
 	fakeX0 = factored_G \ X0
-	Xc_from_flow3 = Gflow_to_01g(10.0) * fakeX0
+	Xc_from_flow3 = Gflow_to_01_Cvode(10.0) * fakeX0
 	
 	
 	#@benchmark sol = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=false, abstol = 1e-9, reltol = 1e-9)

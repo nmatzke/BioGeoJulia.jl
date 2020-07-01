@@ -50,7 +50,7 @@ say_hello2() = println("Hello dude2!")
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
-function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"))
+function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 	areas_list = collect(1:numareas)
@@ -153,7 +153,7 @@ function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2
 	# Solutions to the E vector
 	u0_Es = repeat([0.0], 1*n)
 	uE = repeat([0.0], n)
-	max_t = 1.2*trdf[tr.root,:node_age]
+	max_t = root_age_mult*trdf[tr.root,:node_age]
 	Es_tspan = (0.0, max_t) # 110% of tree root age
 	#by_t = max_t / 10.0
 	#Es_tspan = collect(0.0:by_t:max_t)
@@ -219,7 +219,7 @@ end # End function setup_DEC_SSE
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
-function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"))
+function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 	areas_list = collect(1:numareas)
@@ -315,7 +315,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	# Solutions to the E vector
 	u0_Es = repeat([0.0], 1*n)
 	uE = repeat([0.0], n)
-	max_t = 1.2*trdf[tr.root,:node_age]
+	max_t = root_age_mult*trdf[tr.root,:node_age]
 	Es_tspan = (0.0, max_t) # 110% of tree root age
 	#by_t = max_t / 10.0
 	#Es_tspan = collect(0.0:by_t:max_t)

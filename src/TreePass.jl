@@ -1,6 +1,7 @@
 module TreePass
 using BioGeoJulia.TrUtils # for e.g. flat2
 using BioGeoJulia.SSEs 
+#using BioGeoJulia.Flow 
 using DataFrames			# for e.g. DataFrame()
 using PhyloNetworks		# for e.g. readTopology()
 using Dates						# for e.g. DateTime, Dates.now()
@@ -1441,19 +1442,19 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		return()
 	elseif (sum(TF) == 0)
 	  # If a tip
-	  txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't be run on a tip node."], "")
+	  txt = join(["Error in nodeOp_ClaSSE_v5(current_nodeIndex=", string(current_nodeIndex), "): shouldn't be run on a tip node."], "")
 	  print("\n")
 	  print(txt)
 	  print("\n")
 		return(error(txt))
 	else
-	  txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(TF) should be 0 or 2"], "")
+	  txt = join(["Error in nodeOp_ClaSSE_v5(current_nodeIndex=", string(current_nodeIndex), "): sum(TF) should be 0 or 2"], "")
 	  print("\n")
 	  print(txt)
 	  print("\n")
 		return(error(txt))
 	end # End if (sum(TF) == 2)
-	txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): shouldn't get here."], "")
+	txt = join(["Error in nodeOp_ClaSSE_v5(current_nodeIndex=", string(current_nodeIndex), "): shouldn't get here."], "")
 	print("\n")
 	print(txt)
 	print("\n")
@@ -1509,6 +1510,11 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5, solve
 	
 	return(tmp_threadID, sol_Ds, spawned_nodeIndex, calc_start_time)
 end
+
+
+
+
+
 
 
 
@@ -1767,6 +1773,192 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 	
 	return(total_calctime_in_sec, iteration_number)
 end # END iterative_downpass_nonparallel_ClaSSE_v5!
+
+
+
+
+
+
+
+
+
+
+"""
+Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
+Non-parallel version (no istaskdone, etc.)
+"""
+function iterative_downpass_nonparallel_FlowClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+	diagnostics = collect(repeat([Dates.now()], 3))
+	diagnostics[1] = Dates.now()
+	
+	# Setup
+	current_nodeIndex = res.root_nodeIndex
+
+	# Check number of threads
+	numthreads = Threads.nthreads()
+	parallel_TF = numthreads > 1
+	tasks = Any[]
+	tasks_fetched_TF = Bool[]
+	are_we_done = false
+
+	iteration_number = 0
+	while(are_we_done == false)
+		iteration_number = iteration_number+1
+		# As long as all the nodes are not done,
+		# check for "ready" nodes
+		# When they finish, change to "done"
+		indexes_ready = findall(res.node_state .== "ready_for_branchOp")
+		for current_nodeIndex in indexes_ready
+			# Before spawning, do some checks
+			res.node_state[current_nodeIndex] = "calculating_branchOp"
+			# Check for root; no calculation on root branch for now
+			if current_nodeIndex == res.root_nodeIndex
+				res.node_state[current_nodeIndex] = "done"
+				return()
+			end
+	
+			# Retrieve the inputs for the calculation down the branch
+			
+			# Use the RAW likelihoods (don't normalize)
+			u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+			u0 = u0 ./ (sum(u0))
+			
+			# Use the NORMALIZED (rescaled to sum to 1) likelihoods
+			# Doesn't work -- claims an interpolation error for going beyond range
+			# branchOp on current_nodeIndex=4ERROR: LoadError: Solution interpolation 
+			# cannot extrapolate past the final timepoint. Either solve on a longer 
+			# timespan or use the local extrapolation from the integrator interface.
+			#u0 = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
+			
+			brlen = trdf[current_nodeIndex, :brlen]
+			age_branchtop = trdf[current_nodeIndex, :node_age]
+			age_branchbot = age_branchtop + brlen
+			tspan = (age_branchtop, age_branchbot)
+			#p_Ds_v5 = inputs.p_Ds_v5
+
+			# Spawn a branch operation, and a true-false of whether they are fetched
+			res.calc_spawn_start[current_nodeIndex] = Dates.now()
+			print(join(["\nbranchOp on current_nodeIndex=", string(current_nodeIndex)], ""))
+# 			if (parallel_TF == true)
+# 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
+# 			else
+				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver_options=solver_options)
+				#tmp_results = branchOp(current_nodeIndex, res, num_iterations)
+				push!(tasks, tmp_results)
+# 			end
+			push!(tasks_fetched_TF, false)
+		end
+	
+		# Check which jobs are done, fetch them, and update status of that node
+		num_tasks = length(tasks)
+		for i in 1:num_tasks
+			if (tasks_fetched_TF[i] == false)
+				#if (istaskdone(tasks[i]) == true)
+					# Get the results
+					calc_end_time = Dates.now()
+# 					if (parallel_TF == true)
+# 						(tmp_threadID, nodeData_at_bottom, spawned_nodeIndex, calc_start_time) = fetch(tasks[i])
+# 					else
+					(tmp_threadID, sol_Ds, spawned_nodeIndex, calc_start_time) = tasks[i]
+					nodeData_at_bottom = sol_Ds.u[length(sol_Ds.u)] .+ 0.0
+# 					end
+					# Store run information
+					res.calc_start_time[spawned_nodeIndex] = calc_start_time
+					res.calc_end_time[spawned_nodeIndex] = calc_end_time
+					res.calc_duration[spawned_nodeIndex] = (calc_end_time - calc_start_time).value / 1000.0
+					tasks_fetched_TF[i] = true
+					
+					# Record information
+					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
+# 					print("\n\n12345\n\n")
+# 					print("res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex]:\n")
+# 					print(res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex])
+# 					print("\n\nnodeData_at_bottom:\n")
+# 					print(nodeData_at_bottom)
+# 					print("\n\n12345\n\n")
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
+					# Get the ancestor nodeIndex
+					uppass_edgematrix = res.uppass_edgematrix
+					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex
+					parent_nodeIndex = uppass_edgematrix[TF,1][1]
+
+					# Get the left daughter nodeIndex (1st in the uppass_edgematrix)
+					edge_rows_TF = uppass_edgematrix[:,1] .== parent_nodeIndex
+					left_nodeIndex = uppass_edgematrix[edge_rows_TF,2][1]
+					right_nodeIndex = uppass_edgematrix[edge_rows_TF,2][2]
+
+					# Update the state of the parent_node's daughters
+					if (spawned_nodeIndex == left_nodeIndex)
+						res.node_Lparent_state[parent_nodeIndex] = "ready"
+					end
+					if (spawned_nodeIndex == right_nodeIndex)
+						res.node_Rparent_state[parent_nodeIndex] = "ready"
+					end
+
+					# Update the state of the current node
+					res.node_state[spawned_nodeIndex] = "done"
+				#end
+			end
+		end
+	
+		# Update which nodes have had both parents complete
+		TF1 = res.node_state .== "not_ready"
+		TF2 = res.node_Lparent_state .== "ready"
+		TF3 = res.node_Rparent_state .== "ready"
+		TF = (TF1 + TF2 + TF3) .== 3
+		res.node_state[TF] .= "ready_for_nodeOp"
+	
+		# Update nodes when the branches above finish
+		indexes_ready = findall(res.node_state .== "ready_for_nodeOp")
+		for current_nodeIndex in indexes_ready
+			# Spawn a node operation
+			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
+			# Combine the downpass branch likelihoods
+			#nodeOp(current_nodeIndex, res, nodeOp_function=nodeOp_average_likes)
+			nodeOp_ClaSSE_v5(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
+			# (updates res)
+		end
+	
+		# Check if we are done?
+		are_we_done = count_nodes_finished(res.node_state) >= res.numNodes
+		
+		# Error trap
+		if (iteration_number >= max_iterations)
+			txt = join(["Error in iterative_downpass_nonparallel(): iteration_number ", string(iteration_number), " exceeded max_iterations. Probably your loop is not concluding, or you have a massively huge tree or slow calculation, and need to set max_iterations=Inf."], "")
+			error(txt)
+		end
+		
+		# Test for concluding the while loop
+		are_we_done && break
+	end
+	
+	# This breaks it for some reason:
+	# ERROR: setfield! immutable struct of type Res cannot be changed
+	#global res.number_of_whileLoop_iterations = iteration_number
+
+	print_num_iterations = false
+	if print_num_iterations
+		txt = join(["\nFinished at iteration_number ", string(iteration_number), "."], "")
+		print(txt)
+		print("\n")
+	end
+	
+	# Final run diagnostics
+	diagnostics[2] = Dates.now()
+	diagnostics[3] = diagnostics[2]-diagnostics[1]
+	total_calctime_in_sec = (diagnostics[2]-diagnostics[1]).value / 1000
+	
+	res.calctime_iterations[1] = total_calctime_in_sec
+	res.calctime_iterations[2] = iteration_number / 1.0
+	
+	return(total_calctime_in_sec, iteration_number)
+end # END iterative_downpass_nonparallel_ClaSSE_v5!
+
+
+
+
+
+
 
 
 

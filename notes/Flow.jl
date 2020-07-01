@@ -16,7 +16,7 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
-export parameterized_ClaSSE_As_v5, check_linearDynamics_of_As, calc_Gs_SSE_condnums!, calc_Gs_SSE, calc_Gs_SSE!, run_Gs
+export parameterized_ClaSSE_As_v5, check_linearDynamics_of_As, calc_Gs_SSE_condnums!, calc_Gs_SSE, calc_Gs_SSE!, branchOp_ClaSSE_Gs_v5, run_Gs
 
 
 # Construct interpolation function for calculating linear dynamics A, 
@@ -35,7 +35,7 @@ export parameterized_ClaSSE_As_v5, check_linearDynamics_of_As, calc_Gs_SSE_condn
 #
 # This version excludes Xi (and Xj), just like castor's get_LinearDynamics_A
 # calculation of A
-parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
+parameterized_ClaSSE_As_v5 = (t, A, p; max_condition_number=1e8, print_warnings=true) -> begin
 
   # Possibly varying parameters
   n = p.n
@@ -112,6 +112,20 @@ parameterized_ClaSSE_As_v5 = (t, A, p) -> begin
 # 			 .+ u[Cj_sub_i].*uE[Ck_sub_i]) ))
 
   end # End @inbounds for i in 1:n
+	
+	# Error check; large growth rate in the condition number
+	# (indicated by the norm of the "A" matrix giving the linear dynamics)
+	# suggests that the G matrix is approaching singularity and numerical
+	# errors will accumulate.
+	# Check the maximum condition number of A; if it is exceeded, either raise the max cond number,
+	# or divide the tree into smaller chunks
+	# (after Louca & Pennell)
+	if (print_warnings == true)
+		sigma1_of_A = opnorm(A,1)  # the 1-norm should be adequate here (fastest calc.)
+		if (2*sigma1_of_A > log(max_condition_number))
+			warning_txt = join(["WARNING in parameterized_ClaSSE_As_v5 at t=", string(t), ": 2*opnorm(A,1)>log(max_condition_number) (", string(round(sigma1_of_A; digits=2)), " > ", string(round(log(max_condition_number); digits=2)), ")\n"], "")
+			display(warning_txt)
+		end
  	return(A)
 end
 
@@ -169,6 +183,99 @@ calc_Gs_SSE! = (dG, G, pG, t) -> begin
 	#display(dG)
 	#return(dG)
 end # End calc_Gs_SSE
+
+
+
+# Calculate Ds down a branch, using Louca & Pennell "Flow" (G) algorithm
+#
+# Modifies branchOp to do Ds calculation down a branch, using the G matrix
+#
+# The fakeX0s are also stored, for re-use if needed
+#
+# This function can read from res, but writing to res is VERY BAD as 
+# it created conflicts apparently when there were more @spawns than cores
+# Do all the writing to res in the while() loop
+"""
+inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+#inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+res = inputs.res
+trdf = inputs.trdf
+n = inputs.p_Ds_v5.n
+solver_options = inputs.solver_options
+solver_options.save_everystep
+p_Ds_v5 = inputs.p_Ds_v5  # contains model parameters, and the "Es" solver/interpolator
+trdf = inputs.trdf
+root_age = maximum(trdf[!, :node_age])
+
+# Ground truth with standard ClaSSE integration
+u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
+u0[2] = 1.0
+tspan = (0.0, 10.0)   # age at the branch top and branch bottom
+prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
+ground_truth_Ds_interpolator = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+ground_truth_Ds_interpolatorTsit5 = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+ground_truth_Ds_interpolatorCvode = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+	
+# Set up the G flow
+# build an A (the linear dynamics, i.e. Q and C matrices combined into a square matrix)
+tmpzero = repeat([0.0], n^2)
+A = reshape(tmpzero, (n,n))
+G0 = Matrix{Float64}(I, n, n) # initialize flow matrix G
+
+pG = (n=n, p_Ds_v5=p_Ds_v5, A=A)
+tspan_for_G = (0.0, 1.1*root_age) # Extend well beyond the root to avoid weirdness at the end
+prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan_for_G, pG)
+
+
+tspan = (0.0, 10.0)   # age at the branch top and branch bottom
+u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
+u0[2] = 1.0
+
+# Set up the interpolator for G
+Gflow_to_01_Cvode  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+Gflow_to_01_Tsit5  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+Gflow_to_01_Lsoda  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+# Get node ages > 0.0
+tmp_node_ages = trdf[:node_age]
+node_ages = sort(tmp_node_ages[tmp_node_ages .> 0.0])
+
+Gflow = Gflow_to_01_Cvode
+
+current_nodeIndex = 1
+
+(tmp_threadID, sol_Ds, fakeX0s, spawned_nodeIndex, calc_start_time) = Flow.branchOp_ClaSSE_Gs_v5(current_nodeIndex, trdf; u0=u0, tspan=tspan, Gflow=Gflow, solver_options=solver_options)
+"""
+function branchOp_ClaSSE_Gs_v5(current_nodeIndex, trdf; u0, tspan, Gflow, solver_options=solver_options)
+	calc_start_time = Dates.now()
+	spawned_nodeIndex = current_nodeIndex
+	tmp_threadID = Threads.threadid()
+	
+	# Is it a tip?
+	parent_node_indices = trdf[:leftNodeIndex]
+	tipTF = parent_node_indices[current_nodeIndex] == -999
+	
+	if (tipTF == TRUE)
+		branchBot_vals = Gflow(tspan[2]) * u0
+	else
+		# Reverse Gflow from current_nodeIndex up to t=0
+		# u0 = starting likelihoods at the top of this branch
+		fakeX0s = factorize(Gflow(tspan[1])) \ u0
+		branchBot_vals = Gflow(tspan[2]) * fakeX0s
+	end
+	
+	# Example slow operation
+	#y = countloop(num_iterations, current_nodeIndex)
+	#prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
+	#sol_Ds = solve(prob_Ds_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol)
+	sol_Ds = branchBot_vals
+
+	#nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+	#nodeData_at_bottom = nodeData_at_top / 2.0
+	#nodeData_at_bottom = sol_Ds.u
+	
+	return(tmp_threadID, sol_Ds, fakeX0s, spawned_nodeIndex, calc_start_time)
+end
 
 
 
