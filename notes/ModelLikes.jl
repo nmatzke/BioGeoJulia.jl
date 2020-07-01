@@ -219,7 +219,7 @@ end # End function setup_DEC_SSE
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
-function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult)
+function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 	areas_list = collect(1:numareas)
