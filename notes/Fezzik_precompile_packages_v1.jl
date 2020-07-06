@@ -16,6 +16,7 @@ Fezzik.auto_trace()
 using Fezzik
 using Pkg
 
+# The last 2 seem to be needed on Julia 1.4
 Fezzik.blacklist("BioGeoJulia")
 Fezzik.blacklist("AbstractPlotting")
 Fezzik.blacklist("Interact")
