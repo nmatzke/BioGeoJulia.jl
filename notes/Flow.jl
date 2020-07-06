@@ -197,14 +197,14 @@ end # End calc_Gs_SSE
 # it created conflicts apparently when there were more @spawns than cores
 # Do all the writing to res in the while() loop
 """
-cd("/GitHub/BioGeoJulia.jl/notes/")
+#cd("/GitHub/BioGeoJulia.jl/notes/")
 #include("tst_Flow.jl")
 
 include("ModelLikes.jl")
 import .ModelLikes
 #using .Tmp
 
-include("Flow.jl")
+include("/GitHub/BioGeoJulia.jl/Flow.jl")
 import .Flow
 
 using LinearAlgebra  # for "I" in: Matrix{Float64}(I, 2, 2)
@@ -227,7 +227,7 @@ using Profile     # for @profile
 using DataFrames  # for DataFrame
 using PhyloNetworks
 
-inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:1,human:1):1,gorilla:2);"))
 #inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 res = inputs.res
 trdf = inputs.trdf
@@ -237,6 +237,13 @@ solver_options.save_everystep
 p_Ds_v5 = inputs.p_Ds_v5  # contains model parameters, and the "Es" solver/interpolator
 trdf = inputs.trdf
 root_age = maximum(trdf[!, :node_age])
+
+# Look at the model parameters (Q and C matrix)
+Rcbind(p_Ds_v5.p_indices.Qarray_ivals, p_Ds_v5.p_indices.Qarray_jvals, p_Ds_v5.params.Qij_vals)
+Rcbind(p_Ds_v5.p_indices.Carray_ivals, p_Ds_v5.p_indices.Carray_jvals, p_Ds_v5.p_indices.Carray_kvals, p_Ds_v5.params.Cijk_vals)
+p_Ds_v5.params.mu_vals
+
+
 
 # Ground truth with standard ClaSSE integration
 u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
@@ -258,7 +265,7 @@ tspan_for_G = (0.0, 1.1*root_age) # Extend well beyond the root to avoid weirdne
 prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan_for_G, pG)
 
 
-tspan = (0.0, 10.0)   # age at the branch top and branch bottom
+tspan = (0.0, 1.1*root_age)   # age at the branch top and branch bottom
 u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
 u0[2] = 1.0
 
