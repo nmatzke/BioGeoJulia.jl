@@ -43,10 +43,10 @@ k = length(sampling.f)
 classe_3states = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f, strict=FALSE)
 
 # Input some parameters
-birthRate = 0.222222
-deathRate = 0.1
-d_val = 0.01
-e_val = 0.001
+birthRate = 0.2
+deathRate = 0.0
+d_val = 0.0
+e_val = 0.0
 j_val = 0.0
 
 # The names of the parameters:
@@ -172,9 +172,13 @@ LnLs6t = get_classe_LnLs(res6t)
 
 LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs6, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t, LnLs6t), stringsAsFactors=FALSE)
 names(LnLst) = c("ttl_LnL", "branch_LnL")
-Ldiff = exp((LnLst$ttl_LnL - log(0.5)) - LnLst$branch_LnL)
+Ldiff = exp((LnLst$ttl_LnL - log(0.3333333)) - LnLst$branch_LnL)
 LnLst2 = cbind(LnLst, Ldiff)
 cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
+
+yule(tr)$loglik - log(2)
+
+
 
 # Key parts of the calculation
 lq = t(attr(res2, "intermediates")$lq)			# Branch likelihoods
@@ -257,7 +261,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
-root.p = c(0.25,0.25,0.25,0.25)
+root.p = c(0.25,0.25,0.25)
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -268,7 +272,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=TRUE
-root.p = c(0.1, 0.1, 0.1, 0.7)
+root.p = c(0.1, 0.1, .7)
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -279,7 +283,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
-root.p = c(0, 0, 0, 1)
+root.p = c(0, 0, 1)
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -288,6 +292,9 @@ e.root <- vals[i]
 d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
 loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
+
+
+yule(tr)$loglik - log(2)
 
 
 # If root=ROOT.EQUI, condition.surv=TRUE
@@ -350,9 +357,16 @@ init
 
 base = t(attr(res2, "intermediates")$base)
 base
-# Columns 3-4 sum to 1
-rowSums(base[,3:4])
+# Columns 4-6, the Ds, sum to 1
+rowSums(base[,4:6])
+
+
 
 lq = attr(res2, "intermediates")$lq
 lq
 sum(lq)
+
+rowSums(base[,4:6]) * exp(lq)
+base[,4] * exp(lq)
+base[,5] * exp(lq)
+base[,6] * exp(lq)

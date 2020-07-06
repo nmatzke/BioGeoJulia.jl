@@ -200,12 +200,14 @@ end # End calc_Gs_SSE
 #cd("/GitHub/BioGeoJulia.jl/notes/")
 #include("tst_Flow.jl")
 
-include("ModelLikes.jl")
-import .ModelLikes
 #using .Tmp
 
-include("/GitHub/BioGeoJulia.jl/Flow.jl")
+cd("/GitHub/BioGeoJulia.jl/notes/")
+include("ModelLikes.jl")
+import .ModelLikes
+include("Flow.jl")
 import .Flow
+cd("/GitHub/BioGeoJulia.jl/")
 
 using LinearAlgebra  # for "I" in: Matrix{Float64}(I, 2, 2)
 										 # https://www.reddit.com/r/Julia/comments/9cfosj/identity_matrix_in_julia_v10/
@@ -230,6 +232,8 @@ using PhyloNetworks
 inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:1,human:1):1,gorilla:2);"))
 #inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 res = inputs.res
+inputs.res.likes_at_each_nodeIndex_branchTop
+
 trdf = inputs.trdf
 n = inputs.p_Ds_v5.n
 solver_options = inputs.solver_options
