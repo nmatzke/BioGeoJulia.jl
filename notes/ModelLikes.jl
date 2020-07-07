@@ -23,7 +23,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello2, workprecision, setup_MuSSE, setup_DEC_SSE, calclike_DEC_SSE
+export say_hello2, workprecision, setup_MuSSE, setup_DEC_SSE, calclike_DEC_SSE, setup_DEC_Cmat2
 
 #######################################################
 # Temporary file to store functions under development
@@ -248,7 +248,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	elist = e_val .* elist
 	
 	
-	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e","j"])
+	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 	print("\n")
 	print("elist")
 	print(elist)
@@ -260,6 +260,14 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 
 
 	Cparams = default_Cparams()
+	
+	Cparams.j = j_val
+	wt = (3.0 - j_val) / 3.0
+	Cparams.y = wt
+	Cparams.s = wt
+	Cparams.v = wt
+	Cparams
+	
 	maxent_constraint_01 = 0.0
 	maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
 	maxent01sub = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)

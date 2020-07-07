@@ -98,7 +98,7 @@ jprob = j_val / total_of_weights
 
 # Specifying the nonzero lambdas
 # Narrow sympatry (ancestor A or B; rangesize of 1 area)
-classe_params[param_names=="lambda111"] = birthRate
+classe_params[param_names=="lambda111"] = yprob * birthRate
 classe_params[param_names=="lambda222"] = yprob * birthRate
 classe_params[param_names=="lambda333"] = 0
 
