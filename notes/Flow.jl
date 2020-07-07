@@ -300,6 +300,7 @@ sum(resFlow.logsum_likes_at_nodes)
 (total_calctime_in_sec, iteration_number) = Flow.iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
 resClaSSE = deepcopy(res)
 resClaSSE.likes_at_each_nodeIndex_branchTop
+resClaSSE.likes_at_each_nodeIndex_branchBot
 resClaSSE.logsum_likes_at_nodes
 sum(resClaSSE.logsum_likes_at_nodes)
 

@@ -1261,10 +1261,10 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		Calculation of "D" (likelihood of tip data)
 # 		for state i=1, multiply
 # 		
-# 		All the speciation rates where the ancestor = i; length is sum(Ci_sub_i)
+# 		All the speciation rates where the ancestor = i; length is length(Ci_sub_i)
 # 		Cijk_vals[Ci_sub_i]
 # 		
-# 		All the ancestors (i's) where the ancestor = i; length is sum(Ci_sub_i)
+# 		All the ancestors (i's) where the ancestor = i; length is length(Ci_sub_i)
 # 		Carray_ivals[Ci_sub_i]
 # 
 # 		All the left descendant states (j's) where the ancestor just before speciation = i; length is sum(Ci_sub_i)
@@ -1282,7 +1282,7 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		tmp2[Carray_kvals[Ci_sub_i]]
 		
 		# Parameter values for these events with nonzero rates
-		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* tmp1[Cj_sub_i] .* tmp2[Ck_sub_i])
+		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* (tmp1[Cj_sub_i] .* tmp2[Ck_sub_i]))
   end
   return(tmpDs)
 end
