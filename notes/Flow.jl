@@ -252,7 +252,7 @@ p_Ds_v5.params.mu_vals
 # Ground truth with standard ClaSSE integration
 u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
 u0[2] = 1.0
-tspan = (0.0, 10.0)   # age at the branch top and branch bottom
+tspan = (0.0, 1.4*root_age)   # age at the branch top and branch bottom
 prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
 ground_truth_Ds_interpolator = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 ground_truth_Ds_interpolatorTsit5 = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
