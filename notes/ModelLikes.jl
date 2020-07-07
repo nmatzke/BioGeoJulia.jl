@@ -248,7 +248,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	elist = e_val .* elist
 	
 	
-	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e","j"])
 	print("\n")
 	print("elist")
 	print(elist)
