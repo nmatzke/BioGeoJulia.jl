@@ -45,8 +45,8 @@ classe_3states = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f,
 # Input some parameters
 birthRate = 0.2
 deathRate = 0.1
-d_val = 0.01
-e_val = 0.001
+d_val = 0.33333
+e_val = 0.5
 j_val = 0.0
 
 # The names of the parameters:
