@@ -1252,7 +1252,9 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 	Carray_jvals = p.p_indices.Carray_jvals
 	Carray_kvals = p.p_indices.Carray_kvals
 	
-	display("Running nodeOp_Cmat:\n\n")
+	print("\n")
+	print("\n")
+	print("Running nodeOp_Cmat:\n\n")
 	
 	# Calculate likelihoods of states just before speciation
   @inbounds for i in 1:n
@@ -1286,12 +1288,19 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 		# Parameter values for these events with nonzero rates
 		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* (tmp1[Cj_sub_i] .* tmp2[Ck_sub_i]))
 		print(tmpDs[i])
-		dislay(Cijk_vals)
+		print("\n")
+		print(Cijk_vals)
+		print("\n")
 		print(Ci_sub_i)
+		print("\n")
 		print(Cj_sub_i)
+		print("\n")
 		print(Ck_sub_i)
+		print("\n")
 		print(tmp1)
+		print("\n")
 		print(tmp2)
+		print("\n")
   end
   return(tmpDs)
 end

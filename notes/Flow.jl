@@ -202,6 +202,11 @@ end # End calc_Gs_SSE
 
 #using .Tmp
 
+cd("/GitHub/BioGeoJulia.jl/src/")
+include("TreePass.jl")
+cd("/GitHub/BioGeoJulia.jl/")
+
+
 cd("/GitHub/BioGeoJulia.jl/notes/")
 include("ModelLikes.jl")
 import .ModelLikes
