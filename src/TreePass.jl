@@ -1285,13 +1285,13 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 		
 		# Parameter values for these events with nonzero rates
 		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* (tmp1[Cj_sub_i] .* tmp2[Ck_sub_i]))
-		display(tmpDs[i])
+		print(tmpDs[i])
 		dislay(Cijk_vals)
-		display(Ci_sub_i)
-		display(Cj_sub_i)
-		display(Ck_sub_i)
-		display(tmp1)
-		display(tmp2)
+		print(Ci_sub_i)
+		print(Cj_sub_i)
+		print(Ck_sub_i)
+		print(tmp1)
+		print(tmp2)
   end
   return(tmpDs)
 end
