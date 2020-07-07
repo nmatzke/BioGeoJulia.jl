@@ -1252,6 +1252,10 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 	Carray_jvals = p.p_indices.Carray_jvals
 	Carray_kvals = p.p_indices.Carray_kvals
 	
+	print("\n")
+	print("\n")
+	print("Running nodeOp_Cmat:\n\n")
+	
 	# Calculate likelihoods of states just before speciation
   @inbounds for i in 1:n
 		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
@@ -1261,10 +1265,10 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		Calculation of "D" (likelihood of tip data)
 # 		for state i=1, multiply
 # 		
-# 		All the speciation rates where the ancestor = i; length is sum(Ci_sub_i)
+# 		All the speciation rates where the ancestor = i; length is length(Ci_sub_i)
 # 		Cijk_vals[Ci_sub_i]
 # 		
-# 		All the ancestors (i's) where the ancestor = i; length is sum(Ci_sub_i)
+# 		All the ancestors (i's) where the ancestor = i; length is length(Ci_sub_i)
 # 		Carray_ivals[Ci_sub_i]
 # 
 # 		All the left descendant states (j's) where the ancestor just before speciation = i; length is sum(Ci_sub_i)
@@ -1282,7 +1286,21 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		tmp2[Carray_kvals[Ci_sub_i]]
 		
 		# Parameter values for these events with nonzero rates
-		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* tmp1[Carray_jvals[Cj_sub_i]] .* tmp2[Carray_kvals[Ck_sub_i]])
+		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* (tmp1[Cj_sub_i] .* tmp2[Ck_sub_i]))
+		print(tmpDs[i])
+		print("\n")
+		print(Cijk_vals)
+		print("\n")
+		print(Ci_sub_i)
+		print("\n")
+		print(Cj_sub_i)
+		print("\n")
+		print(Ck_sub_i)
+		print("\n")
+		print(tmp1)
+		print("\n")
+		print(tmp2)
+		print("\n")
   end
   return(tmpDs)
 end

@@ -5,6 +5,17 @@ using Plots  # for savefig
 
 export getwd, Rgetwd, setwd, recursive_find, include_jls, source, dim, Rdim, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, Rclass, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
 
+# Basic checks during Julia startup
+function hello_world_TrUtils()
+	display("TrUtils.hello_world_TrUtils() says hello on 2020-07-06_abc")
+end
+
+# Basic checks during Julia startup
+function hello_world_TrUtils2()
+	display("TrUtils.hello_world_TrUtils2() says hello on 2020-07-06_abcd")
+end
+
+
 # R-like utilities, and other short functions
 
 # Handy aliases

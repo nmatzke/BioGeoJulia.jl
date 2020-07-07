@@ -23,7 +23,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello2, workprecision, setup_MuSSE, setup_DEC_SSE, calclike_DEC_SSE
+export say_hello2, workprecision, setup_MuSSE, setup_DEC_SSE, calclike_DEC_SSE, setup_DEC_Cmat2
 
 #######################################################
 # Temporary file to store functions under development
@@ -64,16 +64,16 @@ function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2
 	trdf = prt(tr, rootnodenum)
 	tipnodes = trdf[!,1][trdf[!,10].=="tip"]
 	
-	birthRate = 0.222222
-	deathRate = 0.1
+	birthRate = 0.2
+	deathRate = 0.0
 	
-	d_val = 0.01
-	e_val = 0.001
+	d_val = 0.0
+	e_val = 0.0
 	j_val = 0.0
 	
-	dmat=reshape(repeat([0.034], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
-	amat=reshape(repeat([0.035], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
-	elist = repeat([0.021], length(areas_list))
+	dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	elist = repeat([1.0], length(areas_list))
 	
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 	print("\n")
@@ -208,7 +208,7 @@ function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2
 	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5)
 	
 	return inputs
-end # End function setup_DEC_SSE
+end # End function setup_MuSSE
 
 
 
@@ -233,16 +233,20 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	trdf = prt(tr, rootnodenum)
 	tipnodes = trdf[!,1][trdf[!,10].=="tip"]
 	
-	birthRate = 0.222222
+	birthRate = 0.2
 	deathRate = 0.1
 	
-	d_val = 0.01
-	e_val = 0.001
-	j_val = 0.0
+	d_val = 0.0
+	e_val = 0.0
+	j_val = 0.2
 	
-	dmat=reshape(repeat([0.034], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
-	amat=reshape(repeat([0.035], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
-	elist = repeat([0.021], length(areas_list))
+	dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	elist = repeat([1.0], length(areas_list))
+	
+	dmat = d_val .* dmat
+	elist = e_val .* elist
+	
 	
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
 	print("\n")
@@ -256,6 +260,14 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 
 
 	Cparams = default_Cparams()
+	
+	Cparams.j = j_val
+	wt = (3.0 - j_val) / 3.0
+	Cparams.y = wt
+	Cparams.s = wt
+	Cparams.v = wt
+	Cparams
+	
 	maxent_constraint_01 = 0.0
 	maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
 	maxent01sub = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)

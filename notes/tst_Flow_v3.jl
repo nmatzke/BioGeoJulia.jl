@@ -149,10 +149,12 @@ module Tst_Flow
 	Gflow_to_01_Tsit5(10.0)
 	Gflow_to_01_Lsoda(10.0)
 
-	
-	mean(Gflow_to_01.u[1])
-	mean(Gflow_to_01.u[2])
 
+	Gflow_to_01_Cvode(0.0)
+	Gflow_to_01_Cvode(0.5)
+	Gflow_to_01_Cvode(1.0)
+
+	
 	
 	# OK, we now have an equation that calculates the flow, G, down any timespan
 	
