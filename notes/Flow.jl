@@ -228,7 +228,7 @@ using DataFrames  # for DataFrame
 using PhyloNetworks
 
 inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
-#inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+# inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 res = inputs.res
 trdf = inputs.trdf
 n = inputs.p_Ds_v5.n
