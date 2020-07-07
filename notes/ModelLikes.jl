@@ -236,9 +236,9 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	birthRate = 0.2
 	deathRate = 0.1
 	
-	d_val = 0.5
+	d_val = 0.0
 	e_val = 0.0
-	j_val = 0.0
+	j_val = 0.2
 	
 	dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
 	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
