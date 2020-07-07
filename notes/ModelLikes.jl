@@ -234,7 +234,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	tipnodes = trdf[!,1][trdf[!,10].=="tip"]
 	
 	birthRate = 0.2
-	deathRate = 0.0
+	deathRate = 0.1
 	
 	d_val = 0.0
 	e_val = 0.0

@@ -44,7 +44,7 @@ classe_3states = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f,
 
 # Input some parameters
 birthRate = 0.2
-deathRate = 0.0
+deathRate = 0.1
 d_val = 0.0
 e_val = 0.0
 j_val = 0.0
@@ -137,9 +137,9 @@ classe_3states_default <- function(pars, condition.surv=TRUE, root=ROOT.OBS, roo
 # Do the ClaSSE calculation, under many different assumptions
 res1 = classe_3states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
 res2 = classe_3states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
-root_probs = c(0.25,0.25,0.25)
+root_probs = c(0.3333333, 0.3333333, 0.3333333)
 res3 = classe_3states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
-root_probs = c(0.1, 0.1, 0.7)
+root_probs = c(0.1, 0.1, 0.8)
 res4 = classe_3states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
 root_probs = c(0, 0, 1)
 res5 = classe_3states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
@@ -147,9 +147,9 @@ res6 = classe_3states(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermedi
 
 res1t = classe_3states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
 res2t = classe_3states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
-root_probs = c(0.25,0.25,0.25)
+root_probs = c(0.3333333, 0.3333333, 0.3333333)
 res3t = classe_3states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)
-root_probs = c(0.1, 0.1, 0.7)
+root_probs = c(0.1, 0.1, 0.8)
 res4t = classe_3states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)
 root_probs = c(0, 0, 1)
 res5t = classe_3states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)
@@ -172,11 +172,61 @@ LnLs6t = get_classe_LnLs(res6t)
 
 LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs6, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t, LnLs6t), stringsAsFactors=FALSE)
 names(LnLst) = c("ttl_LnL", "branch_LnL")
-Ldiff = exp((LnLst$ttl_LnL - log(0.3333333)) - LnLst$branch_LnL)
-LnLst2 = cbind(LnLst, Ldiff)
+LikDiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))
+LnLdiff = round((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)), digits=4)
+LnLst2 = cbind(LnLst, LikDiff, LnLdiff)
 cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
 
-yule(tr)$loglik - log(2)
+# Convert a "res" object from ClaSSE to a 
+# BioGeoBEARS-like set of matrices
+claSSE_res_to_prt <- function(res)
+	{
+	# Branch top values ("initial")
+	init = attr(res,"intermediates")$init
+	
+	# Branch bottom values ("base")
+	base = attr(res,"intermediates")$base
+	
+	# lqs = log-likelihoods at each branch bottom
+	lq = attr(res,"intermediates")$lq
+	q = exp(attr(res,"intermediates")$lq)
+	
+	vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root	
+	E_indices = 1:nstates
+	d_root_orig = vals[-E_indices]							# Original D likelihoods at root
+
+	# Assumes bifurcating tree
+	numstates = nrow(init) / 2
+	numnodes = ncol(init) # internal plus tip nodes
+	numTips = (ncol(init) + 1) / 2
+	numInternal = numTips - 1
+	
+	Es_atNode_branchTop = matrix(data=0, ncol=numstates, nrow=numnodes)
+	Es_atNode_branchBot = matrix(data=0, ncol=numstates, nrow=numnodes) 
+	likes_at_each_nodeIndex_branchTop = matrix(data=0, ncol=numstates, nrow=numnodes)
+	likes_at_each_nodeIndex_branchBot = matrix(data=0, ncol=numstates, nrow=numnodes) 
+	normlikes_at_each_nodeIndex_branchTop = matrix(data=0, ncol=numstates, nrow=numnodes)
+	normlikes_at_each_nodeIndex_branchBot = matrix(data=0, ncol=numstates, nrow=numnodes)
+	
+	Ecols = 1:numstates
+	Dcols = (numstates+1):(2*numstates)
+	Es_atNode_branchTop = (t(init))[,Ecols]
+	Es_atNode_branchBot = (t(base))[,Ecols]
+	likes_at_each_nodeIndex_branchTop = (t(init))[,Dcols]
+	normlikes_at_each_nodeIndex_branchBot = (t(base))[,Dcols]
+	normlikes_at_each_nodeIndex_branchTop = likes_at_each_nodeIndex_branchTop / rowSums(likes_at_each_nodeIndex_branchTop)
+	likes_at_each_nodeIndex_branchBot = normlikes_at_each_nodeIndex_branchBot * q
+	
+	# Assign each branch bottom 
+	trtable = prt(tr, printflag=FALSE)
+	
+	Es_atNode_branchTop
+	Es_atNode_branchBot
+	likes_at_each_nodeIndex_branchTop
+	likes_at_each_nodeIndex_branchBot
+	normlikes_at_each_nodeIndex_branchTop
+	normlikes_at_each_nodeIndex_branchBot
+	}
 
 
 
@@ -198,12 +248,12 @@ loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
-root.p = c(0.25,0.25, 0.25)
+root.p = c(0.3333333, 0.3333333, 0.3333333)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=FALSE
-root.p = c(0.1, 0.1, 0.7)
+root.p = c(0.1, 0.1, 0.8)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
@@ -261,7 +311,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
-root.p = c(0.25,0.25,0.25)
+root.p = c(0.3333333, 0.3333333, 0.3333333)
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -272,7 +322,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 # If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=TRUE
-root.p = c(0.1, 0.1, .7)
+root.p = c(0.1, 0.1, 0.8)
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -294,7 +344,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 
-yule(tr)$loglik - log(2)
+yule(tr)$loglik - log(birthRate)
 
 
 # If root=ROOT.EQUI, condition.surv=TRUE
