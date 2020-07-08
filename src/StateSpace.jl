@@ -13,7 +13,7 @@ using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
 
-export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, prtC, prtQ, setup_DEC_Cmat, update_Cijk_vals
+export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, prtC, prtCi, prtQ, prtQi, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, setup_DEC_Cmat, update_Cijk_vals
 
 
 
@@ -55,6 +55,42 @@ end
 
 function sumj(x)
 	sum(x .== "j")
+end
+
+
+
+"""
+# Print a Carray to a data.frame
+"""
+function prtC(Carray)
+	Cdf = DataFrame(event=Carray.Carray_event_types, i=Carray.Carray_ivals, j=Carray.Carray_jvals, k=Carray.Carray_kvals, wt=Carray.Cijk_weights, val=Carray.Cijk_vals)
+	return Cdf
+end
+
+"""
+# Print a Carray from inputs to a data.frame
+"""
+function prtCi(inputs)
+	Cdf = DataFrame(event=Carray.Carray_event_types, i=inputs.p_Ds_v5.p_indices.Carray_ivals, j=inputs.p_Ds_v5.p_indices.Carray_jvals, k=inputs.p_Ds_v5.p_indices.Carray_kvals, wt=inputs.p_Ds_v5.params.Cijk_weights, val=inputs.p_Ds_v5.params.Cijk_vals)
+	return Cdf
+end
+
+
+
+"""
+# Print a Qarray to a data.frame
+"""
+function prtQ(Qarray)
+	Qdf = DataFrame(event=Qarray.Qarray_event_types, i=Qarray.Qarray_ivals, j=Qarray.Qarray_jvals, val=Qarray.Qij_vals)
+	return Qdf
+end
+
+"""
+# Print a Qarray from inputs to a data.frame
+"""
+function prtQi(inputs)
+	Qdf = DataFrame(event=inputs.p_Ds_v5.params.Qarray_event_types, i=inputs.p_Ds_v5.p_indices.Qarray_ivals, j=inputs.p_Ds_v5.p_indices.Qarray_jvals, val=inputs.p_Ds_v5.params.Qij_vals)
+	return Qdf
 end
 
 
@@ -1152,23 +1188,6 @@ function maxent01_defaults(total_numareas=4; maxent_constraint_01=0.0, maxent_co
 	maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01v)
 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 	return maxent01
-end
-
-
-"""
-# Print a Carray to a data.frame
-"""
-function prtC(Carray)
-	Cdf = DataFrame(event=Carray.Carray_event_types, i=Carray.Carray_ivals, j=Carray.Carray_jvals, k=Carray.Carray_kvals, wt=Carray.Cijk_weights, val=Carray.Cijk_vals)
-	return Cdf
-end
-
-"""
-# Print a Qarray to a data.frame
-"""
-function prtQ(Qarray)
-	Qdf = DataFrame(event=Qarray.Qarray_event_types, i=Qarray.Qarray_ivals, j=Qarray.Qarray_jvals, val=Qarray.Qij_vals)
-	return Qdf
 end
 
 
