@@ -215,7 +215,8 @@ end # END @testset "biSSE_1branch_n1" begin
 R_result_EsDs = [1 0.304473654892522 0.304473654892522 0.0523757642945074 0.525500584759885]
 #######################################################
 
-
+include("/GitHub/BioGeoJulia.jl/src/StateSpace.jl")
+import .StateSpace
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 inputs = ModelLikes.setup_MuSSE_biogeo()

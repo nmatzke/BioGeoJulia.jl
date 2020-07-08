@@ -91,12 +91,22 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
 	elist = repeat([1.0], length(areas_list))
 	
-	# Can't use setup_DEC_DEmat for an MuSSE Qmatrix, due to the null range
-	#Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
-	Qarray_ivals = collect(1:n)
-	Qarray_jvals = collect(1:n)
-	Qij_vals = collect(repeat([a_val], n))
-	Qarray_event_types = collect(repeat(["a"], n))
+	# Set up a pure-"a" Qmat
+	# (a = anagenetic range-switching between single areas)
+	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
+	Qarray_event_types = Qmat.Qarray_event_types
+	Qarray_ivals = Qmat.Qarray_ivals
+	Qarray_jvals = Qmat.Qarray_jvals
+	Qij_vals = Qmat.Qij_vals
+	
+	# Update Qij parameters, manually
+	dTF = Qarray_event_types .== "d"
+	Qmat.Qij_vals[dTF] = Qmat.Qij_vals[dTF] .* in_params.d_val
+	eTF = Qarray_event_types .== "e"
+	Qmat.Qij_vals[eTF] = Qmat.Qij_vals[eTF] .* in_params.e_val
+	aTF = Qarray_event_types .== "a"
+	Qmat.Qij_vals[aTF] = Qmat.Qij_vals[aTF] .* in_params.a_val
+	
 	Qmat = (Qarray_event_types=Qarray_event_types, Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals)
 	
 	# Default values of y, s, v, and j
@@ -110,6 +120,7 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 # 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 # 	Carray = setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 	
+	# Set up a sympatry-only Cmat, manually
 	Carray_ivals = collect(1:n)
 	Carray_jvals = collect(1:n)
 	Carray_kvals = collect(1:n)
@@ -122,8 +133,7 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	prtQ(Qmat)
 	prtC(Carray)
 	
-	
-	# Possibly varying parameters
+	# Set up mu (extinction) rates, manually
 	mu_vals = repeat([deathRate], n)
 
 	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_weights=Cijk_weights, Cijk_vals=Carray.Cijk_vals)
