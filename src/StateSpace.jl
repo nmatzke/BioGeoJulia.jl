@@ -870,18 +870,18 @@ maxent_constraint_01=0.5    = 1 1 1
 maxent_constraint_01=0.9999 = 0 0 1 
 ######################################################
 
-max_numareas=6
+total_numareas=6
 maxent_constraint_01 = 0.0001    # ranges from 0.0001 (all weight on ranges of size 1)
 						                     # to 0.9999 (all weight on ranges of max size)
 NA_val=NaN
-relative_probabilities_of_subsets(max_numareas, maxent_constraint_01, NA_val)
+relative_probabilities_of_subsets(total_numareas, maxent_constraint_01, NA_val)
 """
 
-function relative_probabilities_of_subsets(max_numareas=6, maxent_constraint_01=0.5, NA_val=NaN)
+function relative_probabilities_of_subsets(total_numareas=6, maxent_constraint_01=0.5, NA_val=NaN)
 	# Set up a matrix to hold the maxent distributions of relative prob of 
 	# smaller daughter range sizes
-	relprob_subsets_matrix = reshape(repeat([NA_val], max_numareas^2), (max_numareas,max_numareas))
-	for i in 1:max_numareas
+	relprob_subsets_matrix = reshape(repeat([NA_val], total_numareas^2), (total_numareas,total_numareas))
+	for i in 1:total_numareas
 		ancestor_range_size = i
 		maxent_result = discrete_maxent_distrib_of_smaller_daughter_ranges(ancestor_range_size, maxent_constraint_01)
 
@@ -897,39 +897,39 @@ end
 
 
 
-function relative_probabilities_of_vicariants(max_numareas=6, maxent_constraint_01=0.5, NA_val=NaN)
+function relative_probabilities_of_vicariants(total_numareas=6, maxent_constraint_01=0.5, NA_val=NaN)
 	# Set up a matrix to hold the maxent distributions of relative prob of 
 	# smaller daughter range sizes
-	relprob_subsets_matrix = reshape(repeat([NA_val], max_numareas^2), (max_numareas,max_numareas))
+	relprob_subsets_matrix = reshape(repeat([NA_val], total_numareas^2), (total_numareas,total_numareas))
 	relprob_subsets_matrix[1,:] .= NA_val
 	
-	for i in 2:max_numareas
+	for i in 2:total_numareas
 		ancestor_range_size = i
 		tmpstates = collect(1:i)# .+ 0.0
 		tmpstates_Floats = collect(1:i) .+ 0.0
 		max_smaller_rangesize = median(tmpstates_Floats)
 		possible_vicariance_smaller_rangesizes = tmpstates[tmpstates_Floats .< max_smaller_rangesize]
-		vic_max_numareas = maximum(possible_vicariance_smaller_rangesizes)
+		vic_total_numareas = maximum(possible_vicariance_smaller_rangesizes)
 
-		maxent_result = flat2(discrete_maxent_distrib_of_smaller_daughter_ranges(vic_max_numareas, maxent_constraint_01))
+		maxent_result = flat2(discrete_maxent_distrib_of_smaller_daughter_ranges(vic_total_numareas, maxent_constraint_01))
 
 		if (i <= 3)
 # 			print("\n")
 # 			print(i)
 # 
 # 			print("\n")
-# 			print(vic_max_numareas)
+# 			print(vic_total_numareas)
 # 			
 # 			print("\n")
-# 			print(relprob_subsets_matrix[i,1:vic_max_numareas])
+# 			print(relprob_subsets_matrix[i,1:vic_total_numareas])
 # 
 # 			print("\n")
 # 			print(maxent_result)
 # 
 # 			print("\n")
-			relprob_subsets_matrix[i,1:vic_max_numareas] .= maxent_result
+			relprob_subsets_matrix[i,1:vic_total_numareas] .= maxent_result
 		else
-			relprob_subsets_matrix[i,1:vic_max_numareas] = maxent_result
+			relprob_subsets_matrix[i,1:vic_total_numareas] = maxent_result
 		end
 	end
 	
@@ -941,34 +941,34 @@ end
 
 """
 numareas = 6
-max_numareas=6
+total_numareas=6
 maxent_constraint_01=0.0
-discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas, maxent_constraint_01)
+discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas, maxent_constraint_01)
 
-max_numareas=6
+total_numareas=6
 maxent_constraint_01=0.5
-discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas, maxent_constraint_01)
+discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas, maxent_constraint_01)
 
-max_numareas=6
+total_numareas=6
 maxent_constraint_01=1.0
-discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas, maxent_constraint_01)
+discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas, maxent_constraint_01)
 
 numareas = 2
-max_numareas=6
+total_numareas=6
 maxent_constraint_01=0.0
-discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas, maxent_constraint_01)
+discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas, maxent_constraint_01)
 
-max_numareas=6
+total_numareas=6
 maxent_constraint_01=0.5
-discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas, maxent_constraint_01)
+discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas, maxent_constraint_01)
 
-max_numareas=6
+total_numareas=6
 maxent_constraint_01=1.0
-discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas, maxent_constraint_01)
+discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas, maxent_constraint_01)
 
 """
-function discrete_maxent_distrib_of_smaller_daughter_ranges(max_numareas=6, maxent_constraint_01=0.5)
-	n = max_numareas
+function discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas=6, maxent_constraint_01=0.5)
+	n = total_numareas
 	x = 1:n
 
 	#discrete_values_padded = cat(0, collect(x)[:], n+1; dims=1)
@@ -1095,13 +1095,13 @@ ancstate == lstate == rstate
 areas_list = [1,2,3]
 states_list = areas_list_to_states_list(areas_list, 3, true)
 Cparams=(y=1.0,s=1.0,v=1.0,j=0.0)
-max_numareas = length(areas_list)
+total_numareas = length(areas_list)
 maxent_constraint_01 = 0.0
-maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-maxent01sub = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-maxent01jump = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+maxent01sub = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+maxent01jump = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
 maxent_constraint_01 = 0.5
-maxent01vic = relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
+maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01)
 maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 predeclare_array_length=10000000
 Carray = setup_DEC_Cmat(areas_list, states_list, Cparams)

@@ -235,7 +235,7 @@ using DataFrames  # for DataFrame
 using PhyloNetworks
 
 inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:1,human:1):1,gorilla:2);"))
-#inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+#inputs = ModelLikes.setup_MuSSE_biogeo(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 res = inputs.res
 inputs.res.likes_at_each_nodeIndex_branchTop
 

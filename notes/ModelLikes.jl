@@ -23,7 +23,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello2, workprecision, setup_MuSSE, setup_DEC_SSE, calclike_DEC_SSE, setup_DEC_Cmat2
+export say_hello2, workprecision, setup_MuSSE_biogeo, setup_DEC_SSE, calclike_DEC_SSE, setup_DEC_Cmat2
 
 #######################################################
 # Temporary file to store functions under development
@@ -46,19 +46,36 @@ include("tst2.jl")
 say_hello2() = println("Hello dude2!")
 
 
-
+"""
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
-function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5)
+
+cd("/GitHub/BioGeoJulia.jl/notes/")
+include("ModelLikes.jl")
+import .ModelLikes
+cd("/GitHub/BioGeoJulia.jl")
+inputs = setup_MuSSE_biogeo()
+
+"""
+function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=NaN)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 	areas_list = collect(1:numareas)
-	states_list = areas_list_to_states_list(areas_list, numareas, false)
-	n = length(states_list)
-	max_numareas = length(areas_list)
-
+	total_numareas = length(areas_list)
 	
+	if (isnan(in_params) == true)
+		in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, j_val=0.0)
+	end
+	
+	# Check if max_range_size=NaN
+	if (isnan(max_range_size) == true)
+		max_range_size = numareas
+	end
+	
+	states_list = areas_list_to_states_list(areas_list, max_range_size, include_null_range)
+	n = length(states_list)
+
 	res = construct_Res(tr, n)
 	rootnodenum = tr.root
 	trdf = prt(tr, rootnodenum)
@@ -88,11 +105,11 @@ function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2
 
 	Cparams = default_Cparams()
 # 	maxent_constraint_01 = 0.0
-# 	maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-# 	maxent01sub = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-# 	maxent01jump = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+# 	maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+# 	maxent01sub = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+# 	maxent01jump = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
 # 	maxent_constraint_01 = 0.0
-# 	maxent01vic = relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
+# 	maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01)
 # 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 # 	Carray = setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 	
@@ -208,7 +225,7 @@ function setup_MuSSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2
 	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5)
 	
 	return inputs
-end # End function setup_MuSSE
+end # End function setup_MuSSE_biogeo
 
 
 
@@ -225,7 +242,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	areas_list = collect(1:numareas)
 	states_list = areas_list_to_states_list(areas_list, numareas, false)
 	n = length(states_list)
-	max_numareas = length(areas_list)
+	total_numareas = length(areas_list)
 
 	
 	res = construct_Res(tr, n)
@@ -269,11 +286,11 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	Cparams
 	
 	maxent_constraint_01 = 0.0
-	maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-	maxent01sub = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-	maxent01jump = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+	maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+	maxent01sub = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+	maxent01jump = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
 	maxent_constraint_01 = 0.0
-	maxent01vic = relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
+	maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01)
 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 	Carray = setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 
@@ -414,13 +431,13 @@ ancstate == lstate == rstate
 areas_list = [1,2,3]
 states_list = areas_list_to_states_list(areas_list, 3, true)
 Cparams=(y=1.0,s=1.0,v=1.0,j=0.0)
-max_numareas = length(areas_list)
+total_numareas = length(areas_list)
 maxent_constraint_01 = 0.0
-maxent01symp = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-maxent01sub = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
-maxent01jump = relative_probabilities_of_subsets(max_numareas, maxent_constraint_01)
+maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+maxent01sub = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+maxent01jump = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
 maxent_constraint_01 = 0.5
-maxent01vic = relative_probabilities_of_vicariants(max_numareas, maxent_constraint_01)
+maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01)
 maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 predeclare_array_length=10000000
 Carray = setup_DEC_Cmat(areas_list, states_list, Cparams)
