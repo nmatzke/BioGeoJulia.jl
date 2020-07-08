@@ -488,8 +488,8 @@ Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
-event_type_vals = Qmat.event_type_vals
-hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+Qarray_event_types = Qmat.Qarray_event_types
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 
 
 states_list = areas_list_to_states_list(areas_list, 3, false)
@@ -497,16 +497,16 @@ Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
-event_type_vals = Qmat.event_type_vals
-hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+Qarray_event_types = Qmat.Qarray_event_types
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 
 states_list = areas_list_to_states_list(areas_list, 3, false)
 Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
-event_type_vals = Qmat.event_type_vals
-hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+Qarray_event_types = Qmat.Qarray_event_types
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 
 """
 
@@ -562,7 +562,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 	#mod_vals = Array{Float64, num_nonzero_rates}  # base modifiers -- e.g., "2" for AB -> ABC
 	#mult_vals = Array{Float64, num_nonzero_rates} # multipliers from mult_mat, e_mult 
 	# (ie modification by distance, area, etc.)
-	event_type_vals = repeat([""], num_nonzero_rates)
+	Qarray_event_types = repeat([""], num_nonzero_rates)
 	index = 0
 	
 	
@@ -591,19 +591,19 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 						# Add to arrays
 						# Forward event
 						index += 1
-						event_type_vals[index] = "a"
+						Qarray_event_types[index] = "a"
 						Qarray_ivals[index] = statenum_ival
 						Qarray_jvals[index] = statenum_jval
 						Qij_vals[index] = amat[starting_areanum,ending_areanum]
 						
 						# Reverse event
 						index += 1
-						event_type_vals[index] = "a"
+						Qarray_event_types[index] = "a"
 						Qarray_ivals[index] = statenum_jval
 						Qarray_jvals[index] = statenum_ival
 						Qij_vals[index] = amat[ending_areanum, starting_areanum]
 
-	# 					push!(event_type_vals, "a")
+	# 					push!(Qarray_event_types, "a")
 	# 					push!(Qarray_ivals, i)
 	# 					push!(Qarray_jvals, j)
 	# 					push!(base_vals, amat[starting_areanum,ending_areanum])
@@ -634,7 +634,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 					if length(end_areanums_not_found_in_start_areas) == 1
 						# Add to arrays
 						index += 1
-						event_type_vals[index] = "d"
+						Qarray_event_types[index] = "d"
 						Qarray_ivals[index] = i
 						Qarray_jvals[index] = j
 				
@@ -646,7 +646,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 						end
 
 						Qij_vals[index] = tmp_d_sum
-	# 					push!(event_type_vals, "d")
+	# 					push!(Qarray_event_types, "d")
 	# 					push!(Qarray_ivals, i)
 	# 					push!(Qarray_jvals, j)
 	# 					push!(base_vals, tmp_d_sum)
@@ -676,7 +676,7 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 					if length(start_areanums_not_found_in_end_areas) == 1
 						# Add to arrays
 						index += 1
-						event_type_vals[index] = "e"
+						Qarray_event_types[index] = "e"
 						Qarray_ivals[index] = i
 						Qarray_jvals[index] = j
 						# Because there is only 1 area in start_areanums_not_found_in_end_areas
@@ -687,22 +687,22 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 		end # ending i loop
 	end # ending if (in("e", allowed_event_types)
 	
-	keepTF = event_type_vals .!= ""
+	keepTF = Qarray_event_types .!= ""
 	Qarray_ivals = Qarray_ivals[keepTF]
 	Qarray_jvals = Qarray_jvals[keepTF]
 	Qij_vals = Qij_vals[keepTF]
-	event_type_vals = event_type_vals[keepTF]
+	Qarray_event_types = Qarray_event_types[keepTF]
 	
 	# Return results
-	Qmat = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, event_type_vals=event_type_vals)
+	Qmat = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, Qarray_event_types=Qarray_event_types)
 	
 	"""
 	Qarray_ivals = Qmat.Qarray_ivals
 	Qarray_jvals = Qmat.Qarray_jvals
 	Qij_vals = Qmat.Qij_vals
-	event_type_vals = Qmat.event_type_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 	
-	hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+	hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 	"""
 	
 	return Qmat
@@ -728,8 +728,8 @@ Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
-event_type_vals = Qmat.event_type_vals
-Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+Qarray_event_types = Qmat.Qarray_event_types
+Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 
 # Update!
 dmat = reshape(repeat([0.5], numareas^2), (numareas,numareas))
@@ -739,8 +739,8 @@ Qmat2
 Qarray_ivals = Qmat2.Qarray_ivals
 Qarray_jvals = Qmat2.Qarray_jvals
 Qij_vals = Qmat2.Qij_vals
-event_type_vals = Qmat2.event_type_vals
-Qmat2_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+Qarray_event_types = Qmat2.Qarray_event_types
+Qmat2_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 
 Qmat1_df
 Qmat2_df
@@ -757,10 +757,10 @@ function update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0
 	Qarray_ivals = Qmat.Qarray_ivals
 	Qarray_jvals = Qmat.Qarray_jvals
 	Qij_vals = Qmat.Qij_vals
-	event_type_vals = Qmat.event_type_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 
 	# Update the "d" events (anagenetic range expansion)
-	TF = event_type_vals .== "d"
+	TF = Qarray_event_types .== "d"
 	if (sum(TF) > 0)
 		ivals = Qarray_ivals[TF]
 		jvals = Qarray_jvals[TF]
@@ -791,7 +791,7 @@ function update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0
 
 
 	# Update the "a" events (anagenetic range expansion)
-	TF = event_type_vals .== "a"
+	TF = Qarray_event_types .== "a"
 	if (sum(TF) > 0)
 		ivals = Qarray_ivals[TF]
 		jvals = Qarray_jvals[TF]
@@ -815,7 +815,7 @@ function update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0
 
 	# Update the "e" events (anagenetic range extinction/
 	# local extirpation/range loss)
-	TF = event_type_vals .== "e"
+	TF = Qarray_event_types .== "e"
 	if (sum(TF) > 0)
 		ivals = Qarray_ivals[TF]
 		jvals = Qarray_jvals[TF]
@@ -840,7 +840,7 @@ function update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0
 
 	# Return results
 	# Return results
-	Qmat2 = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, event_type_vals=event_type_vals)
+	Qmat2 = (Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals, Qarray_event_types=Qarray_event_types)
 	return Qmat2
 end # end function update_Qij_vals
 

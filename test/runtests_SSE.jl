@@ -42,7 +42,7 @@ import .ModelLikes
 inputs = ModelLikes.setup_MuSSE_biogeo()
 Rnames(inputs)
 Rnames(inputs.p_Ds_v5.p_indices)
-Rcbind(inputs.p_Ds_v5.p_indices.Qarray_ivals, inputs.p_Ds_v5.p_indices.Qarray_jvals, inputs.p_Ds_v5.params.Qij_vals, inputs.p_Ds_v5.params.Q_event_type_vals)
+Rcbind(inputs.p_Ds_v5.p_indices.Qarray_ivals, inputs.p_Ds_v5.p_indices.Qarray_jvals, inputs.p_Ds_v5.params.Qij_vals, inputs.p_Ds_v5.params.Qarray_event_types)
 Rcbind(inputs.p_Ds_v5.p_indices.Carray_ivals, inputs.p_Ds_v5.p_indices.Carray_jvals, inputs.p_Ds_v5.p_indices.Carray_kvals, inputs.p_Ds_v5.params.Cijk_vals)
 
 

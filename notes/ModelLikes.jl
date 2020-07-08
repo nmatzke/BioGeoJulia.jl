@@ -96,7 +96,7 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	Qarray_ivals = Qmat.Qarray_ivals
 	Qarray_jvals = Qmat.Qarray_jvals
 	Qij_vals = Qmat.Qij_vals
-	event_type_vals = Qmat.event_type_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 
 	# Default values of y, s, v, and j
 	Cparams = default_Cparams()
@@ -120,7 +120,7 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	# Possibly varying parameters
 	mu_vals = repeat([deathRate], n)
 
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Q_event_type_vals=event_type_vals, Cijk_vals=Carray.Cijk_vals)
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Qarray_event_types=Qarray_event_types, Cijk_vals=Carray.Cijk_vals)
 
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
 	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals)
@@ -280,7 +280,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	Qarray_ivals = Qmat.Qarray_ivals
 	Qarray_jvals = Qmat.Qarray_jvals
 	Qij_vals = Qmat.Qij_vals
-	event_type_vals = Qmat.event_type_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 
 
 	Cparams = default_Cparams()
@@ -304,7 +304,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	# Possibly varying parameters
 	mu_vals = repeat([deathRate], n)
 
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Q_event_type_vals=event_type_vals, Cijk_vals=Carray.Cijk_vals)
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Qarray_event_types=Qarray_event_types, Cijk_vals=Carray.Cijk_vals)
 	
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
 	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals)
