@@ -71,7 +71,7 @@ end
 # Print a Carray from inputs to a data.frame
 """
 function prtCi(inputs)
-	Cdf = DataFrame(event=Carray.Carray_event_types, i=inputs.p_Ds_v5.p_indices.Carray_ivals, j=inputs.p_Ds_v5.p_indices.Carray_jvals, k=inputs.p_Ds_v5.p_indices.Carray_kvals, wt=inputs.p_Ds_v5.params.Cijk_weights, val=inputs.p_Ds_v5.params.Cijk_vals)
+	Cdf = DataFrame(event=inputs.p_Ds_v5.p_indices.Carray_event_types, i=inputs.p_Ds_v5.p_indices.Carray_ivals, j=inputs.p_Ds_v5.p_indices.Carray_jvals, k=inputs.p_Ds_v5.p_indices.Carray_kvals, wt=inputs.p_Ds_v5.params.Cijk_weights, val=inputs.p_Ds_v5.params.Cijk_vals)
 	return Cdf
 end
 
@@ -89,7 +89,7 @@ end
 # Print a Qarray from inputs to a data.frame
 """
 function prtQi(inputs)
-	Qdf = DataFrame(event=inputs.p_Ds_v5.params.Qarray_event_types, i=inputs.p_Ds_v5.p_indices.Qarray_ivals, j=inputs.p_Ds_v5.p_indices.Qarray_jvals, val=inputs.p_Ds_v5.params.Qij_vals)
+	Qdf = DataFrame(event=inputs.p_Ds_v5.p_indices.Qarray_event_types, i=inputs.p_Ds_v5.p_indices.Qarray_ivals, j=inputs.p_Ds_v5.p_indices.Qarray_jvals, val=inputs.p_Ds_v5.params.Qij_vals)
 	return Qdf
 end
 

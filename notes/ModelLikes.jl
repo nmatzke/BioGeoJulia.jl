@@ -121,10 +121,10 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	# Possibly varying parameters
 	mu_vals = repeat([deathRate], n)
 
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Qarray_event_types=Qarray_event_types, Cijk_weights=Cijk_weights, Cijk_vals=Carray.Cijk_vals)
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_weights=Cijk_weights, Cijk_vals=Carray.Cijk_vals)
 
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
-	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals)
+	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Qarray_event_types=Qmat.Qarray_event_types, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals, Carray.Carray_event_types)
 
 	# True/False statements by index
 	# The calculation of dEi and dDi for state i involves many
