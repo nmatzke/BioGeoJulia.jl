@@ -197,22 +197,15 @@ end # End calc_Gs_SSE
 # it created conflicts apparently when there were more @spawns than cores
 # Do all the writing to res in the while() loop
 """
-#cd("/GitHub/BioGeoJulia.jl/notes/")
+cd("/GitHub/BioGeoJulia.jl/notes/")
 #include("tst_Flow.jl")
 
-#using .Tmp
-
-cd("/GitHub/BioGeoJulia.jl/src/")
-include("TreePass.jl")
-cd("/GitHub/BioGeoJulia.jl/")
-
-
-cd("/GitHub/BioGeoJulia.jl/notes/")
 include("ModelLikes.jl")
 import .ModelLikes
+#using .Tmp
+
 include("Flow.jl")
 import .Flow
-cd("/GitHub/BioGeoJulia.jl/")
 
 using LinearAlgebra  # for "I" in: Matrix{Float64}(I, 2, 2)
 										 # https://www.reddit.com/r/Julia/comments/9cfosj/identity_matrix_in_julia_v10/
@@ -234,11 +227,9 @@ using Profile     # for @profile
 using DataFrames  # for DataFrame
 using PhyloNetworks
 
-inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:1,human:1):1,gorilla:2);"))
-#inputs = ModelLikes.setup_MuSSE_biogeo(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+inputs = ModelLikes.setup_DEC_SSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
+# inputs = ModelLikes.setup_MuSSE(2, readTopology("((chimp:10,human:10):10,gorilla:20);"))
 res = inputs.res
-inputs.res.likes_at_each_nodeIndex_branchTop
-
 trdf = inputs.trdf
 n = inputs.p_Ds_v5.n
 solver_options = inputs.solver_options
@@ -247,17 +238,10 @@ p_Ds_v5 = inputs.p_Ds_v5  # contains model parameters, and the "Es" solver/inter
 trdf = inputs.trdf
 root_age = maximum(trdf[!, :node_age])
 
-# Look at the model parameters (Q and C matrix)
-Rcbind(p_Ds_v5.p_indices.Qarray_ivals, p_Ds_v5.p_indices.Qarray_jvals, p_Ds_v5.params.Qij_vals)
-Rcbind(p_Ds_v5.p_indices.Carray_ivals, p_Ds_v5.p_indices.Carray_jvals, p_Ds_v5.p_indices.Carray_kvals, p_Ds_v5.params.Cijk_vals)
-p_Ds_v5.params.mu_vals
-
-
-
 # Ground truth with standard ClaSSE integration
 u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
 u0[2] = 1.0
-tspan = (0.0, 1.4*root_age)   # age at the branch top and branch bottom
+tspan = (0.0, 10.0)   # age at the branch top and branch bottom
 prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
 ground_truth_Ds_interpolator = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
 ground_truth_Ds_interpolatorTsit5 = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
@@ -274,7 +258,7 @@ tspan_for_G = (0.0, 1.1*root_age) # Extend well beyond the root to avoid weirdne
 prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan_for_G, pG)
 
 
-tspan = (0.0, 1.1*root_age)   # age at the branch top and branch bottom
+tspan = (0.0, 10.0)   # age at the branch top and branch bottom
 u0 = collect(repeat([0.0], n)) # likelihoods at the branch top
 u0[2] = 1.0
 
@@ -305,7 +289,6 @@ sum(resFlow.logsum_likes_at_nodes)
 (total_calctime_in_sec, iteration_number) = Flow.iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
 resClaSSE = deepcopy(res)
 resClaSSE.likes_at_each_nodeIndex_branchTop
-resClaSSE.likes_at_each_nodeIndex_branchBot
 resClaSSE.logsum_likes_at_nodes
 sum(resClaSSE.logsum_likes_at_nodes)
 

@@ -272,7 +272,7 @@ parameterized_ClaSSE_Ds_v5 = (du,u,p,t) -> begin
 		# Calculation of "D" (likelihood of tip data)
 		du[i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 1: no event
 			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 	# case 2	
-			(sum(Cijk_vals[Ci_sub_i] .*                                               # case 34: change + eventual extinction
+			(sum(Cijk_vals[Ci_sub_i] .*                                               # case 3/4: change + eventual extinction
 				 (u[Ck_sub_i].*uE[Cj_sub_i] 
 			 .+ u[Cj_sub_i].*uE[Ck_sub_i]) ))
   end
