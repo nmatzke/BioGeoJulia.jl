@@ -13,7 +13,7 @@ using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
 
-export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, setup_DEC_Cmat, update_Cijk_vals
+export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, prtC, prtQ, setup_DEC_Cmat, update_Cijk_vals
 
 
 
@@ -896,8 +896,53 @@ function relative_probabilities_of_subsets(total_numareas=6, maxent_constraint_0
 end
 
 
+"""
+# R version:
+library(BioGeoBEARS)
+relative_probabilities_of_vicariants(max_numareas=3, maxent_constraint_01v=0.0001)
+#      [,1] [,2] [,3]
+# [1,]   NA   NA   NA
+# [2,]    1   NA   NA
+# [3,]    1   NA   NA
+relative_probabilities_of_vicariants(max_numareas=3, maxent_constraint_01v=0.5)
+#      [,1] [,2] [,3]
+# [1,]   NA   NA   NA
+# [2,]    1   NA   NA
+# [3,]    1   NA   NA
+relative_probabilities_of_vicariants(max_numareas=4, maxent_constraint_01v=0.5)
+#      [,1] [,2] [,3] [,4]
+# [1,]   NA   NA   NA   NA
+# [2,]  1.0   NA   NA   NA
+# [3,]  1.0   NA   NA   NA
+# [4,]  0.5  0.5   NA   NA
+relative_probabilities_of_vicariants(max_numareas=5, maxent_constraint_01v=0.5)
+#      [,1] [,2] [,3] [,4] [,5]
+# [1,]   NA   NA   NA   NA   NA
+# [2,]  1.0   NA   NA   NA   NA
+# [3,]  1.0   NA   NA   NA   NA
+# [4,]  0.5  0.5   NA   NA   NA
+# [5,]  0.5  0.5   NA   NA   NA
+relative_probabilities_of_vicariants(max_numareas=6, maxent_constraint_01v=0.5)
+#       [,1]  [,2]  [,3] [,4] [,5] [,6]
+# [1,]    NA    NA    NA   NA   NA   NA
+# [2,] 1.000    NA    NA   NA   NA   NA
+# [3,] 1.000    NA    NA   NA   NA   NA
+# [4,] 0.500 0.500    NA   NA   NA   NA
+# [5,] 0.500 0.500    NA   NA   NA   NA
+# [6,] 0.333 0.333 0.333   NA   NA   NA
 
-function relative_probabilities_of_vicariants(total_numareas=6, maxent_constraint_01=0.5, NA_val=NaN)
+# Julia
+relative_probabilities_of_vicariants(3, 0.0001)
+relative_probabilities_of_vicariants(3, 0.5)
+relative_probabilities_of_vicariants(4, 0.0001)
+relative_probabilities_of_vicariants(4, 0.5)
+relative_probabilities_of_vicariants(5, 0.0001)
+relative_probabilities_of_vicariants(5, 0.5)
+relative_probabilities_of_vicariants(6, 0.0001)
+relative_probabilities_of_vicariants(6, 0.5)
+
+"""
+function relative_probabilities_of_vicariants(total_numareas=4, maxent_constraint_01=0.5, NA_val=NaN)
 	# Set up a matrix to hold the maxent distributions of relative prob of 
 	# smaller daughter range sizes
 	relprob_subsets_matrix = reshape(repeat([NA_val], total_numareas^2), (total_numareas,total_numareas))
@@ -1099,11 +1144,11 @@ maxent01jump = maxent01.maxent01jump
 
 """
 function maxent01_defaults(total_numareas=4; maxent_constraint_01=0.0, maxent_constraint_01v=0.0)
-	maxent_constraint_01 = 0.0
+	#maxent_constraint_01 = 0.0
 	maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
 	maxent01sub = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
 	maxent01jump = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
-	maxent_constraint_01v = 0.0
+	#maxent_constraint_01v = 0.0
 	maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01v)
 	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 	return maxent01
@@ -1118,6 +1163,13 @@ function prtC(Carray)
 	return Cdf
 end
 
+"""
+# Print a Qarray to a data.frame
+"""
+function prtQ(Qarray)
+	Qdf = DataFrame(event=Qarray.Qarray_event_types, i=Qarray.Qarray_ivals, j=Qarray.Qarray_jvals, val=Qarray.Qij_vals)
+	return Qdf
+end
 
 
 
