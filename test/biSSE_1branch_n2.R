@@ -7,7 +7,7 @@
 #
 # Run with:
 #
-# source("/GitHub/BioGeoJulia.jl/test/biSSE_1branch_v1.R")
+# source("/GitHub/BioGeoJulia.jl/test/biSSE_1branch_n2.R")
 # 
 #######################################################
 
@@ -35,22 +35,18 @@ source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_pureR_v1.R") # simple implementations
 # mus = extinction rates
 # qs = anagenetic transition rates
 birthRate = 0.222222222
-deathRate = 0.1
+deathRate = 0.4
 
-lambda0 = birthRate
-lambda1 = birthRate
-mu0 = deathRate
-mu1 = deathRate
 
 # Speciation
 lambda0 = birthRate
 lambda1 = birthRate
 # Extinction
-mu0 = 0
-mu1 = 0
+mu0 = deathRate
+mu1 = deathRate
 # Character transition
-q01 = 0 # ML
-q10 = 0
+q01 = 0.1 # ML
+q10 = 0.05
 
 parms = c(lambda0, lambda1, mu0, mu1, q01, q10)
 names(parms) = c("lambda0", "lambda1", "mu0", "mu1", "q01", "q10")
@@ -112,23 +108,16 @@ one_step_result
 # y = initial state values
 # times = times at which you want estimates
 # func
-times = seq(0,1,1/50)
+times = seq(from=0, to=1, by=1/50)
 out <- lsoda(y=y, times=times, func=define_BiSSE_eqns_in_R, parms=parms) 
-out
-
-parms2 = parms
-parms2["mu0"] = 0.1
-parms2["mu1"] = 0.1
-times = seq(0,1,1/50)
-out <- lsoda(y=y, times=times, func=define_BiSSE_eqns_in_R, parms=parms2) 
-out
+tail(out)
 
 # The last values of "out" are:
 result_EsDs = out[nrow(out), ]
 result_EsDs
 
 txt = paste0(result_EsDs, collapse=" ")
-juliatxt = paste0("result_EsDs = [", txt, "]")
+juliatxt = paste0("R_result_EsDs = [", txt, "]")
 cat("\n")
 cat("Output of this R script:")
 cat(juliatxt)

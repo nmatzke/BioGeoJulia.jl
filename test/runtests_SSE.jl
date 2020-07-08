@@ -6,6 +6,13 @@ using Distributed						# for e.g. @spawn
 using Combinatorics					# for e.g. combinations()
 using DataFrames
 
+using LinearAlgebra  # for "I" in: Matrix{Float64}(I, 2, 2)
+										 # https://www.reddit.com/r/Julia/comments/9cfosj/identity_matrix_in_julia_v10/
+using DataFrames  # for DataFrame
+using DifferentialEquations
+using OrdinaryDiffEq, Sundials, DiffEqDevTools, Plots, ODEInterfaceDiffEq, ODE, LSODA
+
+
 # List each BioGeoJulia code file prefix here
 using BioGeoJulia.Example
 using BioGeoJulia.StateSpace
@@ -15,7 +22,7 @@ using BioGeoJulia.SSEs
 
 @testset "Example" begin
 	@test hello("Julia") == "Hello, Julia"
-	@test domath(2.0) ≈ 7.0
+#	@test domath(2.0) ≈ 7.0
 end
 
 
@@ -26,7 +33,7 @@ end
 # under a variety of simple and more complex models
 #######################################################
 
-@testset "SSEs" begin
+@testset "biSSE_1branch_n1" begin
 
 #######################################################
 # Calculation of Es and Ds on a single branch
@@ -35,43 +42,325 @@ end
 # (1 branch, pure birth, no Q transitions, branchlength=1)
 #
 # Run with:
-# source("/GitHub/BioGeoJulia.jl/test/biSSE_1branch_v1.R")
+# source("/GitHub/BioGeoJulia.jl/test/biSSE_1branch_n1.R")
+# Truth:
+R_result_EsDs = [1 0.0860322055692215 0.0860322055692215 0 0.739232931655601]
 #######################################################
+
+
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 inputs = ModelLikes.setup_MuSSE_biogeo()
-Rnames(inputs)
-Rnames(inputs.p_Ds_v5.p_indices)
-Rcbind(inputs.p_Ds_v5.p_indices.Qarray_ivals, inputs.p_Ds_v5.p_indices.Qarray_jvals, inputs.p_Ds_v5.params.Qij_vals, inputs.p_Ds_v5.params.Qarray_event_types)
-Rcbind(inputs.p_Ds_v5.p_indices.Carray_ivals, inputs.p_Ds_v5.p_indices.Carray_jvals, inputs.p_Ds_v5.p_indices.Carray_kvals, inputs.p_Ds_v5.params.Cijk_vals)
+prtQi(inputs)
+prtCi(inputs)
 
-
-result_EsDs = [1 0.0860322055692215 0.0860322055692215 0 0.739232931655601]
 
 # Repeat calculation in Julia
-in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
-inputs = ModelLikes.setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, max_range_size=1, include_null_range=true, in_params=in_params)
-Es_interpolator = inputs.p_Ds_v5.sol_Es_v5
+include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
+import .ModelLikes
+tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
+in_params = (birthRate=0.222222222, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
+numstates = 2
+n = 2
+inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
 
-# Initialize evolving state vector
-u = repeat([0.0], 2*n)
+trdf = inputs.trdf
+root_age = maximum(trdf[!, :node_age])
+Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
+prtQi(inputs)
+prtCi(inputs)
 
-# Starting values
-du = repeat([0.0], 2*n)
-u0 = repeat([0.0], 2*n)
-u0[n+1] = 1.0
-tspan = (0.0, 10.0)
-
-prob = ODEProblem(parameterized_ClaSSE, u0, tspan, p)
-sol = solve(prob, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
-
-
-
-
-
-
-
+#######################################################
+# Check Es at t=1.0
+#######################################################
+Julia_result_Es = Es_interpolator(1.0)
+R_Es = R_result_EsDs[(2:(n+1))]
+@test all(round.(Julia_result_Es; digits=4) .== round.(R_Es; digits=4))
 
 
+#######################################################
+# Check Ds at t=1.0
+#######################################################
+n = inputs.p_Ds_v5.n
+p_Ds_v5 = inputs.p_Ds_v5
+u0 = collect(repeat([0.0], n))
+u0[2] = 1.0
+tspan = (0.0, 1.2*root_age)
+prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
 
-end
+ground_truth_Ds_interpolatorT = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+ground_truth_Ds_interpolatorG = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+ground_truth_Ds_interpolatorL = solve(prob_Ds_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+ground_truth_Ds_interpolatorT.u[length(ground_truth_Ds_interpolatorT.u)]
+ground_truth_Ds_interpolatorG.u[length(ground_truth_Ds_interpolatorG.u)]
+ground_truth_Ds_interpolatorL.u[length(ground_truth_Ds_interpolatorL.u)]
+
+# Check if all of the results are equal, using standard Ds SSE calcs
+Tsit5_results = round.(ground_truth_Ds_interpolatorT.u[length(ground_truth_Ds_interpolatorT.u)]; digits=4)
+GMRES_results = round.(ground_truth_Ds_interpolatorG.u[length(ground_truth_Ds_interpolatorG.u)]; digits=4)
+LSODA_results = round.(ground_truth_Ds_interpolatorL.u[length(ground_truth_Ds_interpolatorL.u)]; digits=4)
+
+@test all(Tsit5_results .== GMRES_results)
+@test all(Tsit5_results .== LSODA_results)
+
+
+#######################################################
+# Check if all of the results are equal, using "Flow" Ds SSE calcs
+#######################################################
+include("/GitHub/BioGeoJulia.jl/notes/Flow.jl")
+import .Flow
+
+# build an A (the linear dynamics, i.e. Q and C matrices combined into a square matrix)
+tmpzero = repeat([0.0], n^2)
+A = reshape(tmpzero, (n,n))
+
+# Map the likelihood "flow" of Ds, G (or Gmap or Psi).
+# Start with an identity matrix
+# The "I" requires "include NumericAlgebra"
+G0 = Matrix{Float64}(I, n, n) 
+
+pG = (n=n, p_Ds_v5=p_Ds_v5, A=A)
+tspan = (0.0, 1.1*root_age)
+prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
+
+Gflow_to_01_GMRES  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+Gflow_to_01_Tsit5  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+Gflow_to_01_Lsoda  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+# Check that the different interpolators match
+Gmat_GMRES = round.(Gflow_to_01_GMRES(1.0); digits=5)
+Gmat_Tsit5 = round.(Gflow_to_01_Tsit5(1.0); digits=5)
+@test all(Gmat_GMRES .== Gmat_Tsit5)
+
+# Lsoda requires a less precise match (!)
+Gmat_GMRES = round.(Gflow_to_01_GMRES(1.0); digits=3)
+Gmat_Tsit5 = round.(Gflow_to_01_Tsit5(1.0); digits=3)
+Gmat_Lsoda = round.(Gflow_to_01_Lsoda(1.0); digits=3)
+@test all(Gmat_GMRES .== Gmat_Lsoda)
+@test all(Gmat_Tsit5 .== Gmat_Lsoda)
+
+
+# Calculate the flow, on a single branch
+X0 = u0
+factored_G = factorize(Gflow_to_01_GMRES(1.0))
+Xc_GMRES = factored_G * X0
+
+factored_G = factorize(Gflow_to_01_Tsit5(1.0))
+Xc_Tsit5 = factored_G * X0
+
+factored_G = factorize(Gflow_to_01_Lsoda(1.0))
+Xc_Lsoda = factored_G * X0
+
+# Compare standard to Flow
+@test all(round.(ground_truth_Ds_interpolatorG(1.0); digits=6) .== round.(Xc_GMRES; digits=6))
+@test all(round.(ground_truth_Ds_interpolatorT(1.0); digits=6) .== round.(Xc_Tsit5; digits=6))
+@test all(round.(ground_truth_Ds_interpolatorL(1.0); digits=3) .== round.(Xc_Lsoda; digits=3)) # Much worse match
+
+ground_truth_Ds_interpolatorG(1.0)
+ground_truth_Ds_interpolatorT(1.0)
+ground_truth_Ds_interpolatorL(1.0)
+
+Ds_indices = 1 .+ collect((n+1):(2*n));
+R_Ds = R_result_EsDs[Ds_indices]
+
+# Test the R Ds, against the Julia Ds
+# Standard calc of Ds
+@test all(round.(ground_truth_Ds_interpolatorG(1.0); digits=4) .== round.(R_Ds; digits=4))
+@test all(round.(ground_truth_Ds_interpolatorT(1.0); digits=4) .== round.(R_Ds; digits=4))
+@test all(round.(ground_truth_Ds_interpolatorL(1.0); digits=3) .== round.(R_Ds; digits=3)) # Much worse match
+# Flow calc of Ds
+@test all(round.(R_Ds; digits=4) .== round.(Xc_GMRES; digits=4))
+@test all(round.(R_Ds; digits=4) .== round.(Xc_Tsit5; digits=4))
+@test all(round.(R_Ds; digits=3) .== round.(Xc_Lsoda; digits=3)) # Much worse match
+
+R_EDs = vcat(R_Es, R_Ds)
+Julia_EDs_GMRES = vcat(Julia_result_Es, Xc_GMRES)
+Julia_EDs_Tsit5 = vcat(Julia_result_Es, Xc_Tsit5)
+Julia_EDs_Lsoda = vcat(Julia_result_Es, Xc_Lsoda)
+
+GMRES_Rlsoda_diffs = R_EDs .- Julia_EDs_GMRES
+Tsit5_Rlsoda_diffs = R_EDs .- Julia_EDs_Tsit5
+Lsoda_Rlsoda_diffs = R_EDs .- Julia_EDs_Lsoda
+
+print("\nDifferences between Julia and R biSSE_1branch_n1 calculation:\n")
+print("GMRES: ")
+print(GMRES_Rlsoda_diffs)
+print("\n")
+print("Tsit5: ")
+print(Tsit5_Rlsoda_diffs)
+print("\n")
+print("LSODA: ")
+print(Lsoda_Rlsoda_diffs)
+print("\n")
+
+end # END @testset "biSSE_1branch_n1" begin
+
+
+
+
+
+
+@testset "biSSE_1branch_n2" begin
+
+#######################################################
+# Calculation of Es and Ds on a single branch
+# Example BiSSE calculation
+# result_EsDs_biSSE_1branch_pureBirth_bl1
+# (1 branch, pure birth, no Q transitions, branchlength=1)
+#
+# Run with:
+# source("/GitHub/BioGeoJulia.jl/test/biSSE_1branch_n2.R")
+# Truth:
+R_result_EsDs = [1 0.304473654892522 0.304473654892522 0.0523757642945074 0.525500584759885]
+#######################################################
+
+
+include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
+import .ModelLikes
+inputs = ModelLikes.setup_MuSSE_biogeo()
+prtQi(inputs)
+prtCi(inputs)
+
+
+# Repeat calculation in Julia
+include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
+import .ModelLikes
+tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
+in_params = (birthRate=0.222222222, deathRate=0.4, d_val=0.0, e_val=0.0, a_val=0.1, j_val=0.0)
+numstates = 2
+n = 2
+inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
+
+trdf = inputs.trdf
+root_age = maximum(trdf[!, :node_age])
+Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
+prtQi(inputs)
+prtCi(inputs)
+
+#######################################################
+# Check Es at t=1.0
+#######################################################
+Julia_result_Es = Es_interpolator(1.0)
+R_Es = R_result_EsDs[(2:(n+1))]
+@test all(round.(Julia_result_Es; digits=4) .== round.(R_Es; digits=4))
+
+
+#######################################################
+# Check Ds at t=1.0
+#######################################################
+n = inputs.p_Ds_v5.n
+p_Ds_v5 = inputs.p_Ds_v5
+u0 = collect(repeat([0.0], n))
+u0[2] = 1.0
+tspan = (0.0, 1.2*root_age)
+prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
+
+ground_truth_Ds_interpolatorT = solve(prob_Ds_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+ground_truth_Ds_interpolatorG = solve(prob_Ds_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+ground_truth_Ds_interpolatorL = solve(prob_Ds_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+ground_truth_Ds_interpolatorT.u[length(ground_truth_Ds_interpolatorT.u)]
+ground_truth_Ds_interpolatorG.u[length(ground_truth_Ds_interpolatorG.u)]
+ground_truth_Ds_interpolatorL.u[length(ground_truth_Ds_interpolatorL.u)]
+
+# Check if all of the results are equal, using standard Ds SSE calcs
+Tsit5_results = round.(ground_truth_Ds_interpolatorT.u[length(ground_truth_Ds_interpolatorT.u)]; digits=4)
+GMRES_results = round.(ground_truth_Ds_interpolatorG.u[length(ground_truth_Ds_interpolatorG.u)]; digits=4)
+LSODA_results = round.(ground_truth_Ds_interpolatorL.u[length(ground_truth_Ds_interpolatorL.u)]; digits=4)
+
+@test all(Tsit5_results .== GMRES_results)
+@test all(Tsit5_results .== LSODA_results)
+
+
+#######################################################
+# Check if all of the results are equal, using "Flow" Ds SSE calcs
+#######################################################
+include("/GitHub/BioGeoJulia.jl/notes/Flow.jl")
+import .Flow
+
+# build an A (the linear dynamics, i.e. Q and C matrices combined into a square matrix)
+tmpzero = repeat([0.0], n^2)
+A = reshape(tmpzero, (n,n))
+
+# Map the likelihood "flow" of Ds, G (or Gmap or Psi).
+# Start with an identity matrix
+# The "I" requires "include NumericAlgebra"
+G0 = Matrix{Float64}(I, n, n) 
+
+pG = (n=n, p_Ds_v5=p_Ds_v5, A=A)
+tspan = (0.0, 1.1*root_age)
+prob_Gs_v5 = DifferentialEquations.ODEProblem(Flow.calc_Gs_SSE!, G0, tspan, pG)
+
+Gflow_to_01_GMRES  = solve(prob_Gs_v5, CVODE_BDF(linear_solver=:GMRES), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+Gflow_to_01_Tsit5  = solve(prob_Gs_v5, Tsit5(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+Gflow_to_01_Lsoda  = solve(prob_Gs_v5, lsoda(), save_everystep=true, abstol = 1e-9, reltol = 1e-9)
+
+# Check that the different interpolators match
+Gmat_GMRES = round.(Gflow_to_01_GMRES(1.0); digits=5)
+Gmat_Tsit5 = round.(Gflow_to_01_Tsit5(1.0); digits=5)
+@test all(Gmat_GMRES .== Gmat_Tsit5)
+
+# Lsoda requires a less precise match (!)
+Gmat_GMRES = round.(Gflow_to_01_GMRES(1.0); digits=3)
+Gmat_Tsit5 = round.(Gflow_to_01_Tsit5(1.0); digits=3)
+Gmat_Lsoda = round.(Gflow_to_01_Lsoda(1.0); digits=3)
+@test all(Gmat_GMRES .== Gmat_Lsoda)
+@test all(Gmat_Tsit5 .== Gmat_Lsoda)
+
+
+# Calculate the flow, on a single branch
+X0 = u0
+factored_G = factorize(Gflow_to_01_GMRES(1.0))
+Xc_GMRES = factored_G * X0
+
+factored_G = factorize(Gflow_to_01_Tsit5(1.0))
+Xc_Tsit5 = factored_G * X0
+
+factored_G = factorize(Gflow_to_01_Lsoda(1.0))
+Xc_Lsoda = factored_G * X0
+
+# Compare standard to Flow
+@test all(round.(ground_truth_Ds_interpolatorG(1.0); digits=6) .== round.(Xc_GMRES; digits=6))
+@test all(round.(ground_truth_Ds_interpolatorT(1.0); digits=6) .== round.(Xc_Tsit5; digits=6))
+@test all(round.(ground_truth_Ds_interpolatorL(1.0); digits=3) .== round.(Xc_Lsoda; digits=3)) # Much worse match
+
+ground_truth_Ds_interpolatorG(1.0)
+ground_truth_Ds_interpolatorT(1.0)
+ground_truth_Ds_interpolatorL(1.0)
+
+Ds_indices = 1 .+ collect((n+1):(2*n));
+R_Ds = R_result_EsDs[Ds_indices]
+
+# Test the R Ds, against the Julia Ds
+# Standard calc of Ds
+@test all(round.(ground_truth_Ds_interpolatorG(1.0); digits=4) .== round.(R_Ds; digits=4))
+@test all(round.(ground_truth_Ds_interpolatorT(1.0); digits=4) .== round.(R_Ds; digits=4))
+@test all(round.(ground_truth_Ds_interpolatorL(1.0); digits=3) .== round.(R_Ds; digits=3)) # Much worse match
+# Flow calc of Ds
+@test all(round.(R_Ds; digits=4) .== round.(Xc_GMRES; digits=4))
+@test all(round.(R_Ds; digits=4) .== round.(Xc_Tsit5; digits=4))
+@test all(round.(R_Ds; digits=3) .== round.(Xc_Lsoda; digits=3)) # Much worse match
+
+R_EDs = vcat(R_Es, R_Ds)
+Julia_EDs_GMRES = vcat(Julia_result_Es, Xc_GMRES)
+Julia_EDs_Tsit5 = vcat(Julia_result_Es, Xc_Tsit5)
+Julia_EDs_Lsoda = vcat(Julia_result_Es, Xc_Lsoda)
+
+GMRES_Rlsoda_diffs = R_EDs .- Julia_EDs_GMRES
+Tsit5_Rlsoda_diffs = R_EDs .- Julia_EDs_Tsit5
+Lsoda_Rlsoda_diffs = R_EDs .- Julia_EDs_Lsoda
+
+print("\nDifferences between Julia and R biSSE_1branch_n2 calculation:\n")
+print("GMRES: ")
+print(GMRES_Rlsoda_diffs)
+print("\n")
+print("Tsit5: ")
+print(Tsit5_Rlsoda_diffs)
+print("\n")
+print("LSODA: ")
+print(Lsoda_Rlsoda_diffs)
+print("\n")
+
+end # END @testset "biSSE_1branch_n2" begin
+

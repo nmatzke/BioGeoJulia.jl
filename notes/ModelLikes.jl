@@ -53,26 +53,25 @@ say_hello2()
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 inputs = ModelLikes.setup_MuSSE_biogeo()
-Rnames(inputs)
+prtQi(inputs)
+prtCi(inputs)
+
 
 """
 
-function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=NaN)
+function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, in_params=NaN)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
-	areas_list = collect(1:numareas)
+	areas_list = collect(1:numstates)
 	total_numareas = length(areas_list)
+	numareas = length(areas_list)
 	
-	if (isnan(in_params) == true)
+	type_string = string(typeof(in_params))
+	if (startswith(type_string, "NamedTuple") == false) && (isnan(in_params) == true)
 		in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
 	end
 	
-	# Check if max_range_size=NaN
-	if (isnan(max_range_size) == true)
-		max_range_size = numareas
-	end
-	
-	states_list = areas_list_to_states_list(areas_list, max_range_size, include_null_range)
+	states_list = collect(1:numstates)
 	n = length(states_list)
 
 	res = construct_Res(tr, n)
@@ -92,12 +91,14 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
 	elist = repeat([1.0], length(areas_list))
 	
-	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
-	Qarray_ivals = Qmat.Qarray_ivals
-	Qarray_jvals = Qmat.Qarray_jvals
-	Qij_vals = Qmat.Qij_vals
-	Qarray_event_types = Qmat.Qarray_event_types
-
+	# Can't use setup_DEC_DEmat for an MuSSE Qmatrix, due to the null range
+	#Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
+	Qarray_ivals = collect(1:n)
+	Qarray_jvals = collect(1:n)
+	Qij_vals = collect(repeat([a_val], n))
+	Qarray_event_types = collect(repeat(["a"], n))
+	Qmat = (Qarray_event_types=Qarray_event_types, Qarray_ivals=Qarray_ivals, Qarray_jvals=Qarray_jvals, Qij_vals=Qij_vals)
+	
 	# Default values of y, s, v, and j
 	Cparams = default_Cparams()
 # 	maxent_constraint_01 = 0.0
@@ -114,9 +115,13 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	Carray_kvals = collect(1:n)
 	Cijk_weights = repeat([1.0], n)
 	Cijk_vals = repeat([birthRate], n)
-	Carray_event_types = repeat("y", n) # y=sYmpatric speciation (for MuSSE)
+	Carray_event_types = repeat(["y"], n) # y=sYmpatric speciation (for MuSSE)
 	
 	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_weights=Cijk_weights, Cijk_vals=Cijk_vals, Carray_event_types=Carray_event_types)
+	
+	prtQ(Qmat)
+	prtC(Carray)
+	
 	
 	# Possibly varying parameters
 	mu_vals = repeat([deathRate], n)
@@ -124,7 +129,7 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_weights=Cijk_weights, Cijk_vals=Carray.Cijk_vals)
 
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
-	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Qarray_event_types=Qmat.Qarray_event_types, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals, Carray.Carray_event_types)
+	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Qarray_event_types=Qmat.Qarray_event_types, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals, Carray_event_types=Carray.Carray_event_types)
 
 	# True/False statements by index
 	# The calculation of dEi and dDi for state i involves many
@@ -206,6 +211,9 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	
 	# Solve the Es
 	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, Es_tspan, p_Es_v5)
+
+	print(u0_Es)
+	print(Es_tspan)
 	
 	# This solution is a linear interpolator
 	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);

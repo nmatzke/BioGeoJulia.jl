@@ -536,13 +536,31 @@ Qij_vals = Qmat.Qij_vals
 Qarray_event_types = Qmat.Qarray_event_types
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 
-states_list = areas_list_to_states_list(areas_list, 3, false)
+# An "a" matrix for single areas - 2 areas
+states_list = areas_list_to_states_list(areas_list, 1, false)
 Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
 Qarray_ivals = Qmat.Qarray_ivals
 Qarray_jvals = Qmat.Qarray_jvals
 Qij_vals = Qmat.Qij_vals
 Qarray_event_types = Qmat.Qarray_event_types
 hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
+
+# An "a" matrix for single areas - 5 areas
+
+areas_list = collect(1:5)
+states_list = areas_list_to_states_list(areas_list, 1, false)
+numareas = length(areas_list)
+numstates = length(states_list)
+amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
+dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
+elist = repeat([0.123], numstates)
+Qmat = StateSpace.setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
+Qarray_ivals = Qmat.Qarray_ivals
+Qarray_jvals = Qmat.Qarray_jvals
+Qij_vals = Qmat.Qij_vals
+Qarray_event_types = Qmat.Qarray_event_types
+hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
+
 
 """
 
@@ -581,8 +599,9 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 		num_d_rates = 0
 	end
 
+	# Single-area transitions
 	if (in("a", allowed_event_types))
-		num_a_rates = 2*numstates
+		num_a_rates = (numareas^2) - numareas
 	else
 		num_a_rates = 0
 	end
@@ -610,6 +629,11 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 		
 		for i in 1:(length(statenums_of_size1)-1)			# starting states
 			for j in (i+1):length(statenums_of_size1)		# ending states
+				print("\n")
+				print(i)
+				print("\n")
+				print(j)
+				print("\n")
 				statenum_ival = statenums_of_size1[i]
 				statenum_jval = statenums_of_size1[j]
 				starting_state = states_list[statenum_ival]
