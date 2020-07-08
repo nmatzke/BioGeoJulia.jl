@@ -23,7 +23,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello2, workprecision, setup_MuSSE_biogeo, setup_DEC_SSE, calclike_DEC_SSE, setup_DEC_Cmat2
+export say_hello2, setup_MuSSE_biogeo, workprecision, setup_DEC_SSE, calclike_DEC_SSE, setup_DEC_Cmat2
 
 #######################################################
 # Temporary file to store functions under development
@@ -44,20 +44,19 @@ include("tst2.jl")
 #######################################################
 
 say_hello2() = println("Hello dude2!")
-
-
+say_hello2()
 """
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
 
-cd("/GitHub/BioGeoJulia.jl/notes/")
-include("ModelLikes.jl")
+include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
-cd("/GitHub/BioGeoJulia.jl")
-inputs = setup_MuSSE_biogeo()
+inputs = ModelLikes.setup_MuSSE_biogeo()
+Rnames(inputs)
 
 """
+
 function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=NaN)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
@@ -65,7 +64,7 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	total_numareas = length(areas_list)
 	
 	if (isnan(in_params) == true)
-		in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, j_val=0.0)
+		in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
 	end
 	
 	# Check if max_range_size=NaN
@@ -81,28 +80,25 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	trdf = prt(tr, rootnodenum)
 	tipnodes = trdf[!,1][trdf[!,10].=="tip"]
 	
-	birthRate = 0.2
-	deathRate = 0.0
+	birthRate = in_params.birthRate
+	deathRate = in_params.deathRate
 	
-	d_val = 0.0
-	e_val = 0.0
-	j_val = 0.0
+	d_val = in_params.d_val
+	e_val = in_params.e_val
+	a_val = in_params.a_val
+	j_val = in_params.j_val
 	
 	dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
 	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
 	elist = repeat([1.0], length(areas_list))
 	
-	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
-	print("\n")
-	print("elist")
-	print(elist)
-	print("\n")
+	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
 	Qarray_ivals = Qmat.Qarray_ivals
 	Qarray_jvals = Qmat.Qarray_jvals
 	Qij_vals = Qmat.Qij_vals
 	event_type_vals = Qmat.event_type_vals
 
-
+	# Default values of y, s, v, and j
 	Cparams = default_Cparams()
 # 	maxent_constraint_01 = 0.0
 # 	maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
@@ -117,13 +113,14 @@ function setup_MuSSE_biogeo(numareas=2, tr=readTopology("((chimp:1,human:1):1,go
 	Carray_jvals = collect(1:n)
 	Carray_kvals = collect(1:n)
 	Cijk_vals = repeat([birthRate], n)
+	Carray_event_types = repeat("y", n) # y=sYmpatric speciation (for MuSSE)
 	
-	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_vals=Cijk_vals)
+	Carray = (Carray_ivals=Carray_ivals, Carray_jvals=Carray_jvals, Carray_kvals=Carray_kvals, Cijk_vals=Cijk_vals, Carray_event_types=Carray_event_types)
 	
 	# Possibly varying parameters
 	mu_vals = repeat([deathRate], n)
 
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_vals=birthRate.*Carray.Cijk_vals)
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Q_event_type_vals=event_type_vals, Cijk_vals=Carray.Cijk_vals)
 
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
 	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals)
@@ -236,13 +233,23 @@ end # End function setup_MuSSE_biogeo
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
-function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5)
+function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=NaN)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
 	areas_list = collect(1:numareas)
-	states_list = areas_list_to_states_list(areas_list, numareas, false)
-	n = length(states_list)
 	total_numareas = length(areas_list)
+	
+	if (isnan(in_params) == true)
+		in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
+	end
+	
+	# Check if max_range_size=NaN
+	if (isnan(max_range_size) == true)
+		max_range_size = numareas
+	end
+	
+	states_list = areas_list_to_states_list(areas_list, max_range_size, include_null_range)
+	n = length(states_list)
 
 	
 	res = construct_Res(tr, n)
@@ -297,8 +304,8 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	# Possibly varying parameters
 	mu_vals = repeat([deathRate], n)
 
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_vals=birthRate.*Carray.Cijk_vals)
-
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Q_event_type_vals=event_type_vals, Cijk_vals=Carray.Cijk_vals)
+	
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
 	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals)
 
@@ -440,7 +447,7 @@ maxent_constraint_01 = 0.5
 maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01)
 maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 predeclare_array_length=10000000
-Carray = setup_DEC_Cmat(areas_list, states_list, Cparams)
+Carray = setup_DEC_Cmat2(areas_list, states_list, Cparams)
 
 """
 

@@ -1070,6 +1070,53 @@ function is_event_vicariance(ancstate, lstate, rstate)
 end
 
 
+"""
+# Default maxent multipliers for different kinds of events
+include("/GitHub/BioGeoJulia.jl/src/StateSpace.jl")
+import .StateSpace
+
+total_numareas = 3
+maxent01 = StateSpace.maxent01_defaults(total_numareas);
+maxent01symp = maxent01.maxent01symp
+maxent01sub = maxent01.maxent01sub
+maxent01vic = maxent01.maxent01vic
+maxent01jump = maxent01.maxent01jump
+
+
+total_numareas = 4
+maxent01 = StateSpace.maxent01_defaults(total_numareas);
+maxent01symp = maxent01.maxent01symp
+maxent01sub = maxent01.maxent01sub
+maxent01vic = maxent01.maxent01vic
+maxent01jump = maxent01.maxent01jump
+
+total_numareas = 4
+maxent01 = StateSpace.maxent01_defaults(total_numareas; maxent_constraint_01v=0.5);
+maxent01symp = maxent01.maxent01symp
+maxent01sub = maxent01.maxent01sub
+maxent01vic = maxent01.maxent01vic
+maxent01jump = maxent01.maxent01jump
+
+"""
+function maxent01_defaults(total_numareas=4; maxent_constraint_01=0.0, maxent_constraint_01v=0.0)
+	maxent_constraint_01 = 0.0
+	maxent01symp = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+	maxent01sub = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+	maxent01jump = relative_probabilities_of_subsets(total_numareas, maxent_constraint_01)
+	maxent_constraint_01v = 0.0
+	maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01v)
+	maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
+	return maxent01
+end
+
+
+"""
+# Print a Carray to a data.frame
+"""
+function prtC(Carray)
+	Cdf = DataFrame(event=Carray.Carray_event_types, i=Carray.Carray_ivals, j=Carray.Carray_jvals, k=Carray.Carray_kvals, wt=Carray.Cijk_weights, val=Carray.Cijk_vals)
+	return Cdf
+end
 
 
 
@@ -1104,13 +1151,18 @@ maxent_constraint_01 = 0.5
 maxent01vic = relative_probabilities_of_vicariants(total_numareas, maxent_constraint_01)
 maxent01 = (maxent01symp=maxent01symp, maxent01sub=maxent01sub, maxent01vic=maxent01vic, maxent01jump=maxent01jump)
 predeclare_array_length=10000000
-Carray = setup_DEC_Cmat(areas_list, states_list, Cparams)
+Carray = setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 
 """
 
-function setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))); predeclare_array_length=Integer(min(length(states_list)*length(states_list)*round((length(states_list)/2)), 10000000)), min_precision=1e-9)
+function setup_DEC_Cmat(areas_list, states_list, maxent01=NaN, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))); predeclare_array_length=Integer(min(length(states_list)*length(states_list)*round((length(states_list)/2)), 10000000)), min_precision=1e-9)
 	numareas = length(areas_list)
+	total_numareas = numareas
 	numstates = length(states_list)
+	
+	if (isnan(maxent01) == true)
+		maxent01 = maxent01_defaults(total_numareas)
+	end
 	
 	maxent01symp = maxent01.maxent01symp
 	maxent01sub = maxent01.maxent01sub
