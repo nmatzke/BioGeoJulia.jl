@@ -1409,8 +1409,10 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 	if (sum(TF) == 2)
 		# Get likelihoods from above (iterates up to tips)
 		parent_nodeIndexes = uppass_edgematrix[TF,2]
-		tmp1 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
-		tmp2 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
+		#tmp1 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
+		#tmp2 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
+		tmp1 = res.normlikes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
+		tmp2 = res.normlikes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
 
 		# Check that data are actually available
 		if (sum(tmp1) == 0.0)
@@ -1439,7 +1441,7 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 # 		print("\ncurrent_nodeIndex:\n")
 # 		print(current_nodeIndex)
 
-		tmpDs = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
+		#tmpDs = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
 		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 # 		print("\ntmpDs:\n")
 # 		print(tmpDs)
