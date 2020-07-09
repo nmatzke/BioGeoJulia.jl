@@ -58,16 +58,14 @@ end
 	@test states_list == states_list_answer
 
 	# still need to be done:
-	"""
-	@test default_Cparams() 
-	Cparams == CparamsStructure(1.0, 1.0, 1.0, 0.0)
-	# default_Cparams
 
-	note I'm getting 'Cparams not defined' which makes no sense at that
-	literally in the definition of the function? the output of default_cparams() is
-	still CparamsStructure(1.0, 1.0, 1.0, 0.0) (however when this is tested, still comes back false
-	when compared to CparamsStructure(1.0, 1.0, 1.0, 0.0), so not sure what's going on there)
-	
+	Cparams = default_Cparams()
+	@test Cparams.y == 1
+	@test Cparams.s == 1
+	@test Cparams.v == 1
+	@test Cparams.j == 0
+	"""
+
 	# sumy
 	# sums
 	# sumv
@@ -113,18 +111,30 @@ end
 	allowed_event_types=["d","e"]
 
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat)
+	Qarray_ivals = Qmat.Qarray_ivals
+	Qarray_jvals = Qmat.Qarray_jvals
+	Qij_vals = Qmat.Qij_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 	@test Qmat.Qarray_jvals[4] == 7
 
 	states_list = areas_list_to_states_list(areas_list, 3, false)
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+	Qarray_ivals = Qmat.Qarray_ivals
+	Qarray_jvals = Qmat.Qarray_jvals
+	Qij_vals = Qmat.Qij_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 	@test Qmat.Qarray_jvals[4] == 6
 
 	states_list = areas_list_to_states_list(areas_list, 3, false)
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["a"])
+	Qarray_ivals = Qmat.Qarray_ivals
+	Qarray_jvals = Qmat.Qarray_jvals
+	Qij_vals = Qmat.Qij_vals
+	Qarray_event_types = Qmat.Qarray_event_types
 	@test Qmat.Qarray_jvals[4] == 1
 
 	# update_Qij_vals
-	Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, event_type_vals)
+	Qmat1_df = hcat(Qarray_ivals, Qarray_jvals, Qij_vals, Qarray_event_types)
 	dmat = reshape(repeat([0.5], numareas^2), (numareas,numareas))
 	"""
 	Qmat2 = update_Qij_vals(Qmat, areas_list, states_list, dmat, elist, amat )
