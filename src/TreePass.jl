@@ -1302,7 +1302,7 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		tmp2[Carray_kvals[Ci_sub_i]]
 		
 		# Parameter values for these events with nonzero rates
-		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* (tmp1[Cj_sub_i] .* tmp2[Ck_sub_i]))
+		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* tmp1[Cj_sub_i] .* tmp2[Ck_sub_i])
 # 		print(tmpDs[i])
 # 		print("\n")
 # 		print(Cijk_vals)
@@ -1439,6 +1439,7 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 # 		print("\ncurrent_nodeIndex:\n")
 # 		print(current_nodeIndex)
 
+		tmpDs = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
 		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 # 		print("\ntmpDs:\n")
 # 		print(tmpDs)
@@ -1674,7 +1675,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 			
 			# Use the RAW likelihoods (don't normalize)
 			u0 = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-			u0 = u0 ./ (sum(u0))
+			#u0 = u0 ./ (sum(u0))
 			
 			# Use the NORMALIZED (rescaled to sum to 1) likelihoods
 			# Doesn't work -- claims an interpolation error for going beyond range
@@ -1692,15 +1693,15 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 			# Spawn a branch operation, and a true-false of whether they are fetched
 			res.calc_spawn_start[current_nodeIndex] = Dates.now()
 			print(join(["\nbranchOp on current_nodeIndex=", string(current_nodeIndex)], ""))
-# 			if (parallel_TF == true)
-# 				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
-# 			else
-				tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver_options=solver_options)
-				#tmp_results = branchOp(current_nodeIndex, res, num_iterations)
-				push!(tasks, tmp_results)
-# 			end
-			push!(tasks_fetched_TF, false)
-		end
+#			if (parallel_TF == true)
+#				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
+#			else
+			tmp_results = branchOp_ClaSSE_Ds_v5(current_nodeIndex, res, u0=u0, tspan=tspan, p_Ds_v5=p_Ds_v5, solver_options=solver_options)
+			#tmp_results = branchOp(current_nodeIndex, res, num_iterations)
+			push!(tasks, tmp_results)			 # Add results to "tasks"
+#			end
+			push!(tasks_fetched_TF, false) # Add a "false" to tasks_fetched_TF
+		end # END for current_nodeIndex in indexes_ready
 	
 		# Check which jobs are done, fetch them, and update status of that node
 		num_tasks = length(tasks)
@@ -1784,7 +1785,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 		
 		# Test for concluding the while loop
 		are_we_done && break
-	end
+	end # END while(are_we_done == false)
 	
 	# This breaks it for some reason:
 	# ERROR: setfield! immutable struct of type Res cannot be changed
