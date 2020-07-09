@@ -20,27 +20,27 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.TrUtils
 using BioGeoJulia.SSEs
 
-
-"""
-# Run with:
-include("/GitHub/BioGeoJulia.jl/test/runtests_BiSSE_tree_n1.jl")
-"""
-
-@testset "Example" begin
-	@test hello("runtests_BiSSE_tree_n1.jl") == "Hello, runtests_BiSSE_tree_n1.jl"
-#	@test domath(2.0) ≈ 7.0
-end
-
-
-#######################################################
-# Do a bunch of tests of the SSE calculation of 
-# Ds, Es, and likelihoods, on
-# branches, nodes, and trees,
-# under a variety of simple and more complex models
-#######################################################
-
-@testset "runtests_BiSSE_tree_n1.jl" begin
-
+# 
+# """
+# # Run with:
+# include("/GitHub/BioGeoJulia.jl/test/runtests_BiSSE_tree_n1.jl")
+# """
+# 
+# @testset "Example" begin
+# 	@test hello("runtests_BiSSE_tree_n1.jl") == "Hello, runtests_BiSSE_tree_n1.jl"
+# #	@test domath(2.0) ≈ 7.0
+# end
+# 
+# 
+# #######################################################
+# # Do a bunch of tests of the SSE calculation of 
+# # Ds, Es, and likelihoods, on
+# # branches, nodes, and trees,
+# # under a variety of simple and more complex models
+# #######################################################
+# 
+# @testset "runtests_BiSSE_tree_n1.jl" begin
+# 
 #######################################################
 # Calculation of Es and Ds on a single branch
 # Example BiSSE calculation
@@ -105,10 +105,14 @@ Julia_sum_lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
 d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nodeIndex_branchTop)]
 root_stateprobs = d_root_orig/sum(d_root_orig)
 rootstates_lnL = log(sum(root_stateprobs .* d_root_orig))
-Julia_total_lnL = lq + rootstates_lnL
+Julia_total_lnL = Julia_sum_lq + rootstates_lnL
 
 # Does the total lnL match R?
 @test round(R_result_total_lnL; digits=5) == round(Julia_total_lnL; digits=5)
+
+# Another way to get the lnL!
+sum(res.logsum_likes_at_nodes)-sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
+
 
 
 print("\nDifferences between Julia and R lnLs for _compare_ClaSSE_calcs_v3_compare2julia.R calculation:\n")
