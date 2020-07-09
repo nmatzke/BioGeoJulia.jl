@@ -96,6 +96,13 @@ end
 
 
 
+
+"""
+# Print downpass "res" object likelihoods to an R-like table
+
+"""
+
+
 """
 numstates_from_numareas(3,3,false)
 numstates_from_numareas(3,3,true)

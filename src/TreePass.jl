@@ -1752,9 +1752,9 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 
 					sum_nodeData_at_bottom = sum(nodeData_at_bottom)
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
-					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom[:]
-					res.lq_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom[:]
-					res.like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom[:]
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
+					res.lq_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
+					res.like_at_branchBot[spawned_nodeIndex] = exp(sum_nodeData_at_bottom)
 					
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
@@ -1914,9 +1914,9 @@ function iterative_downpass!(res; max_iterations=10^10, num_iterations=10000000)
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
 					sum_nodeData_at_bottom = sum(nodeData_at_bottom)
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
-					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom[:]
-					res.lq_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom[:]
-					res.like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom[:]
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
+					res.lq_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
+					res.like_at_branchBot[spawned_nodeIndex] = exp(sum_nodeData_at_bottom)
 
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
@@ -2063,9 +2063,9 @@ function iterative_downpass_nonparallel!(res; max_iterations=10^10, num_iteratio
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
 					sum_nodeData_at_bottom = sum(nodeData_at_bottom)
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
-					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom[:]
-					res.lq_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom[:]
-					res.like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom[:]
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
+					res.lq_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
+					res.like_at_branchBot[spawned_nodeIndex] = exp(sum_nodeData_at_bottom)
 
 					
 					# Get the ancestor nodeIndex
