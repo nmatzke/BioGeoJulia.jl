@@ -73,12 +73,23 @@ trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
 root_age = maximum(trdf[!, :node_age])
 Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
+
+# Parameters
 prtQi(inputs)
 prtCi(inputs)
-
+inputs.p_Ds_v5.params.mu_vals
 
 # Do downpass
-iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+sum.(res.likes_at_each_nodeIndex_branchTop)
+log.(sum.(res.likes_at_each_nodeIndex_branchTop))
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
+
+res.likes_at_each_nodeIndex_branchTop
+res.normlikes_at_each_nodeIndex_branchTop
+
+Rnames(res)
+
 
 #######################################################
 # Check Es at t=1.0
