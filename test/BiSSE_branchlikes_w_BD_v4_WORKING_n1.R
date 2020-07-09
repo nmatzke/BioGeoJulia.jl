@@ -342,7 +342,7 @@ states
 
 # Proportion of species in each state; for 2 states
 # (Let's assume we have all species)
-sampling.f = c(1,1,1)
+sampling.f = c(1,1)  # length(sampling.f) = 2 states
 
 # Number of states
 k = 2

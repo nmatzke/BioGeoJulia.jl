@@ -9,7 +9,7 @@ using Distributed			# for e.g. @spawn
 using Random					# for MersenneTwister()
 using DifferentialEquations # for ODEProblem
 using LSODA						# for lsoda()
-export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, SolverOpt, construct_SolverOpt, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, nodeOp_Cmat, nodeOp_ClaSSE_v5, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
+export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, SolverOpt, construct_SolverOpt, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, nodeOp_Cmat, nodeOp_ClaSSE_v5!, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
 
 
 
@@ -1413,8 +1413,8 @@ function nodeOp(current_nodeIndex, res; nodeOp_function=nodeOp_average_likes)
 end
 
 
-
-function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
+# Node operation, combining probabilities from above (assumed to be fast)
+function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 	res.node_state[current_nodeIndex] = "calculating_nodeOp"
 	uppass_edgematrix = res.uppass_edgematrix
 	
@@ -1476,7 +1476,7 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = ((nodeData_at_top .+ 0.0) ./ sum_likes_at_node)
 		
 		res.sum_likes_at_nodes[current_nodeIndex] = sum_likes_at_node + 0.0
-		res.logsum_likes_at_nodes[current_nodeIndex] = log(sum_likes_at_node) + 0.0 + node_lnL
+		res.logsum_likes_at_nodes[current_nodeIndex] = log(sum_likes_at_node) + 0.0
 # 		print("\nnodeData_at_top:\n")
 # 		print(nodeData_at_top)
 # 
@@ -1795,7 +1795,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
 			# Combine the downpass branch likelihoods
 			#nodeOp(current_nodeIndex, res, nodeOp_function=nodeOp_average_likes)
-			nodeOp_ClaSSE_v5(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
+			nodeOp_ClaSSE_v5!(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
 			# (updates res)
 		end
 	
