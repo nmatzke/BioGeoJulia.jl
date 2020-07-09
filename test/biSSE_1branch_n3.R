@@ -35,7 +35,7 @@ source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_pureR_v1.R") # simple implementations
 # mus = extinction rates
 # qs = anagenetic transition rates
 birthRate = 0.222222222
-deathRate = 0.4
+deathRate = 0.1
 
 
 # Speciation

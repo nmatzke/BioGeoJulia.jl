@@ -201,7 +201,9 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	
 	res.likes_at_each_nodeIndex_branchTop
 	for i in 1:tr.numTaxa
-		res.likes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0;
+		# [:] avoids creating a linked reference
+		res.likes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:];
+		res.normlikes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:] / sum(u0[:]);
 	end
 	#res.likes_at_each_nodeIndex_branchTop[6] = u0;
 	res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
@@ -388,7 +390,9 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	
 	res.likes_at_each_nodeIndex_branchTop
 	for i in 1:tr.numTaxa
-		res.likes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0;
+		# [:] avoids creating a linked reference
+		res.likes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:];
+		res.normlikes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:] / sum(u0[:]);
 	end
 	#res.likes_at_each_nodeIndex_branchTop[6] = u0;
 	res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]

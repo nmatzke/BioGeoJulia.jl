@@ -629,11 +629,6 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 		
 		for i in 1:(length(statenums_of_size1)-1)			# starting states
 			for j in (i+1):length(statenums_of_size1)		# ending states
-				print("\n")
-				print(i)
-				print("\n")
-				print(j)
-				print("\n")
 				statenum_ival = statenums_of_size1[i]
 				statenum_jval = statenums_of_size1[j]
 				starting_state = states_list[statenum_ival]

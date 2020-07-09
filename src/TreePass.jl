@@ -1287,20 +1287,20 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 		
 		# Parameter values for these events with nonzero rates
 		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* (tmp1[Cj_sub_i] .* tmp2[Ck_sub_i]))
-		print(tmpDs[i])
-		print("\n")
-		print(Cijk_vals)
-		print("\n")
-		print(Ci_sub_i)
-		print("\n")
-		print(Cj_sub_i)
-		print("\n")
-		print(Ck_sub_i)
-		print("\n")
-		print(tmp1)
-		print("\n")
-		print(tmp2)
-		print("\n")
+# 		print(tmpDs[i])
+# 		print("\n")
+# 		print(Cijk_vals)
+# 		print("\n")
+# 		print(Ci_sub_i)
+# 		print("\n")
+# 		print(Cj_sub_i)
+# 		print("\n")
+# 		print(Ck_sub_i)
+# 		print("\n")
+# 		print(tmp1)
+# 		print("\n")
+# 		print(tmp2)
+# 		print("\n")
   end
   return(tmpDs)
 end
@@ -1715,6 +1715,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 # 					print(nodeData_at_bottom)
 # 					print("\n\n12345\n\n")
 					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum(nodeData_at_bottom)
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
 					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex
@@ -1871,7 +1872,8 @@ function iterative_downpass!(res; max_iterations=10^10, num_iterations=10000000)
 					
 					# Record information
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
-					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum(nodeData_at_bottom)
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
 					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex
@@ -2015,7 +2017,8 @@ function iterative_downpass_nonparallel!(res; max_iterations=10^10, num_iteratio
 					
 					# Record information
 					res.thread_for_each_branchOp[spawned_nodeIndex] = tmp_threadID
-					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum(nodeData_at_bottom)
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
 					TF = uppass_edgematrix[:,2] .== spawned_nodeIndex

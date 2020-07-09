@@ -20,8 +20,14 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.TrUtils
 using BioGeoJulia.SSEs
 
-@testset "Example" begin
-	@test hello("Julia") == "Hello, Julia"
+
+"""
+# Run with:
+include("/GitHub/BioGeoJulia.jl/test/runtests_SSE.jl")
+"""
+
+@testset "runtests_SSE.jl" begin
+	@test hello("runtests_SSE.jl") == "Hello, runtests_SSE.jl"
 #	@test domath(2.0) ≈ 7.0
 end
 
@@ -141,16 +147,12 @@ Gmat_Lsoda = round.(Gflow_to_01_Lsoda(1.0); digits=3)
 @test all(Gmat_Tsit5 .== Gmat_Lsoda)
 
 
-# Calculate the flow, on a single branch
+# Calculate the flow, on a single branch, starting from u0
+# (tip values, so no fakeX0 calculation needed)
 X0 = u0
-factored_G = factorize(Gflow_to_01_GMRES(1.0))
-Xc_GMRES = factored_G * X0
-
-factored_G = factorize(Gflow_to_01_Tsit5(1.0))
-Xc_Tsit5 = factored_G * X0
-
-factored_G = factorize(Gflow_to_01_Lsoda(1.0))
-Xc_Lsoda = factored_G * X0
+Xc_GMRES = Gflow_to_01_GMRES(1.0) * X0
+Xc_Tsit5 = Gflow_to_01_Tsit5(1.0) * X0
+Xc_Lsoda = Gflow_to_01_Lsoda(1.0) * X0
 
 # Compare standard to Flow
 @test all(round.(ground_truth_Ds_interpolatorG(1.0); digits=6) .== round.(Xc_GMRES; digits=6))
@@ -310,16 +312,13 @@ Gmat_Lsoda = round.(Gflow_to_01_Lsoda(1.0); digits=3)
 @test all(Gmat_Tsit5 .== Gmat_Lsoda)
 
 
-# Calculate the flow, on a single branch
+# Calculate the flow, on a single branch, starting from u0
+# (tip values, so no fakeX0 calculation needed)
 X0 = u0
-factored_G = factorize(Gflow_to_01_GMRES(1.0))
-Xc_GMRES = factored_G * X0
+Xc_GMRES = Gflow_to_01_GMRES(1.0) * X0
+Xc_Tsit5 = Gflow_to_01_Tsit5(1.0) * X0
+Xc_Lsoda = Gflow_to_01_Lsoda(1.0) * X0
 
-factored_G = factorize(Gflow_to_01_Tsit5(1.0))
-Xc_Tsit5 = factored_G * X0
-
-factored_G = factorize(Gflow_to_01_Lsoda(1.0))
-Xc_Lsoda = factored_G * X0
 
 # Compare standard to Flow
 @test all(round.(ground_truth_Ds_interpolatorG(1.0); digits=6) .== round.(Xc_GMRES; digits=6))
