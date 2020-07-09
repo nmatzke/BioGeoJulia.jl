@@ -1430,7 +1430,9 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		# Crucial
 		tmp1 = res.normlikes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
 		tmp2 = res.normlikes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
-
+		node_lnL = res.lq_at_branchBot[parent_nodeIndexes[1]] + res.lq_at_branchBot[parent_nodeIndexes[2]]
+		
+		
 		# Check that data are actually available
 		if (sum(tmp1) == 0.0)
 			txt = join(["Error in nodeOp(current_nodeIndex=", string(current_nodeIndex), "): sum(tmp1) == 0.0, indicating data at parent nodes actually not available."], "")
@@ -1458,8 +1460,7 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 # 		print("\ncurrent_nodeIndex:\n")
 # 		print(current_nodeIndex)
 
-		#tmpDs = res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex]
-		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
+		tmpDs = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] # Placeholder
 # 		print("\ntmpDs:\n")
 # 		print(tmpDs)
 		nodeData_at_top = nodeOp_Cmat(tmpDs, tmp1=tmp1, tmp2=tmp2, p_Ds_v5=p_Ds_v5)
@@ -1467,14 +1468,14 @@ function nodeOp_ClaSSE_v5(current_nodeIndex, res; p_Ds_v5)
 		
 		sum_likes_at_node = sum(nodeData_at_top)
 		#sum_likes_at_node = 1.0
-		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = (nodeData_at_top .+ 0.0)
+		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = (nodeData_at_top .+ 0.0) .* exp(node_lnL)
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 		print("\n\ncurrent_nodeIndex:")
 		print(current_nodeIndex)
 		print("\n")
-		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = ((nodeData_at_top .+ 0.0) ./ sum_likes_at_node)
+		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = ((nodeData_at_top .+ 0.0) ./ sum_likes_at_node) .* exp(node_lnL)
 		
-		res.sum_likes_at_nodes[current_nodeIndex] = sum_likes_at_node + 0.0
+		res.sum_likes_at_nodes[current_nodeIndex] = (sum_likes_at_node + 0.0) * exp(node_lnL)
 		res.logsum_likes_at_nodes[current_nodeIndex] = log(sum_likes_at_node) + 0.0
 # 		print("\nnodeData_at_top:\n")
 # 		print(nodeData_at_top)

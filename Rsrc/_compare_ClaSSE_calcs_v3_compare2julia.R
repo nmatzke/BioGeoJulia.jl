@@ -172,9 +172,11 @@ LnLs6t = get_classe_LnLs(res6t)
 
 LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs6, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t, LnLs6t), stringsAsFactors=FALSE)
 names(LnLst) = c("ttl_LnL", "branch_LnL")
-LikDiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))
+ObsDiff = (LnLst$ttl_LnL - LnLst$branch_LnL)
+exp_ObsDiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL))
 LnLdiff = round((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)), digits=4)
-LnLst2 = cbind(LnLst, LikDiff, LnLdiff)
+exp_LnLdiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))
+LnLst2 = cbind(LnLst, ObsDiff, LnLdiff, exp_ObsDiff, exp_LnLdiff)
 cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
 
 # Convert a "res" object from ClaSSE to a 
