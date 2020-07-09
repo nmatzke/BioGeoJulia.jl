@@ -50,12 +50,13 @@ end
 # Run with:
 # source("/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_BD_v4_WORKING_n1.R")
 # Truth:
-R_result_lnL = -3.128581
+R_result_branch_lnL = -3.128581
+R_result_total_lnL = -4.937608
 #######################################################
 
 
-include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
-import .ModelLikes
+include("/GitHub/BioGeoJulia.jl/src/TreePass.jl")
+import .TreePass
 
 # Repeat calculation in Julia
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
@@ -92,8 +93,22 @@ res.normlikes_at_each_nodeIndex_branchBot
 sum.(res.likes_at_each_nodeIndex_branchTop)
 log.(sum.(res.likes_at_each_nodeIndex_branchTop))
 sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
-lq = sum(log.(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)]))
+lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
 
+# Does the total of the branch log-likelihoods match?
+@test round(R_result_branch_lnL; digits=5) == round(lq; digits=5)
+
+# Add the root probabilities
+# Assuming diversitree options:
+# root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
+# i.e., the root state probs are just the root_Ds/sum(root_Ds)
+d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nodeIndex_branchTop)]
+root_stateprobs = d_root_orig/sum(d_root_orig)
+rootstates_lnL = log(sum(root_stateprobs .* d_root_orig))
+total_lnL = lq + rootstates_lnL
+
+# Does the total lnL match R?
+@test round(R_result_total_lnL; digits=5) == round(total_lnL; digits=5)
 
 
 #######################################################
