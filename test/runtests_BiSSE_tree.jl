@@ -78,6 +78,7 @@ Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
 prtQi(inputs)
 prtCi(inputs)
 inputs.p_Ds_v5.params.mu_vals
+p_Ds_v5.sol_Es_v5(1.0)
 
 # Do downpass
 (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
@@ -87,6 +88,8 @@ sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
 
 res.likes_at_each_nodeIndex_branchTop
 res.normlikes_at_each_nodeIndex_branchTop
+res.likes_at_each_nodeIndex_branchBot
+res.normlikes_at_each_nodeIndex_branchBot
 
 Rnames(res)
 
