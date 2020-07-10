@@ -792,10 +792,30 @@ sum(lnls, na.rm=TRUE)
 # [1] -0.2993006 -0.3021421 -0.5711150         NA -1.9499680
 # [1] -3.122526
 
+
+# Sum of the branch likelihoods
 lq
 sum(lq)
 # [1] -0.3021421 -0.3021421 -0.5711149  0.0000000 -1.9531821
 # [1] -3.128581
+
+
+# Add the root probabilities
+# Assuming diversitree options:
+# root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
+# i.e., the root state probs are just the root_Ds/sum(root_Ds)
+LnLs1
+# -4.937608 -3.128581
+
+# Does the total of branch likelihoods (lq) + node likelihoods match R?
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = sum(log(computed_likelihoods_at_each_node_x_lambda))
+# -6.579522
+
+
+R_result_branch_lnL = -3.128581
+R_result_total_lnL = -4.937608
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -6.579522
+
 
 #######################################################
 #######################################################

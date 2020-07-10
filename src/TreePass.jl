@@ -968,8 +968,8 @@ struct Res
 	root_nodeIndex::Int64
 	numNodes::Int64
 	uppass_edgematrix::Array{Int64}
-	sum_likes_at_nodes::Array{Float64}
-	logsum_likes_at_nodes::Array{Float64}
+	sumLikes_at_node_at_branchTop::Array{Float64}
+	lnL_at_node_at_branchTop::Array{Float64}
 	lq_at_branchBot::Array{Float64}
 	like_at_branchBot::Array{Float64}
 
@@ -1003,8 +1003,8 @@ function construct_Res_old()
 	uppass_edgematrix = [7 6; 7 5; 5 4; 5 3; 3 2; 3 1]
 	likes_at_each_nodeIndex_branchTop = collect(repeat([1.0, 2.0, 3.0, 4.0, 0.0, 0.0, 0.0], n))
 	likes_at_each_nodeIndex_branchBot = collect(repeat([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], n))
-	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
-	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
+	sumLikes_at_node_at_branchTop = collect(repeat([0.0], numNodes))
+	lnL_at_node_at_branchTop = collect(repeat([0.0], numNodes))
 	lq_at_branchBot = collect(repeat([0.0], numNodes))
 	like_at_branchBot = collect(repeat([0.0], numNodes))
 
@@ -1018,7 +1018,7 @@ function construct_Res_old()
 
 	calctime_iterations = [0.0, 0.0]
 
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, sum_likes_at_nodes, logsum_likes_at_nodes, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, likes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, sumLikes_at_node_at_branchTop, lnL_at_node_at_branchTop, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations)
 	return res
 end
 
@@ -1051,8 +1051,8 @@ function construct_Res()
 		likes_at_each_nodeIndex_branchTop[i][1] = default_likes_at_each_nodeIndex_branchTop[i]
 	end
 	#typeof(likes_at_each_nodeIndex_branchTop)
-	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
-	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
+	sumLikes_at_node_at_branchTop = collect(repeat([0.0], numNodes))
+	lnL_at_node_at_branchTop = collect(repeat([0.0], numNodes))
 	lq_at_branchBot = collect(repeat([0.0], numNodes))
 	like_at_branchBot = collect(repeat([0.0], numNodes))
 
@@ -1067,7 +1067,7 @@ function construct_Res()
 
 	calctime_iterations = [0.0, 0.0]
 
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, sum_likes_at_nodes, logsum_likes_at_nodes, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations, Es_at_each_nodeIndex_branchTop, Es_at_each_nodeIndex_branchBot, fakeX0s_at_each_nodeIndex_branchBot, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, normlikes_at_each_nodeIndex_branchBot)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, sumLikes_at_node_at_branchTop, lnL_at_node_at_branchTop, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations, Es_at_each_nodeIndex_branchTop, Es_at_each_nodeIndex_branchBot, fakeX0s_at_each_nodeIndex_branchBot, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, normlikes_at_each_nodeIndex_branchBot)
 	return res
 end
 
@@ -1131,8 +1131,8 @@ function construct_Res(tr::HybridNetwork)
 	f(numNodes, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, fakeX0s_at_each_nodeIndex_branchBot, tipsTF)
 	
 	likes_at_each_nodeIndex_branchTop
-	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
-	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
+	sumLikes_at_node_at_branchTop = collect(repeat([0.0], numNodes))
+	lnL_at_node_at_branchTop = collect(repeat([0.0], numNodes))
 	lq_at_branchBot = collect(repeat([0.0], numNodes))
 	like_at_branchBot = collect(repeat([0.0], numNodes))
 	
@@ -1159,7 +1159,7 @@ function construct_Res(tr::HybridNetwork)
 	number_of_whileLoop_iterations = [0]	
 
 	# Initialize res object
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, sum_likes_at_nodes, logsum_likes_at_nodes, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations, Es_at_each_nodeIndex_branchTop, Es_at_each_nodeIndex_branchBot, fakeX0s_at_each_nodeIndex_branchBot, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, normlikes_at_each_nodeIndex_branchBot)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, sumLikes_at_node_at_branchTop, lnL_at_node_at_branchTop, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations, Es_at_each_nodeIndex_branchTop, Es_at_each_nodeIndex_branchBot, fakeX0s_at_each_nodeIndex_branchBot, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, normlikes_at_each_nodeIndex_branchBot)
 	return res
 end
 
@@ -1214,8 +1214,8 @@ function construct_Res(tr::HybridNetwork, n)
 # 			normlikes_at_each_nodeIndex_branchTop[i] = [tipLikes[j] / sum(tipLikes[j])]
 # 		end
 # 	end
-	sum_likes_at_nodes = collect(repeat([0.0], numNodes))
-	logsum_likes_at_nodes = collect(repeat([0.0], numNodes))
+	sumLikes_at_node_at_branchTop = collect(repeat([0.0], numNodes))
+	lnL_at_node_at_branchTop = collect(repeat([0.0], numNodes))
 	lq_at_branchBot = collect(repeat([0.0], numNodes))
 	like_at_branchBot = collect(repeat([0.0], numNodes))
 	
@@ -1240,7 +1240,7 @@ function construct_Res(tr::HybridNetwork, n)
 	number_of_whileLoop_iterations = [0]	
 
 	# Initialize res object
-	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, sum_likes_at_nodes, logsum_likes_at_nodes, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations, Es_at_each_nodeIndex_branchTop, Es_at_each_nodeIndex_branchBot, fakeX0s_at_each_nodeIndex_branchBot, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, normlikes_at_each_nodeIndex_branchBot)
+	res = Res(node_state, node_Lparent_state, node_Rparent_state, root_nodeIndex, numNodes, uppass_edgematrix, sumLikes_at_node_at_branchTop, lnL_at_node_at_branchTop, lq_at_branchBot, like_at_branchBot, thread_for_each_nodeOp, thread_for_each_branchOp, calc_spawn_start, calc_start_time, calc_end_time, calc_duration, calctime_iterations, Es_at_each_nodeIndex_branchTop, Es_at_each_nodeIndex_branchBot, fakeX0s_at_each_nodeIndex_branchBot, likes_at_each_nodeIndex_branchTop, normlikes_at_each_nodeIndex_branchTop, likes_at_each_nodeIndex_branchBot, normlikes_at_each_nodeIndex_branchBot)
 	return res
 end
 
@@ -1428,9 +1428,10 @@ function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 		#tmp1 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
 		#tmp2 = res.likes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
 		# Crucial
+		# The likelihoods were taken out to produce normlikes, stored in "res.lq_at_branchBot"
 		tmp1 = res.normlikes_at_each_nodeIndex_branchBot[parent_nodeIndexes[1]]
 		tmp2 = res.normlikes_at_each_nodeIndex_branchBot[parent_nodeIndexes[2]]
-		node_lnL = res.lq_at_branchBot[parent_nodeIndexes[1]] + res.lq_at_branchBot[parent_nodeIndexes[2]]
+		combined_branch_lnLs = res.lq_at_branchBot[parent_nodeIndexes[1]] + res.lq_at_branchBot[parent_nodeIndexes[2]]
 		
 		
 		# Check that data are actually available
@@ -1475,8 +1476,8 @@ function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 		print("\n")
 		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = ((nodeData_at_top .+ 0.0) ./ sum_likes_at_node)
 		
-		res.sum_likes_at_nodes[current_nodeIndex] = sum_likes_at_node + 0.0
-		res.logsum_likes_at_nodes[current_nodeIndex] = log(sum_likes_at_node) + 0.0
+		res.sumLikes_at_node_at_branchTop[current_nodeIndex] = sum_likes_at_node + 0.0
+		res.lnL_at_node_at_branchTop[current_nodeIndex] = log(sum_likes_at_node) + 0.0
 # 		print("\nnodeData_at_top:\n")
 # 		print(nodeData_at_top)
 # 

@@ -52,6 +52,7 @@ using BioGeoJulia.SSEs
 # Truth:
 R_result_branch_lnL = -3.128581
 R_result_total_lnL = -4.937608
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -6.579522
 #######################################################
 
 
@@ -95,7 +96,7 @@ log.(sum.(res.likes_at_each_nodeIndex_branchTop))
 sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
 Julia_sum_lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
 
-# Does the total of the branch log-likelihoods match?
+# Does the total of the branch log-likelihoods (lq) match?
 @test round(R_result_branch_lnL; digits=5) == round(Julia_sum_lq; digits=5)
 
 # Add the root probabilities
@@ -110,8 +111,33 @@ Julia_total_lnL = Julia_sum_lq + rootstates_lnL
 # Does the total lnL match R?
 @test round(R_result_total_lnL; digits=5) == round(Julia_total_lnL; digits=5)
 
-# Another way to get the lnL!
-sum(res.logsum_likes_at_nodes)-sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
+# Does the total of branch likelihoods (lq) + node likelihoods match R?
+# 
+# R: R_result_sum_log_computed_likelihoods_at_each_node_x_lambda 
+#    = sum(log(computed_likelihoods_at_each_node_x_lambda))
+Julia_sum_lq_nodes = sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop))) + Julia_sum_lq
+R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+@test round(Julia_sum_lq_nodes; digits=5) == round(R_sum_lq_nodes; digits=5)
+
+
+# The standard diversitree lnL calculation sums:
+# 1. log-likelihoods at branch-bottoms (lq)
+# 2. root-state likelihoods (e.g. rootstates_lnL)
+
+# We can get this in R also:
+# 1. sum(lq)
+# 2. res1t = bisse_2areas(pars=bisse_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
+#    (is sum(lq) + sum(rootstates_lnL)
+
+# Weirdly, it seems like this R calculation extracts the total likelihood at the 
+# branch bottoms (lq), but not the total likelihood at the nodes, after 
+# the normlikes from above branches are combined at the node, and multiplied by
+# the birthRate.
+#
+# This suggests another possible likelihood
+
+		res.lnL_at_node_at_branchTop
+
 
 
 
