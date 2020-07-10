@@ -334,8 +334,7 @@ source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")
 # States at the tips of the tree
 # (ranges A, A, A, B)
 #states = c(1, 1, 1, 1)
-states = c(0, 0, 0) # 3 states for 3 tips
-states = c(1, 1, 1) # 3 states for 3 tips
+states = c(0, 1, 1) # 3 states for 3 tips
 names(states) = tr$tip.label
 states
 
@@ -350,6 +349,7 @@ k = 2
 # Make the BiSSE likelihood function. 
 # (strict=FALSE means that some states in the state space can be absent from the tips)
 bisse_2areas = diversitree::make.bisse(tree=tr, states=states, sampling.f=sampling.f, strict=FALSE)
+
 # Look at all the parameters of this model!
 # lambdas = speciation rates
 # mus = extinction rates
@@ -368,6 +368,21 @@ names(parms) = c("lambda0", "lambda1", "mu0", "mu1", "q01", "q10")
 parms
 bisse_params = parms
 
+# Constraint parameters so you are only fitting 1 birthRate
+constraints = list(lambda0~lambda1, mu0~mu1, q01~q10)
+bisse_2areas_constrained = constrain(f=bisse_2areas, formulae=constraints)
+
+# Wait 1 seconds
+fit <- find.mle(func=bisse_2areas_constrained, x.init=bisse_params, method="subplex")
+fit$par.full
+fit$lnLik
+
+# Compare to Yule
+yule(tr)
+
+bisse_params_orig = bisse_params
+bisse_params = fit$par.full
+
 res1 = bisse_2areas(pars=bisse_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
 res2 = bisse_2areas(pars=bisse_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
 root_probs = c(0, 1)
@@ -378,7 +393,7 @@ root_probs = c(0.5,0.5)
 res5 = bisse_2areas(pars=bisse_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
 res6 = bisse_2areas(pars=bisse_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
 
-
+# Res1t is BiSSE default
 res1t = bisse_2areas(pars=bisse_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
 res2t = bisse_2areas(pars=bisse_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
 root_probs = c(0, 1)
@@ -436,14 +451,14 @@ birthRate
 
 
 # Speciation
-lambda0 = birthRate
-lambda1 = birthRate
+lambda0 = bisse_params["lambda0"]
+lambda1 = bisse_params["lambda1"]
 # Extinction
-mu0 = 0
-mu1 = 0
+mu0 = bisse_params["mu0"]
+mu1 = bisse_params["mu1"]
 # Character transition
-q01 = 0.1 # ML
-q10 = 0.1
+q01 = bisse_params["q01"]
+q10 = bisse_params["q10"]
 
 parms = c(lambda0, lambda1, mu0, mu1, q01, q10)
 names(parms) = c("lambda0", "lambda1", "mu0", "mu1", "q01", "q10")
@@ -573,16 +588,15 @@ computed_likelihoods_at_each_node_x_lambda = computed_likelihoods_at_each_node
 i = 1
 edges_to_visit = seq(from=1, by=2, length.out=num_internal_nodes)
 
-birthRate = 0.222222222
-deathRate = 0.1
-
-lambda0 = birthRate
-lambda1 = birthRate
-mu0 = deathRate
-mu1 = deathRate
-q01 = 0.1
-q10 = 0.1
-
+# Speciation
+lambda0 = bisse_params["lambda0"]
+lambda1 = bisse_params["lambda1"]
+# Extinction
+mu0 = bisse_params["mu0"]
+mu1 = bisse_params["mu1"]
+# Character transition
+q01 = bisse_params["q01"]
+q10 = bisse_params["q10"]
 
 parms = c(lambda0, lambda1, mu0, mu1, q01, q10)
 names(parms) = c("lambda0", "lambda1", "mu0", "mu1", "q01", "q10")
@@ -740,20 +754,20 @@ for (i in edges_to_visit)
 #######################################################
 # Best, matches diversitree BiSSE "init"
 init
+# condlikes_treeStates_BRANCHTOP_AT_NODE_DOWNPASS
+#              [,1]         [,2]       [,3]       [,4]
+# [1,] 0.000000e+00 0.000000e+00 1.00000000 0.00000000
+# [2,] 0.000000e+00 0.000000e+00 0.00000000 1.00000000
+# [3,] 0.000000e+00 0.000000e+00 0.00000000 1.00000000
+# [4,] 1.488113e-13 1.488113e-13 0.05000001 0.05000002
+# [5,] 8.182151e-14 8.182151e-14 0.05000002 0.05000002
 condlikes_treeStates_BRANCHTOP_AT_NODE_DOWNPASS
-#            [,1]       [,2]        [,3]      [,4]
-# [1,] 0.00000000 0.00000000 0.000000000 1.0000000
-# [2,] 0.00000000 0.00000000 0.000000000 1.0000000
-# [3,] 0.00000000 0.00000000 0.000000000 1.0000000
-# [4,] 0.15069356 0.15069356 0.003615038 0.1672756
-# [5,] 0.08603219 0.08603219 0.001825474 0.1837656
-#
-#            [,1]       [,2]        [,3]      [,4]
-# [1,] 0.00000000 0.00000000 0.000000000 1.0000000
-# [2,] 0.00000000 0.00000000 0.000000000 1.0000000
-# [3,] 0.00000000 0.00000000 0.000000000 1.0000000
-# [4,] 0.15026899 0.15026899 0.003582702 0.1674394
-# [5,] 0.08566205 0.08566205 0.001808968 0.1839313
+#      [,1] [,2] [,3]      [,4]
+# [1,]    0    0    0 1.0000000
+# [2,]    0    0    0 1.0000000
+# [3,]    0    0    0 1.0000000
+# [4,]    0    0    0 0.2000001
+# [5,]    0    0    0 0.2000001
 
 
 # Matches matches diversitree BiSSE "base" -- but a weird combination of 
@@ -761,60 +775,66 @@ condlikes_treeStates_BRANCHTOP_AT_NODE_DOWNPASS
 # - right columns: normalized conditional likelihoods
 base
 condlikesProbs_treeStates_BRANCHBOTTOM_BELOW_NODE_DOWNPASS
-#            [,1]       [,2]       [,3]      [,4]
-# [1,] 0.08603219 0.08603219 0.09063462 0.9093654
-# [2,] 0.08603219 0.08603219 0.09063462 0.9093654
-# [3,] 0.15069356 0.15069356 0.16483998 0.8351600
-# [4,]         NA         NA         NA        NA
-# [5,] 0.15069356 0.15069356 0.09868766 0.9013123
-# 
-#            [,1]       [,2]       [,3]      [,4]
-# [1,] 0.08566205 0.08566205 0.08981508 0.9101849
-# [2,] 0.08566205 0.08566205 0.09063463 0.9093654
-# [3,] 0.15026899 0.15026899 0.16484005 0.8351599
-# [4,] 0.00000000 0.00000000 0.00000000 0.0000000
-# [5,] 0.15026899 0.15026899 0.09780486 0.9021951
+#              [,1]         [,2] [,3] [,4]
+# [1,] 8.182151e-14 8.182151e-14  0.5  0.5
+# [2,] 8.182151e-14 8.182151e-14  0.5  0.5
+# [3,] 1.488113e-13 1.488113e-13  0.5  0.5
+# [4,]           NA           NA   NA   NA
+# [5,] 1.488113e-13 1.488113e-13  0.5  0.5
+condlikesProbs_treeStates_BRANCHBOTTOM_BELOW_NODE_DOWNPASS
+#      [,1] [,2] [,3] [,4]
+# [1,]    0    0    0    1
+# [2,]    0    0    0    1
+# [3,]    0    0    0    1
+# [4,]    0    0    0    0
+# [5,]    0    0    0    1
 
 # lq and likelihoods
 condlikes_treeStates_BRANCHBOTTOM_BELOW_NODE_DOWNPASS
-#            [,1]       [,2]       [,3]      [,4]
-# [1,] 0.08603219 0.08603219 0.06700011 0.6722329
-# [2,] 0.08603219 0.08603219 0.06700011 0.6722329
-# [3,] 0.15069358 0.15069358 0.09311736 0.4717779
-# [4,] 0.00000000 0.00000000 0.00000000 0.0000000
-# [5,] 0.15069357 0.15069357 0.01399609 0.1278260
+#      [,1] [,2] [,3]      [,4]
+# [1,]    0    0    0 0.8187307
+# [2,]    0    0    0 0.8187307
+# [3,]    0    0    0 0.6703200
+# [4,]    0    0    0 0.0000000
+# [5,]    0    0    0 0.1637462
 
 # Matches diversitree BiSSE "lq"
 lnls = log(rowSums(condlikes_treeStates_BRANCHBOTTOM_BELOW_NODE_DOWNPASS[,3:4]))
 lnls[!is.finite(lnls)] = NA
 lnls
 sum(lnls, na.rm=TRUE)
-# [1] -0.2993006 -0.3021421 -0.5711150         NA -1.9499680
-# [1] -3.122526
+# -0.2000001 -0.2000001 -0.4000002         NA -2.5025850
+sum(lnls, na.rm=TRUE)
+# [1] -3.302585
 
 
 # Sum of the branch likelihoods
 lq
 sum(lq)
-# [1] -0.3021421 -0.3021421 -0.5711149  0.0000000 -1.9531821
-# [1] -3.128581
-
+# -0.1999566 -0.1999566 -0.3999132  0.0000000 -1.8096115
+# -3.302585
 
 # Add the root probabilities
 # Assuming diversitree options:
 # root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
 # i.e., the root state probs are just the root_Ds/sum(root_Ds)
 LnLs1
-# -4.937608 -3.128581
+# -6.298317 -3.302585
+
+# root=ROOT.OBS, root.p=NULL, condition.surv=TRUE
+LnLs1t
+# -4.688879 -3.302585
 
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = sum(log(computed_likelihoods_at_each_node_x_lambda))
-# -6.579522
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+# -7.907755
 
 
-R_result_branch_lnL = -3.128581
-R_result_total_lnL = -4.937608
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -6.579522
+R_result_branch_lnL = -3.302585
+R_result_total_LnLs1 = -6.298317
+R_result_total_LnLs1t = -4.688879
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -7.907755
 
 
 #######################################################

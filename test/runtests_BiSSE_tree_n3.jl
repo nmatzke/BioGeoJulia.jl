@@ -23,11 +23,11 @@ using BioGeoJulia.SSEs
 # 
 # """
 # # Run with:
-# include("/GitHub/BioGeoJulia.jl/test/runtests_BiSSE_tree_n1.jl")
+# include("/GitHub/BioGeoJulia.jl/test/runtests_BiSSE_tree_n3.jl")
 # """
 # 
 # @testset "Example" begin
-# 	@test hello("runtests_BiSSE_tree_n1.jl") == "Hello, runtests_BiSSE_tree_n1.jl"
+# 	@test hello("runtests_BiSSE_tree_n3.jl") == "Hello, runtests_BiSSE_tree_n3.jl"
 # #	@test domath(2.0) ≈ 7.0
 # end
 # 
@@ -39,7 +39,7 @@ using BioGeoJulia.SSEs
 # # under a variety of simple and more complex models
 # #######################################################
 # 
-# @testset "runtests_BiSSE_tree_n1.jl" begin
+# @testset "runtests_BiSSE_tree_n3.jl" begin
 # 
 #######################################################
 # Calculation of Es and Ds on a single branch
@@ -48,11 +48,13 @@ using BioGeoJulia.SSEs
 # (1 branch, pure birth, no Q transitions, branchlength=1)
 #
 # Run with:
-# source("/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_BD_v4_WORKING_n1.R")
+# source("/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_MLE_v6_WORKING.R")
 # Truth:
-R_result_branch_lnL = -3.128581
-R_result_total_lnL = -4.937608
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -6.579522
+R_result_branch_lnL = -10.08938
+R_result_total_LnLs1 = -11.47222
+R_result_total_LnLs1t = -6.043899
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -14.31109
+
 #######################################################
 
 
@@ -63,14 +65,22 @@ import .TreePass
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
-in_params = (birthRate=0.222222222, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.1, j_val=0.0)
+in_params = (birthRate=0.222222222, deathRate=1.2, d_val=0.0, e_val=0.0, a_val=0.2, j_val=0.0)
 numstates = 2
 n = 2
+
+# CHANGE PARAMETERS BEFORE E INTERPOLATOR
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
+inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]
+inputs.p_Ds_v5.params.Cijk_vals[1] = 2*inputs.p_Ds_v5.params.Cijk_vals[2]
+inputs.p_Ds_v5.params.mu_vals[2] = 2*inputs.p_Ds_v5.params.mu_vals[1]
+
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
 
 res = inputs.res
+res.likes_at_each_nodeIndex_branchTop[1] = [1.0, 0.0]
+res.normlikes_at_each_nodeIndex_branchTop[1] = [1.0, 0.0]
 trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
 root_age = maximum(trdf[!, :node_age])
@@ -97,19 +107,38 @@ sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
 Julia_sum_lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
 
 # Does the total of the branch log-likelihoods (lq) match?
-@test round(R_result_branch_lnL; digits=5) == round(Julia_sum_lq; digits=5)
+@test round(R_result_branch_lnL; digits=4) == round(Julia_sum_lq; digits=4)
 
 # Add the root probabilities
+
 # Assuming diversitree options:
 # root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
 # i.e., the root state probs are just the root_Ds/sum(root_Ds)
 d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nodeIndex_branchTop)]
 root_stateprobs = d_root_orig/sum(d_root_orig)
 rootstates_lnL = log(sum(root_stateprobs .* d_root_orig))
-Julia_total_lnL = Julia_sum_lq + rootstates_lnL
+Julia_total_lnLs1 = Julia_sum_lq + rootstates_lnL
+
+
+# Assuming diversitree options:
+# root=ROOT.OBS, root.p=NULL, condition.surv=TRUE (these seem to be the defaults)
+# i.e., the root state probs are just the root_Ds/sum(root_Ds)
+d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nodeIndex_branchTop)]
+root_stateprobs = d_root_orig/sum(d_root_orig)
+lambda = in_params.birthRate
+e_root = Es_interpolator(root_age)
+d_root = d_root_orig ./ sum(root_stateprobs .* lambda .* (1 .- e_root).^2)
+rootstates_lnL = log(sum(root_stateprobs .* d_root))
+# The above all works out to [0,1] for the Yule model with q01=q02=0.0
+
+Julia_total_lnLs1t = Julia_sum_lq + rootstates_lnL
 
 # Does the total lnL match R?
-@test round(R_result_total_lnL; digits=5) == round(Julia_total_lnL; digits=5)
+# root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
+@test round(R_result_total_LnLs1; digits=5) == round(Julia_total_lnLs1; digits=5)
+
+# root=ROOT.OBS, root.p=NULL, condition.surv=TRUE
+@test round(R_result_total_LnLs1t; digits=5) == round(Julia_total_lnLs1t; digits=5)
 
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 # 
@@ -117,7 +146,7 @@ Julia_total_lnL = Julia_sum_lq + rootstates_lnL
 #    = sum(log(computed_likelihoods_at_each_node_x_lambda))
 Julia_sum_lq_nodes = sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop))) + Julia_sum_lq
 R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
-@test round(Julia_sum_lq_nodes; digits=5) == round(R_sum_lq_nodes; digits=5)
+@test round(Julia_sum_lq_nodes; digits=4) == round(R_sum_lq_nodes; digits=4)
 
 
 # The standard diversitree lnL calculation sums:
@@ -159,7 +188,7 @@ print("R_result_total_lnL (lq) - Julia_sum_lq_nodes: ")
 print(R_sum_lq_nodes - Julia_sum_lq_nodes)
 print("\n")
 
-end # END @testset "runtests_BiSSE_tree_n1" begin
+end # END @testset "runtests_BiSSE_tree_n3" begin
 
 
 
