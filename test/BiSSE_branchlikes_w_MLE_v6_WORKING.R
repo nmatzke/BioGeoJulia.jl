@@ -831,7 +831,7 @@ R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 # -14.31109
 
 
-R_result_branch_lnL = -3.302585
+R_result_branch_lnL = -10.08938
 R_result_total_LnLs1 = -11.47222
 R_result_total_LnLs1t = -6.043899
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -14.31109
