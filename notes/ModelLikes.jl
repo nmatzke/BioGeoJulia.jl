@@ -181,7 +181,6 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
 	
 	# Solutions to the E vector
-	u0_Es = repeat([0.0], 1*n)
 	uE = repeat([0.0], n)
 	max_t = root_age_mult*trdf[tr.root,:node_age]
 	Es_tspan = (0.0, max_t) # 110% of tree root age
@@ -204,6 +203,8 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 		# [:] avoids creating a linked reference
 		res.likes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:];
 		res.normlikes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:] / sum(u0[:]);
+		res.Es_at_each_nodeIndex_branchTop = uE[:];
+		res.Es_at_each_nodeIndex_branchBot = uE[:];
 	end
 	#res.likes_at_each_nodeIndex_branchTop[6] = u0;
 	res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
@@ -219,19 +220,6 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
 	
-	print("\nSolving the Es once, for the whole tree timespan...")
-	
-	# Solve the Es
-	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, Es_tspan, p_Es_v5)
-
-	print(u0_Es)
-	print(Es_tspan)
-	
-	# This solution is a linear interpolator
-	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
-	
-	print("...solving Es has finished, creating interpolator 'sol_Es_v5'.\n")
-	
 	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
 	"""
 	res = inputs.res
@@ -240,12 +228,25 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	p_Ds_v5 = inputs.p_Ds_v5
 	"""
 	
-	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5)
+	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, p_Es_v5=p_Es_v5, Es_tspan=Es_tspan)
 	
 	return inputs
 end # End function setup_MuSSE_biogeo
 
 
+
+	print("\nSolving the Es once, for the whole tree timespan...")
+	
+	# Solve the Es
+	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, uE, Es_tspan, p_Es_v5)
+
+	print(Es_tspan)
+	
+	# This solution is a linear interpolator
+	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
+	
+	print("...solving Es has finished, creating interpolator 'sol_Es_v5'.\n")
+	
 
 
 
@@ -370,7 +371,6 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
 	
 	# Solutions to the E vector
-	u0_Es = repeat([0.0], 1*n)
 	uE = repeat([0.0], n)
 	max_t = root_age_mult*trdf[tr.root,:node_age]
 	Es_tspan = (0.0, max_t) # 110% of tree root age
@@ -411,7 +411,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	print("\nSolving the Es once, for the whole tree timespan...")
 	
 	# Solve the Es
-	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, u0_Es, Es_tspan, p_Es_v5)
+	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, uE, Es_tspan, p_Es_v5)
 	
 	# This solution is a linear interpolator
 	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
@@ -426,7 +426,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	p_Ds_v5 = inputs.p_Ds_v5
 	"""
 	
-	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5)
+	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, p_Es_v5=p_Es_v5, Es_tspan=Es_tspan)
 	
 	return inputs
 end # End function setup_DEC_SSE
