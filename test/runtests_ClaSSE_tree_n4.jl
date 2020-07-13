@@ -70,7 +70,7 @@ n = 3
 
 # CHANGE PARAMETERS BEFORE E INTERPOLATOR
 inputs = ModelLikes.setup_DEC_SSE(numareas, tr; root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=in_params)
-(res, trdf, solver_options, p_Ds_v5, p_Es_v5, Es_tspan) = inputs
+(res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
 
 # Change parameter inputs manually
 # inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]
@@ -87,7 +87,7 @@ root_age = maximum(trdf[!, :node_age])
 
 # Solve the Es
 print("\nSolving the Es once, for the whole tree timespan...")
-prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v5.uE, Es_tspan, p_Ds_v5)
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Ds_v5.uE, Es_tspan, p_Ds_v5)
 # This solution is a linear interpolator
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
 Es_interpolator = sol_Es_v5;

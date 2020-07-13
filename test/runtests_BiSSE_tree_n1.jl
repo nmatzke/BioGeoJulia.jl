@@ -67,7 +67,7 @@ in_params = (birthRate=0.222222222, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0
 numstates = 2
 n = 2
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
-(res, trdf, solver_options, p_Ds_v5, p_Es_v5, Es_tspan) = inputs
+(res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
 
@@ -78,7 +78,7 @@ root_age = maximum(trdf[!, :node_age])
 
 # Solve the Es
 print("\nSolving the Es once, for the whole tree timespan...")
-prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v5.uE, Es_tspan, p_Es_v5)
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Ds_v5.uE, Es_tspan, p_Ds_v5)
 # This solution is a linear interpolator
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
 Es_interpolator = sol_Es_v5;

@@ -179,13 +179,13 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	p_orig = (n=n, params=params, p_indices=p_indices)
 	p = p_orig
 	
-	# Solutions to the E vector
+	# Setup the E vector
 	uE = repeat([0.0], n)
 	max_t = root_age_mult*trdf[tr.root,:node_age]
 	Es_tspan = (0.0, max_t) # 110% of tree root age
 	#by_t = max_t / 10.0
 	#Es_tspan = collect(0.0:by_t:max_t)
-	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
+	#p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 
 
 	#######################################################
@@ -230,7 +230,7 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	p_Ds_v5 = inputs.p_Ds_v5
 	"""
 	
-	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, p_Es_v5=p_Es_v5, Es_tspan=Es_tspan)
+	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, Es_tspan=Es_tspan)
 	
 	return inputs
 end # End function setup_MuSSE_biogeo
@@ -244,6 +244,16 @@ end # End function setup_MuSSE_biogeo
 # Set up a DEC-like model for numareas areas
 # (numstates = (2^numareas)-1
 # Will calculate Es over 120% of root depth.
+
+"""
+numareas = 2
+max_range_size=2
+include_null_range=false
+
+
+Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+"""
+
 function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla:2);"); root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=NaN)
 	#numareas=2
 	#tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
@@ -288,15 +298,12 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	
 	
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
-	print("\n")
-	print("elist")
-	print(elist)
-	print("\n")
 	Qarray_ivals = Qmat.Qarray_ivals
 	Qarray_jvals = Qmat.Qarray_jvals
 	Qij_vals = Qmat.Qij_vals
 	Qarray_event_types = Qmat.Qarray_event_types
-
+	
+	prtQ(Qmat)
 
 	Cparams = default_Cparams()
 	
@@ -317,12 +324,13 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	Carray = setup_DEC_Cmat(areas_list, states_list, maxent01, Cparams)
 
 	# Possibly varying parameters
+	# Set up mu (extinction) rates, manually
 	mu_vals = repeat([deathRate], n)
 
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Qarray_event_types=Qarray_event_types, Cijk_vals=Carray.Cijk_vals)
-	
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_weights=Cijk_weights, Cijk_vals=Carray.Cijk_vals)
+
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
-	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals)
+	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Qarray_event_types=Qmat.Qarray_event_types, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals, Carray_event_types=Carray.Carray_event_types)
 
 	# True/False statements by index
 	# The calculation of dEi and dDi for state i involves many
@@ -361,14 +369,14 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	p_TFs = (Qi_eq_i=Qi_eq_i, Ci_eq_i=Ci_eq_i, Qi_sub_i=Qi_sub_i, Qj_sub_i=Qj_sub_i, Ci_sub_i=Ci_sub_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i)
 	p_orig = (n=n, params=params, p_indices=p_indices)
 	p = p_orig
-	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 	
-	# Solutions to the E vector
+	# Setup the E vector
 	uE = repeat([0.0], n)
 	max_t = root_age_mult*trdf[tr.root,:node_age]
 	Es_tspan = (0.0, max_t) # 110% of tree root age
 	#by_t = max_t / 10.0
 	#Es_tspan = collect(0.0:by_t:max_t)
+	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 
 	#######################################################
 	# Downpass with ClaSSE
@@ -400,6 +408,9 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 																					# for lsoda, Tsit5; GMRES worked either way
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
+
+	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
+	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 	
 	"""
 	res = inputs.res
@@ -408,7 +419,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	p_Ds_v5 = inputs.p_Ds_v5
 	"""
 	
-	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, p_Es_v5=p_Es_v5, Es_tspan=Es_tspan)
+	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, Es_tspan=Es_tspan)
 	
 	return inputs
 end # End function setup_DEC_SSE
