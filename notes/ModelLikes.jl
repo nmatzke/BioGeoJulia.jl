@@ -178,7 +178,6 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	p_TFs = (Qi_eq_i=Qi_eq_i, Ci_eq_i=Ci_eq_i, Qi_sub_i=Qi_sub_i, Qj_sub_i=Qj_sub_i, Ci_sub_i=Ci_sub_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i)
 	p_orig = (n=n, params=params, p_indices=p_indices)
 	p = p_orig
-	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
 	
 	# Solutions to the E vector
 	uE = repeat([0.0], n)
@@ -186,6 +185,8 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	Es_tspan = (0.0, max_t) # 110% of tree root age
 	#by_t = max_t / 10.0
 	#Es_tspan = collect(0.0:by_t:max_t)
+	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
+
 
 	#######################################################
 	# Downpass with ClaSSE
@@ -220,7 +221,8 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
 	
-	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
+	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
+	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 	"""
 	res = inputs.res
 	trdf = inputs.trdf
