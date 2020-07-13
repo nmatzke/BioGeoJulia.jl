@@ -47,7 +47,7 @@ birthRate = 0.2
 deathRate = 0.1
 d_val = 0.0
 e_val = 0.0
-j_val = 0.2
+j_val = 0.0
 
 # The names of the parameters:
 param_names = argnames(classe_3states)
@@ -58,7 +58,7 @@ classe_params = rep(0, times=length(param_names))
 names(classe_params) = param_names
 
 
-# This is basically a DEC model for 4 states
+# This is basically a DEC model for 3 states
 
 # All extinction rates are the same (state-independent)
 # Here, deathRate is 0 for all states
