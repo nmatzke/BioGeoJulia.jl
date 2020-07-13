@@ -79,8 +79,8 @@ inputs = ModelLikes.setup_DEC_SSE(numareas, tr; root_age_mult=1.5, max_range_siz
 
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
-res.likes_at_each_nodeIndex_branchTop[1] = [1.0, 0.0]
-res.normlikes_at_each_nodeIndex_branchTop[1] = [1.0, 0.0]
+res.likes_at_each_nodeIndex_branchTop[2] = [1.0, 0.0, 0.0]			# state 1 for tip #2
+res.normlikes_at_each_nodeIndex_branchTop[2] = [1.0, 0.0, 0.0]	# state 1 for tip #2
 trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
 root_age = maximum(trdf[!, :node_age])

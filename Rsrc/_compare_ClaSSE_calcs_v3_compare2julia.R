@@ -109,12 +109,17 @@ classe_params[param_names=="lambda212"] = jprob * birthRate
 classe_params[param_names=="lambda221"] = jprob * birthRate
 
 # Subset sympatry for state AB
-classe_params[param_names=="lambda312"] = 1/6 * birthRate
-classe_params[param_names=="lambda321"] = 1/6 * birthRate
-classe_params[param_names=="lambda313"] = 1/6 * birthRate
-classe_params[param_names=="lambda331"] = 1/6 * birthRate
-classe_params[param_names=="lambda323"] = 1/6 * birthRate
-classe_params[param_names=="lambda332"] = 1/6 * birthRate
+# classe_params[param_names=="lambda312"] = 1/6 * birthRate
+# classe_params[param_names=="lambda321"] = 1/6 * birthRate
+# classe_params[param_names=="lambda313"] = 1/6 * birthRate
+# classe_params[param_names=="lambda331"] = 1/6 * birthRate
+# classe_params[param_names=="lambda323"] = 1/6 * birthRate
+# classe_params[param_names=="lambda332"] = 1/6 * birthRate
+
+# For diversitree ClaSSE, you have to lump lambda312 and lambda321
+classe_params[param_names=="lambda312"] = 1/3 * birthRate
+classe_params[param_names=="lambda313"] = 1/3 * birthRate
+classe_params[param_names=="lambda323"] = 1/3 * birthRate
 
 classe_params_DEC = classe_params
 
@@ -178,6 +183,18 @@ LnLdiff = round((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)), digits=4)
 exp_LnLdiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))
 LnLst2 = cbind(LnLst, ObsDiff, LnLdiff, exp_ObsDiff, exp_LnLdiff)
 cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
+
+
+
+init = t(attr(res2, "intermediates")$init)
+init
+
+base = t(attr(res2, "intermediates")$base)
+base
+
+apply(X=base[,4:6], MARGIN=2, FUN="*", exp(lq))
+
+
 
 # Convert a "res" object from ClaSSE to a 
 # BioGeoBEARS-like set of matrices
@@ -380,7 +397,7 @@ init
 base = t(attr(res2, "intermediates")$base)
 base
 
-
+apply(X=base[,4:6], MARGIN=2, FUN="*", exp(lq))
 
 # Get Es,Ds matrix
 Dindexes = (nstates+1):(nstates*2)
