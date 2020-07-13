@@ -54,7 +54,6 @@ R_result_branch_lnL = -10.08938
 R_result_total_LnLs1 = -11.47222
 R_result_total_LnLs1t = -6.043899
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -14.31109
-
 #######################################################
 
 
@@ -88,7 +87,7 @@ root_age = maximum(trdf[!, :node_age])
 
 # Solve the Es
 print("\nSolving the Es once, for the whole tree timespan...")
-prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v5.uE, Es_tspan, p_Es_v5)
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v5.uE, Es_tspan, p_Ds_v5)
 # This solution is a linear interpolator
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
 Es_interpolator = sol_Es_v5;
@@ -152,6 +151,11 @@ Julia_total_lnLs1t = Julia_sum_lq + rootstates_lnL
 # 
 # R: R_result_sum_log_computed_likelihoods_at_each_node_x_lambda 
 #    = sum(log(computed_likelihoods_at_each_node_x_lambda))
+res.likes_at_each_nodeIndex_branchTop
+log.(sum.(res.likes_at_each_nodeIndex_branchTop))
+
+sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
+
 Julia_sum_lq_nodes = sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop))) + Julia_sum_lq
 R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 @test round(Julia_sum_lq_nodes; digits=4) == round(R_sum_lq_nodes; digits=4)
