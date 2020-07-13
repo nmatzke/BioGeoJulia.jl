@@ -48,12 +48,12 @@ using BioGeoJulia.SSEs
 # (1 branch, pure birth, no Q transitions, branchlength=1)
 #
 # Run with:
-# source("/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_MLE_v6_WORKING.R")
+# source("/GitHub/BioGeoJulia.jl/Rsrc/_compare_ClaSSE_calcs_v3_compare2julia.R")
 # Truth:
-R_result_branch_lnL = -5.364846
-R_result_total_LnLs1 = -11.47222
-R_result_total_LnLs1t = -6.043899
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -13.18894
+R_result_branch_lnL = -4.748244
+R_result_total_LnLs1 = -8.170992
+R_result_total_LnLs1t = -6.228375
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.58421
 #######################################################
 
 
@@ -135,7 +135,10 @@ d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nod
 root_stateprobs = d_root_orig/sum(d_root_orig)
 lambda = in_params.birthRate
 e_root = Es_interpolator(root_age)
-d_root = d_root_orig ./ sum(root_stateprobs .* inputs.p_Ds_v5.params.Cijk_vals .* (1 .- e_root).^2)
+
+
+#d_root = d_root_orig ./ sum(root_stateprobs .* inputs.p_Ds_v5.params.Cijk_vals .* (1 .- e_root).^2)
+d_root = d_root_orig ./ sum(root_stateprobs .* in_params.birthRate .* (1 .- e_root).^2)
 rootstates_lnL = log(sum(root_stateprobs .* d_root))
 # The above all works out to [0,1] for the Yule model with q01=q02=0.0
 
@@ -160,6 +163,21 @@ sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
 Julia_sum_lq_nodes = sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop))) + Julia_sum_lq
 R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 @test round(Julia_sum_lq_nodes; digits=4) == round(R_sum_lq_nodes; digits=4)
+
+
+
+
+
+
+#######################################################
+# 2020-07-13_NJM: ClaSSE root calculation is pretty close,
+# but needs a bit more work I think.  Can do later - Nick
+#
+# (i.e., the R script is also using the BiSSE root likelihoods
+#  calculation, which might not be right)
+#
+#######################################################
+
 
 
 # The standard diversitree lnL calculation sums:
@@ -190,7 +208,7 @@ R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 
 
 
-print("\nDifferences between Julia and R lnLs for\n/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_MLE_v6_WORKING.R\n calculation:\n")
+print("\nDifferences between Julia and R lnLs for\n/GitHub/BioGeoJulia.jl/Rsrc/_compare_ClaSSE_calcs_v3_compare2julia.R\n calculation:\n")
 print("R_result_branch_lnL (lq) - Julia_sum_lq: ")
 print(R_result_branch_lnL - Julia_sum_lq)
 print("\n")
