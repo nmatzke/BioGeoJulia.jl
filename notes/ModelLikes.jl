@@ -250,12 +250,14 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	areas_list = collect(1:numareas)
 	total_numareas = length(areas_list)
 	
-	if (isnan(in_params) == true)
+	type_string = string(typeof(in_params))
+	if (startswith(type_string, "NamedTuple") == false) && (isnan(in_params) == true)
 		in_params = (birthRate=0.2, deathRate=0.0, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
 	end
 	
 	# Check if max_range_size=NaN
-	if (isnan(max_range_size) == true)
+	type_string = string(typeof(max_range_size))
+	if (startswith(type_string, "NamedTuple") == false) && (isnan(max_range_size) == true)
 		max_range_size = numareas
 	end
 	
@@ -268,12 +270,13 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	trdf = prt(tr, rootnodenum)
 	tipnodes = trdf[!,1][trdf[!,10].=="tip"]
 	
-	birthRate = 0.2
-	deathRate = 0.1
+	birthRate = in_params.birthRate
+	deathRate = in_params.deathRate
 	
-	d_val = 0.0
-	e_val = 0.0
-	j_val = 0.2
+	d_val = in_params.d_val
+	e_val = in_params.e_val
+	a_val = in_params.a_val
+	j_val = in_params.j_val
 	
 	dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
 	amat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
@@ -281,6 +284,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	
 	dmat = d_val .* dmat
 	elist = e_val .* elist
+	amat = a_val .* amat
 	
 	
 	Qmat = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
@@ -357,7 +361,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	p_TFs = (Qi_eq_i=Qi_eq_i, Ci_eq_i=Ci_eq_i, Qi_sub_i=Qi_sub_i, Qj_sub_i=Qj_sub_i, Ci_sub_i=Ci_sub_i, Cj_sub_i=Cj_sub_i, Ck_sub_i=Ck_sub_i)
 	p_orig = (n=n, params=params, p_indices=p_indices)
 	p = p_orig
-	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs)
+	p_Es_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 	
 	# Solutions to the E vector
 	uE = repeat([0.0], n)
@@ -397,17 +401,6 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
 	
-	print("\nSolving the Es once, for the whole tree timespan...")
-	
-	# Solve the Es
-	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, uE, Es_tspan, p_Es_v5)
-	
-	# This solution is a linear interpolator
-	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
-	
-	print("...solving Es has finished, creating interpolator 'sol_Es_v5'.\n")
-	
-	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
 	"""
 	res = inputs.res
 	trdf = inputs.trdf

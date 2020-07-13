@@ -50,7 +50,7 @@ using BioGeoJulia.SSEs
 # Run with:
 # source("/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_MLE_v6_WORKING.R")
 # Truth:
-R_result_branch_lnL = -10.08938
+R_result_branch_lnL = -5.364846
 R_result_total_LnLs1 = -11.47222
 R_result_total_LnLs1t = -6.043899
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -13.18894
@@ -64,18 +64,18 @@ import .TreePass
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
-in_params = (birthRate=0.222222222, deathRate=1.2, d_val=0.0, e_val=0.0, a_val=0.2, j_val=0.0)
-numstates = 2
-n = 2
+in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
+numareas = 2
+n = 3
 
 # CHANGE PARAMETERS BEFORE E INTERPOLATOR
-inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
+inputs = ModelLikes.setup_DEC_SSE(numareas, tr; root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=in_params)
 (res, trdf, solver_options, p_Ds_v5, p_Es_v5, Es_tspan) = inputs
 
 # Change parameter inputs manually
-inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]
-inputs.p_Ds_v5.params.Cijk_vals[1] = 2*inputs.p_Ds_v5.params.Cijk_vals[2]
-inputs.p_Ds_v5.params.mu_vals[2] = 2*inputs.p_Ds_v5.params.mu_vals[1]
+# inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]
+# inputs.p_Ds_v5.params.Cijk_vals[1] = 2*inputs.p_Ds_v5.params.Cijk_vals[2]
+# inputs.p_Ds_v5.params.mu_vals[2] = 2*inputs.p_Ds_v5.params.mu_vals[1]
 
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
@@ -92,6 +92,7 @@ prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
 Es_interpolator = sol_Es_v5;
 p_Ds_v5 = (n=p_Ds_v5.n, params=p_Ds_v5.params, p_indices=p_Ds_v5.p_indices, p_TFs=p_Ds_v5.p_TFs, uE=p_Ds_v5.uE, sol_Es_v5=sol_Es_v5)
+
 
 # Parameters
 prtQi(inputs)

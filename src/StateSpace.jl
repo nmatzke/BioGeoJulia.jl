@@ -1257,7 +1257,9 @@ function setup_DEC_Cmat(areas_list, states_list, maxent01=NaN, Cparams=default_C
 	total_numareas = numareas
 	numstates = length(states_list)
 	
-	if (isnan(maxent01) == true)
+	# Check if max_range_size=NaN
+	type_string = string(typeof(maxent01))
+	if (startswith(type_string, "NamedTuple") == false) && (isnan(maxent01) == true)
 		maxent01 = maxent01_defaults(total_numareas)
 	end
 	
