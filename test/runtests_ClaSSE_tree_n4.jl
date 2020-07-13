@@ -53,7 +53,7 @@ using BioGeoJulia.SSEs
 R_result_branch_lnL = -4.748244
 R_result_total_LnLs1 = -8.170992
 R_result_total_LnLs1t = -6.228375
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.58421
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.57223
 #######################################################
 
 
@@ -138,7 +138,15 @@ e_root = Es_interpolator(root_age)
 
 
 #d_root = d_root_orig ./ sum(root_stateprobs .* inputs.p_Ds_v5.params.Cijk_vals .* (1 .- e_root).^2)
-d_root = d_root_orig ./ sum(root_stateprobs .* in_params.birthRate .* (1 .- e_root).^2)
+# diversitree::rootfunc.classe
+# lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+sum_of_lambdas = collect(repeat([0.0], n))
+for i in 1:n
+	print(i)
+	sum_of_lambdas[i] = sum(inputs.p_Ds_v5.params.Cijk_vals[inputs.p_Ds_v5.p_TFs.Ci_eq_i[i]])
+end
+sum_of_lambdas
+d_root = d_root_orig ./ sum(root_stateprobs .* sum_of_lambdas .* (1 .- e_root).^2)
 rootstates_lnL = log(sum(root_stateprobs .* d_root))
 # The above all works out to [0,1] for the Yule model with q01=q02=0.0
 

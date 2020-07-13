@@ -1313,6 +1313,34 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 # 		resulting length is sum(Ci_sub_i)
 # 		tmp2[Carray_kvals[Ci_sub_i]]
 		
+		# Equivalent:
+		# inputs.p_Ds_v5.params.Cijk_vals[inputs.p_Ds_v5.p_TFs.Ci_eq_i[i]]
+		# 6-element Array{Float64,1}:
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		# 
+		# julia> inputs.p_Ds_v5.p_TFs.Ci_sub_i[i]
+		# 6-element Array{Int64,1}:
+		#  3
+		#  3
+		#  3
+		#  3
+		#  3
+		#  3
+		# 
+		# julia> inputs.p_Ds_v5.params.Cijk_vals[ inputs.p_Ds_v5.p_TFs.Ci_sub_i[i]]
+		# 6-element Array{Float64,1}:
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333
+		#  0.03333333333333333		
+		
 		# Parameter values for these events with nonzero rates
 		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* tmp1[Cj_sub_i] .* tmp2[Ck_sub_i])
 # 		print(tmpDs[i])

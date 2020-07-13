@@ -228,6 +228,7 @@ computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr
 likes_at_node5 = rep(0.0, times=ncol(base_likes))
 likes_at_node4 = rep(0.0, times=ncol(base_likes))
 
+# Internal node
 state_i = 1
 likes_at_node5[state_i] = sum(base_normlikes[1,state_i] * base_normlikes[2,state_i] * birthRate) # sympatry
 state_i = 2
@@ -235,19 +236,18 @@ likes_at_node5[state_i] = sum(base_normlikes[1,state_i] * base_normlikes[2,state
 state_i = 3
 likes_at_node5[state_i] = sum(base_normlikes[1,2] * base_normlikes[2,1] * 1/6*birthRate) # vicariance
 # Add small probs for subset sympatry
-likes_at_node5[state_i] = likes_at_node5[state_i] + sum(base_normlikes[1,2] * base_normlikes[3,1] * 1/6*birthRate)
-likes_at_node5[state_i] = likes_at_node5[state_i] + sum(base_normlikes[2,1] * base_normlikes[3,1] * 1/6*birthRate)
+likes_at_node5[state_i] = likes_at_node5[state_i] + sum(base_normlikes[1,2] * base_normlikes[2,3] * 1/6*birthRate)
+likes_at_node5[state_i] = likes_at_node5[state_i] + sum(base_normlikes[2,1] * base_normlikes[1,3] * 1/6*birthRate)
 likes_at_node5
-log(likes_at_node5)
 
+# Root node
 state_i = 1
-likes_at_node4[state_i] = sum(base_normlikes[1,state_i] * base_normlikes[5,i] * birthRate) # sympatry
+likes_at_node4[state_i] = sum(base_normlikes[3,state_i] * base_normlikes[5,state_i] * birthRate) # sympatry
 state_i = 2
-likes_at_node4[state_i] = sum(base_normlikes[1,state_i] * base_normlikes[5,i] * birthRate) # sympatry
+likes_at_node4[state_i] = sum(base_normlikes[3,state_i] * base_normlikes[5,state_i] * birthRate) # sympatry
 state_i = 3
-likes_at_node4[state_i] = sum(base_normlikes[3,2] * base_normlikes[5,3] * 1/6*birthRate) # vicariance
+likes_at_node4[state_i] = sum(base_normlikes[3,2] * base_normlikes[5,3] * 1/6*birthRate) # subset sympatry
 likes_at_node4
-log(likes_at_node4)
 
 
 
@@ -255,9 +255,12 @@ R_result_sum_log_computed_likelihoods_at_each_node = c(sum(likes_at_node4), sum(
 R_result_sum_log_computed_likelihoods_at_each_node
 log(R_result_sum_log_computed_likelihoods_at_each_node)
 sum(log(R_result_sum_log_computed_likelihoods_at_each_node))
-# 0.03262265 0.03293506
-# -3.422748 -3.413217
-# -6.835966
+# [1] 0.03262265 0.03333214
+# log(R_result_sum_log_computed_likelihoods_at_each_node)
+# [1] -3.422748 -3.401233
+# sum(log(R_result_sum_log_computed_likelihoods_at_each_node))
+# [1] -6.823982
+
 
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = sum(log(R_result_sum_log_computed_likelihoods_at_each_node)) + sum(lq)
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
@@ -268,7 +271,7 @@ R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 R_result_branch_lnL = -4.748244
 R_result_total_LnLs1 = -8.170992
 R_result_total_LnLs1t = -6.228375
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.58421
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.57223
 
 
 
