@@ -203,8 +203,8 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 		# [:] avoids creating a linked reference
 		res.likes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:];
 		res.normlikes_at_each_nodeIndex_branchTop[tipnodes[i]] = u0[:] / sum(u0[:]);
-		res.Es_at_each_nodeIndex_branchTop = uE[:];
-		res.Es_at_each_nodeIndex_branchBot = uE[:];
+		res.Es_at_each_nodeIndex_branchTop[tipnodes[i]] = uE[:];
+		res.Es_at_each_nodeIndex_branchBot[tipnodes[i]] = uE[:];
 	end
 	#res.likes_at_each_nodeIndex_branchTop[6] = u0;
 	res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
