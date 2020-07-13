@@ -326,9 +326,11 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	# Possibly varying parameters
 	# Set up mu (extinction) rates, manually
 	mu_vals = repeat([deathRate], n)
-
-	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_weights=Cijk_weights, Cijk_vals=Carray.Cijk_vals)
-
+	
+	# Get the DEC weights and per-event weights, then multiply per-event weights by birthRate
+	params = (mu_vals=mu_vals, Qij_vals=Qmat.Qij_vals, Cijk_weights=Carray.Cijk_weights, Cijk_vals=Carray.Cijk_vals)
+	params.Cijk_vals = birthRate .* params.Cijk_vals
+	
 	# Indices for the parameters (events in a sparse anagenetic or cladogenetic matrix)
 	p_indices = (Qarray_ivals=Qmat.Qarray_ivals, Qarray_jvals=Qmat.Qarray_jvals, Qarray_event_types=Qmat.Qarray_event_types, Carray_ivals=Carray.Carray_ivals, Carray_jvals=Carray.Carray_jvals, Carray_kvals=Carray.Carray_kvals, Carray_event_types=Carray.Carray_event_types)
 
