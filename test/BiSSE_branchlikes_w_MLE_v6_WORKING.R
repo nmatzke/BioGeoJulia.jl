@@ -559,7 +559,7 @@ condlikes_of_each_treeState_BRANCHTOP_AT_NODE = matrix(data=0, nrow=numnodes, nc
 # Fill in the likelihoods of tip nodes manually
 #tip_states_Ds = y[c(((length(y)/2)+1), length(y))]
 condlikes_of_each_treeState_BRANCHTOP_AT_NODE[1,numstates] = 1	# chimp
-condlikes_of_each_treeState_BRANCHTOP_AT_NODE[2,numstates] = 1	# human
+condlikes_of_each_treeState_BRANCHTOP_AT_NODE[2,1] = 1	# human
 condlikes_of_each_treeState_BRANCHTOP_AT_NODE[3,numstates] = 1	# gorilla
 # condlikes_of_each_treeState_BRANCHTOP_AT_NODE[4,numstates] = 1	# orang if a different state
 # condlikes_of_each_treeState_BRANCHTOP_AT_NODE[4,numstates] = 1	# orang same states for all tips
@@ -834,7 +834,7 @@ R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 R_result_branch_lnL = -10.08938
 R_result_total_LnLs1 = -11.47222
 R_result_total_LnLs1t = -6.043899
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -14.31109
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -13.18894
 
 
 #######################################################
