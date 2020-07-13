@@ -30,7 +30,7 @@ tr = read.tree(file="", text=trstr)
 # Run a BiSSE model from diversitree
 
 # Setup
-states = c(2,2,2)		# Tip states
+states = c(2,1,2)		# Tip states
 names(states) = tr$tip.label
 states
 
