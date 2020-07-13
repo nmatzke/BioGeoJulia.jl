@@ -235,6 +235,19 @@ end # End function setup_MuSSE_biogeo
 
 
 
+	print("\nSolving the Es once, for the whole tree timespan...")
+	
+	# Solve the Es
+	prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, uE, Es_tspan, p_Es_v5)
+
+	print(Es_tspan)
+	
+	# This solution is a linear interpolator
+	sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
+	
+	print("...solving Es has finished, creating interpolator 'sol_Es_v5'.\n")
+	
+
 
 
 

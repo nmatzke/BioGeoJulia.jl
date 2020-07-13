@@ -71,19 +71,34 @@ n = 2
 
 # CHANGE PARAMETERS BEFORE E INTERPOLATOR
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
+(res, trdf, solver_options, p_Ds_v5, p_Es_v5, Es_tspan) = inputs
 inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]
 inputs.p_Ds_v5.params.Cijk_vals[1] = 2*inputs.p_Ds_v5.params.Cijk_vals[2]
 inputs.p_Ds_v5.params.mu_vals[2] = 2*inputs.p_Ds_v5.params.mu_vals[1]
 
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
-
-res = inputs.res
 res.likes_at_each_nodeIndex_branchTop[1] = [1.0, 0.0]
 res.normlikes_at_each_nodeIndex_branchTop[1] = [1.0, 0.0]
 trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
 root_age = maximum(trdf[!, :node_age])
+
+print("\nSolving the Es once, for the whole tree timespan...")
+
+# Solve the Es
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, uE, Es_tspan, p_Es_v5)
+
+print(Es_tspan)
+
+# This solution is a linear interpolator
+sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
+
+print("...solving Es has finished, creating interpolator 'sol_Es_v5'.\n")
+	
+
+
+
 Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
 
 # Parameters
