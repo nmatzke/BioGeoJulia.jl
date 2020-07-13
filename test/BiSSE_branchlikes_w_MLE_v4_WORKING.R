@@ -334,8 +334,8 @@ source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")
 # States at the tips of the tree
 # (ranges A, A, A, B)
 #states = c(1, 1, 1, 1)
-states = c(0, 0, 0) # 3 states for 3 tips
-states = c(1, 1, 1) # 3 states for 3 tips
+states = c(0, 0, 0) # 3 binary states for 3 tips
+states = c(1, 1, 1) # 3 binary states for 3 tips
 names(states) = tr$tip.label
 states
 
@@ -371,7 +371,7 @@ bisse_params = parms
 
 # Constraint parameters so you are only fitting 1 birthRate
 constraints = list(lambda0~lambda1, mu0~0.0, mu1~0.0, q01~0.0, q10~0.0)
-bisse_2areas_constrained = constrain(f=bisse_2areas, formulae=constraints)
+bisse_2areas_constrained = diversitree::constrain(f=bisse_2areas, formulae=constraints)
 
 # Wait 1 seconds
 fit <- find.mle(func=bisse_2areas_constrained, x.init=bisse_params, method="subplex")
@@ -792,6 +792,7 @@ condlikesProbs_treeStates_BRANCHBOTTOM_BELOW_NODE_DOWNPASS
 # [5,]    0    0    0    1
 
 # lq and likelihoods
+base[,3:4] * exp(lq)
 condlikes_treeStates_BRANCHBOTTOM_BELOW_NODE_DOWNPASS
 #      [,1] [,2] [,3]      [,4]
 # [1,]    0    0    0 0.8187663

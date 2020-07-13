@@ -67,6 +67,7 @@ in_params = (birthRate=0.1999566, deathRate=0.0, d_val=0.0, e_val=0.0, a_val=0.0
 numstates = 2
 n = 2
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
+(res, trdf, solver_options, p_Ds_v5, p_Es_v5, Es_tspan) = inputs
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
 
@@ -74,7 +75,14 @@ res = inputs.res
 trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
 root_age = maximum(trdf[!, :node_age])
-Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
+
+# Solve the Es
+print("\nSolving the Es once, for the whole tree timespan...")
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v5.uE, Es_tspan, p_Es_v5)
+# This solution is a linear interpolator
+sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
+Es_interpolator = sol_Es_v5;
+p_Ds_v5 = (n=p_Ds_v5.n, params=p_Ds_v5.params, p_indices=p_Ds_v5.p_indices, p_TFs=p_Ds_v5.p_TFs, uE=p_Ds_v5.uE, sol_Es_v5=sol_Es_v5)
 
 # Parameters
 prtQi(inputs)
@@ -153,7 +161,7 @@ R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 
 
 
-print("\nDifferences between Julia and R lnLs for _compare_ClaSSE_calcs_v3_compare2julia.R calculation:\n")
+print("\nDifferences between Julia and R lnLs for\n/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_MLE_v4_WORKING.R\ncalculation:\n")
 print("R_result_branch_lnL (lq) - Julia_sum_lq: ")
 print(R_result_branch_lnL - Julia_sum_lq)
 print("\n")

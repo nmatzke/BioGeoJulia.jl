@@ -72,6 +72,8 @@ n = 2
 # CHANGE PARAMETERS BEFORE E INTERPOLATOR
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
 (res, trdf, solver_options, p_Ds_v5, p_Es_v5, Es_tspan) = inputs
+
+# Change parameter inputs manually
 inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]
 inputs.p_Ds_v5.params.Cijk_vals[1] = 2*inputs.p_Ds_v5.params.Cijk_vals[2]
 inputs.p_Ds_v5.params.mu_vals[2] = 2*inputs.p_Ds_v5.params.mu_vals[1]
@@ -84,22 +86,13 @@ trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
 root_age = maximum(trdf[!, :node_age])
 
-print("\nSolving the Es once, for the whole tree timespan...")
-
 # Solve the Es
-prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, uE, Es_tspan, p_Es_v5)
-
-print(Es_tspan)
-
+print("\nSolving the Es once, for the whole tree timespan...")
+prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Es_v5.uE, Es_tspan, p_Es_v5)
 # This solution is a linear interpolator
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
-
-print("...solving Es has finished, creating interpolator 'sol_Es_v5'.\n")
-	
-
-
-
-Es_interpolator = inputs.p_Ds_v5.sol_Es_v5;
+Es_interpolator = sol_Es_v5;
+p_Ds_v5 = (n=p_Ds_v5.n, params=p_Ds_v5.params, p_indices=p_Ds_v5.p_indices, p_TFs=p_Ds_v5.p_TFs, uE=p_Ds_v5.uE, sol_Es_v5=sol_Es_v5)
 
 # Parameters
 prtQi(inputs)
@@ -142,7 +135,7 @@ d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nod
 root_stateprobs = d_root_orig/sum(d_root_orig)
 lambda = in_params.birthRate
 e_root = Es_interpolator(root_age)
-d_root = d_root_orig ./ sum(root_stateprobs .* lambda .* (1 .- e_root).^2)
+d_root = d_root_orig ./ sum(root_stateprobs .* inputs.p_Ds_v5.params.Cijk_vals .* (1 .- e_root).^2)
 rootstates_lnL = log(sum(root_stateprobs .* d_root))
 # The above all works out to [0,1] for the Yule model with q01=q02=0.0
 
@@ -153,7 +146,7 @@ Julia_total_lnLs1t = Julia_sum_lq + rootstates_lnL
 @test round(R_result_total_LnLs1; digits=5) == round(Julia_total_lnLs1; digits=5)
 
 # root=ROOT.OBS, root.p=NULL, condition.surv=TRUE
-@test round(R_result_total_LnLs1t; digits=5) == round(Julia_total_lnLs1t; digits=5)
+@test round(R_result_total_LnLs1t; digits=4) == round(Julia_total_lnLs1t; digits=4)
 
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 # 
@@ -192,12 +185,15 @@ R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 
 
 
-print("\nDifferences between Julia and R lnLs for _compare_ClaSSE_calcs_v3_compare2julia.R calculation:\n")
+print("\nDifferences between Julia and R lnLs for\n/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_MLE_v6_WORKING.R\n calculation:\n")
 print("R_result_branch_lnL (lq) - Julia_sum_lq: ")
 print(R_result_branch_lnL - Julia_sum_lq)
 print("\n")
-print("R_result_total_lnL (lq) - Julia_total_lnL: ")
-print(R_result_total_lnL - Julia_total_lnL)
+print("R_result_total_LnLs1 (lq) - Julia_total_lnLs1: ")
+print(R_result_total_LnLs1 - Julia_total_lnLs1)
+print("\n")
+print("R_result_total_LnLs1t (lq) - Julia_total_lnLs1t: ")
+print(R_result_total_LnLs1t - Julia_total_lnLs1t)
 print("\n")
 print("R_result_total_lnL (lq) - Julia_sum_lq_nodes: ")
 print(R_sum_lq_nodes - Julia_sum_lq_nodes)
