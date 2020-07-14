@@ -48,7 +48,7 @@ birthRate = 0.2
 deathRate = 0.1
 d_val = 0.0
 e_val = 0.0
-j_val = 0.1
+j_val = 0.0
 
 # The names of the parameters:
 param_names = argnames(classe_3states)

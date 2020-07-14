@@ -222,7 +222,7 @@ parameterized_ClaSSE_Es_v5 = (du,u,p,t) -> begin
 	Carray_jvals = p.p_indices.Carray_jvals
 	Carray_kvals = p.p_indices.Carray_kvals
 	
-	two = 1.0
+	two = 2.0
   @inbounds for i in 1:n
 		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Qi_sub_i = p.p_TFs.Qi_sub_i[i]

@@ -64,7 +64,7 @@ import .TreePass
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
-in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.1)
+in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
 numareas = 2
 n = 3
 
