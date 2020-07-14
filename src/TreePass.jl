@@ -1286,9 +1286,13 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 	
 	# Calculate likelihoods of states just before speciation
   @inbounds for i in 1:n
+  	# These are the i's, j's, and k's FOR AN ANCESTOR I
 		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
+		
+		# This is the TFs for an ancestor i - NEEDED FOR VALUES
+		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
 
 # 		Calculation of "D" (likelihood of tip data)
 # 		for state i=1, multiply
@@ -1342,7 +1346,7 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 		#  0.03333333333333333		
 		
 		# Parameter values for these events with nonzero rates
-		tmpDs[i] = sum(Cijk_vals[Ci_sub_i] .* tmp1[Cj_sub_i] .* tmp2[Ck_sub_i])
+		tmpDs[i] = sum(Cijk_vals[Ci_eq_i] .* tmp1[Cj_sub_i] .* tmp2[Ck_sub_i])
 # 		print(tmpDs[i])
 # 		print("\n")
 # 		print(Cijk_vals)
