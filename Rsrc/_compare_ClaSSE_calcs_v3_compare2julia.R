@@ -251,6 +251,16 @@ likes_at_node4
 
 
 
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+computed_likelihoods_at_each_node_just_before_speciation
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+# [1] 0.00000000 0.00000000 0.00000000 0.03262265 0.03333214
+# [1]      -Inf      -Inf      -Inf -3.422748 -3.401233
+# [1] -6.823982
+
 R_result_sum_log_computed_likelihoods_at_each_node = c(sum(likes_at_node4), sum(likes_at_node5))
 R_result_sum_log_computed_likelihoods_at_each_node
 log(R_result_sum_log_computed_likelihoods_at_each_node)
@@ -280,58 +290,6 @@ R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.57223
 
 
 
-
-
-# Convert a "res" object from ClaSSE to a 
-# BioGeoBEARS-like set of matrices
-claSSE_res_to_prt <- function(res)
-	{
-	# Branch top values ("initial")
-	init = attr(res,"intermediates")$init
-	
-	# Branch bottom values ("base")
-	base = attr(res,"intermediates")$base
-	
-	# lqs = log-likelihoods at each branch bottom
-	lq = attr(res,"intermediates")$lq
-	q = exp(attr(res,"intermediates")$lq)
-	
-	vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root	
-	E_indices = 1:nstates
-	d_root_orig = vals[-E_indices]							# Original D likelihoods at root
-
-	# Assumes bifurcating tree
-	numstates = nrow(init) / 2
-	numnodes = ncol(init) # internal plus tip nodes
-	numTips = (ncol(init) + 1) / 2
-	numInternal = numTips - 1
-	
-	Es_atNode_branchTop = matrix(data=0, ncol=numstates, nrow=numnodes)
-	Es_atNode_branchBot = matrix(data=0, ncol=numstates, nrow=numnodes) 
-	likes_at_each_nodeIndex_branchTop = matrix(data=0, ncol=numstates, nrow=numnodes)
-	likes_at_each_nodeIndex_branchBot = matrix(data=0, ncol=numstates, nrow=numnodes) 
-	normlikes_at_each_nodeIndex_branchTop = matrix(data=0, ncol=numstates, nrow=numnodes)
-	normlikes_at_each_nodeIndex_branchBot = matrix(data=0, ncol=numstates, nrow=numnodes)
-	
-	Ecols = 1:numstates
-	Dcols = (numstates+1):(2*numstates)
-	Es_atNode_branchTop = (t(init))[,Ecols]
-	Es_atNode_branchBot = (t(base))[,Ecols]
-	likes_at_each_nodeIndex_branchTop = (t(init))[,Dcols]
-	normlikes_at_each_nodeIndex_branchBot = (t(base))[,Dcols]
-	normlikes_at_each_nodeIndex_branchTop = likes_at_each_nodeIndex_branchTop / rowSums(likes_at_each_nodeIndex_branchTop)
-	likes_at_each_nodeIndex_branchBot = normlikes_at_each_nodeIndex_branchBot * q
-	
-	# Assign each branch bottom 
-	trtable = prt(tr, printflag=FALSE)
-	
-	Es_atNode_branchTop
-	Es_atNode_branchBot
-	likes_at_each_nodeIndex_branchTop
-	likes_at_each_nodeIndex_branchBot
-	normlikes_at_each_nodeIndex_branchTop
-	normlikes_at_each_nodeIndex_branchBot
-	}
 
 
 
@@ -387,7 +345,7 @@ loglik
 
 # If root=ROOT.OBS, root.p=NULL, condition.surv=TRUE
 root.p = d_root_orig/sum(d_root_orig)
-lambda <- classe_params[E_indices]
+#lambda <- classe_params[E_indices]
 e.root <- vals[E_indices]
 
 # BiSSE
