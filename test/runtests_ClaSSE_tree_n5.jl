@@ -64,7 +64,7 @@ import .TreePass
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
-in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
+in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.1)
 numareas = 2
 n = 3
 
@@ -89,6 +89,9 @@ root_age = maximum(trdf[!, :node_age])
 print("\nSolving the Es once, for the whole tree timespan...")
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Ds_v5.uE, Es_tspan, p_Ds_v5)
 # This solution is a linear interpolator
+solver_options.solver = lsoda()
+solver_options.abstol = 1.0e-9
+solver_options.reltol = 1.0e-9
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
 Es_interpolator = sol_Es_v5;
 p_Ds_v5 = (n=p_Ds_v5.n, params=p_Ds_v5.params, p_indices=p_Ds_v5.p_indices, p_TFs=p_Ds_v5.p_TFs, uE=p_Ds_v5.uE, sol_Es_v5=sol_Es_v5)

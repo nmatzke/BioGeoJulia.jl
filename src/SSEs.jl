@@ -222,19 +222,22 @@ parameterized_ClaSSE_Es_v5 = (du,u,p,t) -> begin
 	Carray_jvals = p.p_indices.Carray_jvals
 	Carray_kvals = p.p_indices.Carray_kvals
 	
-	two = 2.0
+	two = 1.0
   @inbounds for i in 1:n
-		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Qi_sub_i = p.p_TFs.Qi_sub_i[i]
+		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
+		Qi_eq_i  = p.p_TFs.Qi_eq_i[i]
+
+		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
-		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
+		Ci_eq_i  = p.p_TFs.Ci_eq_i[i]
 
 		# Calculation of "E" (prob. of extinction)
 		du[i] = mu[i] +                                         # case 1: lineage extinction
-			-(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 2: no event + eventual extinction
-			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 			# case 3: change + eventual extinction
-			(two * sum(Cijk_vals[Ci_sub_i] .* u[Cj_sub_i] .* u[Ck_sub_i])) 
+			-(sum(Cijk_vals[Ci_eq_i]) + sum(Qij_vals[Qi_eq_i]) + mu[i])*u[i] +  # case 2: no event + eventual extinction
+			(sum(Qij_vals[Qi_eq_i] .* u[Qj_sub_i])) + 			# case 3: change + eventual extinction
+			(two * sum(Cijk_vals[Ci_eq_i] .* u[Cj_sub_i] .* u[Ck_sub_i])) 
 			# case 4 & 5: speciation from i producing j,k or k,j, eventually both daughters go extinct
 			# Because Carray contains all nonzero i->j,k rates, iterating once through on a particular
 			# "i" does the double-summation required
