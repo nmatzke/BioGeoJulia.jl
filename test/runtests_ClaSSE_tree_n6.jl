@@ -39,7 +39,7 @@ using BioGeoJulia.SSEs
 # # under a variety of simple and more complex models
 # #######################################################
 # 
-# @testset "runtests_ClaSSE_tree_n5.jl" begin
+# @testset "runtests_ClaSSE_tree_n6.jl" begin
 # 
 #######################################################
 # Calculation of Es and Ds on a single branch
@@ -48,12 +48,12 @@ using BioGeoJulia.SSEs
 # (1 branch, pure birth, no Q transitions, branchlength=1)
 #
 # Run with:
-# source("/GitHub/BioGeoJulia.jl/Rsrc/_compare_ClaSSE_calcs_n5_compare2julia.R")
+# source("/GitHub/BioGeoJulia.jl/Rsrc/_compare_ClaSSE_calcs_n6_compare2julia.R")
 # Truth:
-R_result_branch_lnL = -4.017710
-R_result_total_LnLs1 = -7.337335
-R_result_total_LnLs1t = -5.394719
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -9.307255
+R_result_branch_lnL = -4.322633
+R_result_total_LnLs1 = -8.008731
+R_result_total_LnLs1t = -6.066114
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -9.861079
 #######################################################
 
 
@@ -64,7 +64,7 @@ import .TreePass
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 tr = readTopology("((chimp:1,human:1):1,gorilla:2);")
-in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.1)
+in_params = (birthRate=0.2, deathRate=0.1, d_val=0.5, e_val=0.4, a_val=0.0, j_val=0.1)
 numareas = 2
 n = 3
 

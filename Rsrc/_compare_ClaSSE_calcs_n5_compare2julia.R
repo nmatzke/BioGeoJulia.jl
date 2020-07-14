@@ -224,48 +224,23 @@ claSSE_res_to_prt(res1, tr, classe_params)
 # Sum of the branch likelihoods
 lq
 sum(lq)
-# -0.2757956 -0.2757956 -0.5116280         NA -3.6850244
-# -4.748244
+# [1,] -0.2757956 -0.2757956 -0.511628    0 -2.954491
+# [1] -4.01771
 
 # Add the root probabilities
 # Assuming diversitree options:
 # root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
 # i.e., the root state probs are just the root_Ds/sum(root_Ds)
 LnLs1
-# -8.170992 -4.748244
+# [1] -7.337335 -4.017710
 
 
 # root=ROOT.OBS, root.p=NULL, condition.surv=TRUE
 LnLs1t
-# -6.228375 -4.748244
+# -5.394719 -4.017710
 
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))
-likes_at_node5 = rep(0.0, times=ncol(base_likes))
-likes_at_node4 = rep(0.0, times=ncol(base_likes))
-
-# Internal node
-state_i = 1
-likes_at_node5[state_i] = sum(base_normlikes[1,state_i] * base_normlikes[2,state_i] * birthRate) # sympatry
-state_i = 2
-likes_at_node5[state_i] = sum(base_normlikes[1,state_i] * base_normlikes[2,state_i] * birthRate) # sympatry
-state_i = 3
-likes_at_node5[state_i] = sum(base_normlikes[1,2] * base_normlikes[2,1] * 1/6*birthRate) # vicariance
-# Add small probs for subset sympatry
-likes_at_node5[state_i] = likes_at_node5[state_i] + sum(base_normlikes[1,2] * base_normlikes[2,3] * 1/6*birthRate)
-likes_at_node5[state_i] = likes_at_node5[state_i] + sum(base_normlikes[2,1] * base_normlikes[1,3] * 1/6*birthRate)
-likes_at_node5
-
-# Root node
-state_i = 1
-likes_at_node4[state_i] = sum(base_normlikes[3,state_i] * base_normlikes[5,state_i] * birthRate) # sympatry
-state_i = 2
-likes_at_node4[state_i] = sum(base_normlikes[3,state_i] * base_normlikes[5,state_i] * birthRate) # sympatry
-state_i = 3
-likes_at_node4[state_i] = sum(base_normlikes[3,2] * base_normlikes[5,3] * 1/6*birthRate) # subset sympatry
-likes_at_node4
-
-
 
 computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
 computed_likelihoods_at_each_node_just_before_speciation
@@ -273,31 +248,22 @@ rowSums(computed_likelihoods_at_each_node_just_before_speciation)
 log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
 TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))
 sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
-# [1] 0.00000000 0.00000000 0.00000000 0.03262265 0.03333214
-# [1]      -Inf      -Inf      -Inf -3.422748 -3.401233
-# [1] -6.823982
-
-R_result_sum_log_computed_likelihoods_at_each_node = c(sum(likes_at_node4), sum(likes_at_node5))
-R_result_sum_log_computed_likelihoods_at_each_node
-log(R_result_sum_log_computed_likelihoods_at_each_node)
-sum(log(R_result_sum_log_computed_likelihoods_at_each_node))
-# [1] 0.03262265 0.03333214
-# log(R_result_sum_log_computed_likelihoods_at_each_node)
-# [1] -3.422748 -3.401233
-# sum(log(R_result_sum_log_computed_likelihoods_at_each_node))
-# [1] -6.823982
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+# [1] 0.00000000 0.00000000 0.00000000 0.07471615 0.06750957
+# [1]      -Inf      -Inf      -Inf -2.594059 -2.695486
+# [1] -5.289545
 
 
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = sum(log(R_result_sum_log_computed_likelihoods_at_each_node)) + sum(lq)
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
-# -11.58421
+# -9.307255
 
 
 
-R_result_branch_lnL = -4.748244
-R_result_total_LnLs1 = -8.170992
-R_result_total_LnLs1t = -6.228375
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.57223
+R_result_branch_lnL = -4.017710
+R_result_total_LnLs1 = -7.337335
+R_result_total_LnLs1t = -5.394719
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -9.307255
 
 
 
