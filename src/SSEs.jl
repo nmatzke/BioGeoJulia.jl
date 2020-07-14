@@ -277,9 +277,11 @@ parameterized_ClaSSE_Ds_v5 = (du,u,p,t) -> begin
 		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
 		Qi_eq_i  = p.p_TFs.Qi_eq_i[i]
 
+  	# These are the i's, j's, and k's FOR AN ANCESTOR I
 		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
+		# This is the TFs for an ancestor i - NEEDED FOR FETCHING Cij_vals!!
 		Ci_eq_i  = p.p_TFs.Ci_eq_i[i]
 
 		# Calculation of "D" (likelihood of tip data)
