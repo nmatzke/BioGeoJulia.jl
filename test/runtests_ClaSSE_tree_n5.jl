@@ -50,7 +50,7 @@ using BioGeoJulia.SSEs
 # Run with:
 # source("/GitHub/BioGeoJulia.jl/Rsrc/_compare_ClaSSE_calcs_v3_compare2julia.R")
 # Truth:
-R_result_branch_lnL = -5.085475
+R_result_branch_lnL = -4.748244
 R_result_total_LnLs1 = -8.170992
 R_result_total_LnLs1t = -6.228375
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -11.57223
