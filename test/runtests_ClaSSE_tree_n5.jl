@@ -88,10 +88,7 @@ root_age = maximum(trdf[!, :node_age])
 # Solve the Es
 print("\nSolving the Es once, for the whole tree timespan...")
 prob_Es_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Es_v5, p_Ds_v5.uE, Es_tspan, p_Ds_v5)
-# This solution is a linear interpolator
-solver_options.solver = lsoda()
-solver_options.abstol = 1.0e-9
-solver_options.reltol = 1.0e-9
+# This solution is an interpolator
 sol_Es_v5 = solve(prob_Es_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol);
 Es_interpolator = sol_Es_v5;
 p_Ds_v5 = (n=p_Ds_v5.n, params=p_Ds_v5.params, p_indices=p_Ds_v5.p_indices, p_TFs=p_Ds_v5.p_TFs, uE=p_Ds_v5.uE, sol_Es_v5=sol_Es_v5)

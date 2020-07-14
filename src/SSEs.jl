@@ -266,16 +266,19 @@ parameterized_ClaSSE_Ds_v5 = (du,u,p,t) -> begin
 	
 	two = 1.0
   @inbounds for i in 1:n
-		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Qi_sub_i = p.p_TFs.Qi_sub_i[i]
+		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
+		Qi_eq_i  = p.p_TFs.Qi_eq_i[i]
+
+		Ci_sub_i = p.p_TFs.Ci_sub_i[i]
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
-		Qj_sub_i = p.p_TFs.Qj_sub_i[i]
+		Ci_eq_i  = p.p_TFs.Ci_eq_i[i]
 
 		# Calculation of "D" (likelihood of tip data)
-		du[i] = -(sum(Cijk_vals[Ci_sub_i]) + sum(Qij_vals[Qi_sub_i]) + mu[i])*u[i] +  # case 1: no event
-			(sum(Qij_vals[Qi_sub_i] .* u[Qj_sub_i])) + 	# case 2	
-			(sum(Cijk_vals[Ci_sub_i] .*                                               # case 3/4: change + eventual extinction
+		du[i] = -(sum(Cijk_vals[Ci_eq_i]) + sum(Qij_vals[Qi_eq_i]) + mu[i])*u[i] +  # case 1: no event
+			(sum(Qij_vals[Qi_eq_i] .* u[Qj_sub_i])) + 	# case 2	
+			(sum(Cijk_vals[Ci_eq_i] .*                                               # case 3/4: change + eventual extinction
 				 (u[Ck_sub_i].*uE[Cj_sub_i] 
 			 .+ u[Cj_sub_i].*uE[Ck_sub_i]) ))
   end
