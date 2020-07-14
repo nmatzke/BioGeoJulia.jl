@@ -16,6 +16,7 @@ library(BioGeoBEARS)
 
 source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")  # utility functions from diversitree
 source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_pureR_v1.R") # simple implementations in plain-R
+source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R") # simple implementations in plain-R
 
 
 # Load simple example tree
@@ -47,7 +48,7 @@ birthRate = 0.2
 deathRate = 0.1
 d_val = 0.0
 e_val = 0.0
-j_val = 0.0
+j_val = 0.1
 
 # The names of the parameters:
 param_names = argnames(classe_3states)
@@ -103,28 +104,32 @@ classe_params[param_names=="lambda222"] = yprob * birthRate
 classe_params[param_names=="lambda333"] = 0
 
 # Jump dispersal speciation
-classe_params[param_names=="lambda112"] = jprob * birthRate
-classe_params[param_names=="lambda121"] = jprob * birthRate
-classe_params[param_names=="lambda212"] = jprob * birthRate
-classe_params[param_names=="lambda221"] = jprob * birthRate
+# We do x2, because lambda112 covers lambda121
+classe_params[param_names=="lambda112"] = jprob * birthRate * 2
+classe_params[param_names=="lambda121"] = jprob * birthRate * 2
+classe_params[param_names=="lambda212"] = jprob * birthRate * 2
+classe_params[param_names=="lambda221"] = jprob * birthRate * 2
 
-# Subset sympatry for state AB
-# classe_params[param_names=="lambda312"] = 1/6 * birthRate
-# classe_params[param_names=="lambda321"] = 1/6 * birthRate
-# classe_params[param_names=="lambda313"] = 1/6 * birthRate
-# classe_params[param_names=="lambda331"] = 1/6 * birthRate
-# classe_params[param_names=="lambda323"] = 1/6 * birthRate
-# classe_params[param_names=="lambda332"] = 1/6 * birthRate
+# Vicariance etc. -- still just 1/6 as there are 
+# no j events from AB in a 2-area system
+# We do x2, because lambda312 covers lambda321
+classe_params[param_names=="lambda312"] = 1/6 * birthRate * 2
+classe_params[param_names=="lambda321"] = 1/6 * birthRate * 2
+classe_params[param_names=="lambda313"] = 1/6 * birthRate * 2
+classe_params[param_names=="lambda331"] = 1/6 * birthRate * 2
+classe_params[param_names=="lambda323"] = 1/6 * birthRate * 2
+classe_params[param_names=="lambda332"] = 1/6 * birthRate * 2
 
 # For diversitree ClaSSE, you have to lump lambda312 and lambda321
-classe_params[param_names=="lambda312"] = 1/3 * birthRate
-classe_params[param_names=="lambda313"] = 1/3 * birthRate
-classe_params[param_names=="lambda323"] = 1/3 * birthRate
+# classe_params[param_names=="lambda312"] = 1/3 * birthRate
+# classe_params[param_names=="lambda313"] = 1/3 * birthRate
+# classe_params[param_names=="lambda323"] = 1/3 * birthRate
+classe_lambdas_to_df(classe_params, k=3)
 
 classe_params_DEC = classe_params
 
 
-
+classe_lambdas_to_df(classe_params, k=3)
 
 # To see the function:
 dput(classe_3states)
@@ -185,7 +190,6 @@ LnLst2 = cbind(LnLst, ObsDiff, LnLdiff, exp_ObsDiff, exp_LnLdiff)
 cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
 
 
-
 init = t(attr(res2, "intermediates")$init)
 init
 
@@ -194,6 +198,7 @@ lq
 
 base = t(attr(res2, "intermediates")$base)
 base
+
 
 
 base_likes = apply(X=base[,4:6], MARGIN=2, FUN="*", exp(lq))
@@ -206,7 +211,13 @@ lnls[!is.finite(lnls)] = NA
 lnls
 # -0.2757956 -0.2757956 -0.5116280         NA -3.6850244
 sum(lnls, na.rm=TRUE)
-# -4.748244
+# -5.085475
+
+
+
+res = res1
+claSSE_res_to_prt(res1, tr, classe_params)
+
 
 
 

@@ -196,7 +196,7 @@ q31 = 0, q32 = 0)
 	q = exp(attr(res,"intermediates")$lq)
 	
 	vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root	
-	E_indices = 1:nstates
+	E_indices = 1:k
 	d_root_orig = vals[-E_indices]							# Original D likelihoods at root
 
 	# Assumes bifurcating tree
