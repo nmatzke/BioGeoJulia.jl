@@ -1291,7 +1291,7 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 		Cj_sub_i = p.p_TFs.Cj_sub_i[i]
 		Ck_sub_i = p.p_TFs.Ck_sub_i[i]
 		
-		# This is the TFs for an ancestor i - NEEDED FOR VALUES
+		# This is the TFs for an ancestor i - NEEDED FOR FETCHING Cij_vals!!
 		Ci_eq_i = p.p_TFs.Ci_eq_i[i]
 
 # 		Calculation of "D" (likelihood of tip data)
