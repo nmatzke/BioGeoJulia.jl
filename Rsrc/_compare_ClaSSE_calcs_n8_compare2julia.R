@@ -248,12 +248,37 @@ sum(lq) - sum(bd_lq)
 all_lnLs
 sum(log(res$computed_likelihoods_at_each_node[-20])) +sum(bd_lq)
 -67.62949 - -67.51729
+-0.1122
+exp(-0.1122)
+# 0.8938655
+
+
+# GOT IT F YEAH
+all_lnLs
+# -67.629498
+sum(log(res$computed_likelihoods_at_each_node[-20])) +sum(bd_lq) + log(birthRate) + 1
+# -67.62954
+
+
+
+sum(rowSums(base_likes)[c(22,31)])
+
 
 x = -birthRate * trtable$edge.length
 exp(x[c(22,31)])
 x[c(22,31)]
 sum(x[c(22,31)])
 
+# rows Sum to 1, so just summing "x", equals -17
+y = res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * x
+rowSums(y)
+sum(rowSums(y), na.rm=TRUE)
+# -17
+
+
+
+rowSums(base_likes) /exp(x)
+(rowSums(base_likes) /exp(x))[c(22,31)]
 
 # This should be the character change process, times the tree process
 x = res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * exp(attr(diversitree_bd,"intermediates")$lq)
