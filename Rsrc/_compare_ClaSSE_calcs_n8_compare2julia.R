@@ -106,6 +106,7 @@ j_val = 0.0
 # Blank out the params
 classe_params = rep(0, times=length(param_names))
 names(classe_params) = param_names
+head(classe_params)
 
 # Fill in the params from the BioGeoBEARS "res" results
 classe_params = BGBres_into_classe_params(res, classe_params, birthRate=birthRate)
@@ -209,6 +210,51 @@ sum(log(tmp_rowSums), na.rm=TRUE) # matches sum(lq)
 # Equal
 log(tmp_rowSums) - attr(res4,"intermediates")$lq
 
+
+# Diversitree birthdeath calculation
+lik.bd <- make.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
+diversitree_bd = lik.bd(pars=c(birthRate=0.3288164, deathRate=0.0), intermediates=TRUE)
+bd_lq = attr(diversitree_bd,"intermediates")$lq
+
+# FIGURED IT OUT
+bd_lq
+log(exp(-birthRate * trtable$edge.length))
+-birthRate * trtable$edge.length
+
+sum(-birthRate * trtable$edge.length, na.rm=TRUE)
+# -17
+
+bd_lq[21:37] - (-birthRate * trtable$edge.length)[21:37]
+# -1.112256 -1.112256 -1.112256....
+
+exp(-1.112256)
+#[1] 0.3288163
+
+# 19 tips, 18 internal nodes
+# birthRate = (17 speciation events above root)/total_brlen
+sum(-birthRate * trtable$edge.length, na.rm=TRUE) + 17*log(birthRate)
+sum(bd_lq)
+
+sum(log(res$computed_likelihoods_at_each_node[-20]))
+branches_above_node = (-birthRate * trtable$edge.length)[c(22,31)]
+branches_above_node
+
+sum(log(res$computed_likelihoods_at_each_node[-20])) + sum(branches_above_node)
+
+res$total_loglikelihood + sum(bd_lq)
+res$total_loglikelihood + sum(bd_lq)
+sum(lq) - sum(bd_lq)
+
+all_lnLs
+sum(log(res$computed_likelihoods_at_each_node[-20])) +sum(bd_lq)
+-67.62949 - -67.51729
+
+x = -birthRate * trtable$edge.length
+exp(x[c(22,31)])
+x[c(22,31)]
+sum(x[c(22,31)])
+
+
 # This should be the character change process, times the tree process
 x = res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * exp(attr(diversitree_bd,"intermediates")$lq)
 
@@ -234,12 +280,6 @@ all_lnLs$ttl_LnL - res$total_loglikelihood
 LnLs2[2] - res$total_loglikelihood
 
 
-# Diversitree birthdeath calculation
-lik.bd <- make.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
-diversitree_bd = lik.bd(pars=c(birthRate=0.3288164, deathRate=0.0), intermediates=TRUE)
-bd_lq = attr(diversitree_bd,"intermediates")$lq
-sum(bd_lq)
-sum(lq) - sum(bd_lq)
 
 # Get the constant part of bd_lq
 cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))

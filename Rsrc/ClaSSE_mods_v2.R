@@ -190,10 +190,10 @@ q31 = 0, q32 = 0)
 		Qij_mat = cbind(is_vec, js_vec)
 		}
 	
-	Qij_df = as.data.frame(cbind(Qij_mat, Q_vals))
+	Qij_df = as.data.frame(cbind(Qij_mat, Q_vals), stringsAsFactors=FALSE)
 	names(Qij_df) = c("i", "j", "q")
 	# Convert qs to numeric
-	Qij_df$q = as.numeric(Qij_df$q)
+	Qij_df$q = as.numeric(as.character(Qij_df$q))
 	return(Qij_df)
 	} # END classe_Qs_to_df <- function(classe_params, k=3)
 
@@ -264,10 +264,10 @@ q31 = 0, q32 = 0)
 		lambda_ijk_mat = cbind(is_vec, js_vec, ks_vec)
 		}
 	
-	lambda_ijk_df = as.data.frame(cbind(lambda_ijk_mat, lambda_vals))
+	lambda_ijk_df = as.data.frame(cbind(lambda_ijk_mat, lambda_vals), stringsAsFactors=FALSE)
 	names(lambda_ijk_df) = c("i", "j", "k", "lambda")
 	# Convert lambdas to numeric
-	lambda_ijk_df$lambda = as.numeric(lambda_ijk_df$lambda)
+	lambda_ijk_df$lambda = as.numeric(as.character(lambda_ijk_df$lambda))
 	return(lambda_ijk_df)
 	} # END classe_lambdas_to_df <- function(classe_params, k=3)
 
