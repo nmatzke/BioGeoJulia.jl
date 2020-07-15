@@ -1,1102 +1,358 @@
-for (i in 1:4)#
-    {#
-    print(var3[i])#
-    }
-for (i in 1:4)#
-    { #
-    print(var3[i])#
-    if (var3[i] == "human")#
-        {#
-        print("match found!")#
-        } else {#
-        print("match not found!")#
-        }#
-    }
-print(var3)#
-print(var3[1])
-rnorm(n=1, mean=1.0, sd=0.1)#
+all_lnLs$ttl_LnL - sum(bd_lq)#
+LnLs2[2] - sum(bd_lq)
+sum(log(tmp_rowSums))
+tmp_rowSums = (base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)[,numstates]#
+tmp_rowSums#
+log(tmp_rowSums)#
+sum(log(tmp_rowSums))
+sum(log(tmp_rowSums), na.rm=TRUE)
+res$total_loglikelihood
+sum(log(tmp_rowSums), na.rm=TRUE)#
+# Log-likelihoods#
 #
-# Do it several times#
-rnorm(n=1, mean=1.0, sd=0.1)#
-rnorm(n=1, mean=1.0, sd=0.1)#
-rnorm(n=1, mean=1.0, sd=0.1)#
-rnorm(n=1, mean=1.0, sd=0.1)#
-rnorm(n=1, mean=1.0, sd=0.1)
-var4 = rnorm(n=100, mean=1.0, sd=0.1)
-var4
-var4#
+res$total_loglikelihood#
 #
-# But, looking at a histogram is easy:#
-hist(var4)
-var5 = rnorm(n=10000, mean=1.0, sd=0.1)#
-hist(var5)
-tr = rtree(n=10, rooted=TRUE)
-library(ape)
-tr = rtree(n=10, rooted=TRUE)
+all_lnLs$ttl_LnL - res$total_loglikelihood - log(1/16)#
+LnLs2[2] - res$total_loglikelihood - log(1/16)#
+#
+all_lnLs$ttl_LnL - res$total_loglikelihood#
+LnLs2[2] - res$total_loglikelihood#
+# Diversitree birthdeath calculation#
+lik.bd <- make.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))#
+diversitree_bd = lik.bd(pars=c(birthRate=0.3288164, deathRate=0.0), intermediates=TRUE)#
+bd_lq = attr(diversitree_bd,"intermediates")$lq#
+sum(bd_lq)#
+#
+all_lnLs$ttl_LnL - sum(bd_lq)#
+LnLs2[2] - sum(bd_lq)#
+#
+bd = bd_liks(tr, birthRate=birthRate, deathRate=deathRate)#
+bd
+all_lnLs
+sum(bd_lq)
+sum(bd_lq) + sum(lq)
+sum(bd_lq) - sum(lq)
+sum(lq) - sum(bd_lq)
+all_lnLs
+bd
+dput(lik.bd)
+rootfunc
+diversitree::: rootfunc
+cache <- make.cache.bd(tree, sampling.f, unresolved, times, control)
+cache <- diversitree:::make.cache.bd(tree, sampling.f, unresolved, times, control)
+cache <- diversitree:::make.cache.bd(tree, sampling.f, unresolved, times, control=list(method="ode"))
+cache <- diversitree:::make.cache.bd(tree=tr, sampling.f, unresolved, times, control=list(method="ode"))
+cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
+cache
+cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
+cache$const
+bd
+diversitree:::rootfunc.bd.ode
+diversitree_bd
+diversitree_bd - cache$const
+c(diversitree_bd) - cache$const
+names(res)
+diversitree_bd_lnL_minus_const - res$total_loglikelihood
+diversitree_bd_lnL_minus_const = c(diversitree_bd) - cache$const#
+diversitree_bd_lnL_minus_const#
+# -35.90835#
+#
+diversitree_bd_lnL_minus_const - res$total_loglikelihood
+exp(-1.365222)
+log(1/16)
+names(res)
+res$ML_marginal_prob_each_state_at_branch_top_AT_node
+res$ML_marginal_prob_each_state_at_branch_top_AT_node[20,]
+sum(res$ML_marginal_prob_each_state_at_branch_top_AT_node[20,])
+names(res)
+sum(res$condlikes_of_each_state[20,])
+sqrt(sum(res$condlikes_of_each_state[20,]))
+diversitree_bd_lnL_minus_const - res$total_loglikelihood
+lq = t(attr(res2, "intermediates")$lq)			# Branch likelihoods#
+vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root#
+nstates = length(vals) / 2#
+E_indices = 1:nstates#
+d_root_orig = vals[-E_indices]							# Original D likelihoods at root
+d_root_orig
+sum(d_root_orig)
 tr
-plot(tr)
-title("This is a randomly-generated phylogenetic tree, with 10 tips.")
-plot(tr)#
+res$condlikes[20,]
+sum(res$condlikes[20,])
+d_root_orig  / res$condlikes[20,]
+log(0.3678631)
+diversitree_bd_lnL_minus_const
+diversitree_bd_lnL_minus_const - res$total_loglikelihood
+exp(-1.365222)
+0.255324/0.05317382
+exp(.365222)
+1/exp(.365222)
+diversitree_bd_lnL_minus_const
+sum(lq)
+sum(lq) - cache$const
+sum(lq) + cache$const
+c(diversitree_bd)
+diversitree:::rootfunc.bd.ode
+diversitree_bd
+log(0.3288164 )
+c(diversitree_bd) - cache$const - log(birthRate)
+exp(-1)
+c(diversitree_bd) - cache$const - log(birthRate) + exp(-1)
+res$total_loglikelihood
+log(-birthRate)
+c(diversitree_bd) - cache$const - log(birthRate) + exp(-1)
+-34.54313 - -34.42821
+c(diversitree_bd) - cache$const - log(birthRate) + exp(-(15/16))
+exp(-0.11492)
+c(diversitree_bd) - cache$const - log(15/16*birthRate) + exp(-1)
+c(diversitree_bd) - cache$const - log(16/15*birthRate) + exp(-1)
+c(diversitree_bd) - cache$const - log(16/15*birthRate) + exp(-15/16)
+c(diversitree_bd) - cache$const - log(16/15*birthRate) + exp(-16/15)
+root_probs_single = rep(1, times=numstates)#
+root_probs_single[sum(include_null_range)] = 0
+root_probs_single
+root_probs_single = rep(1, times=numstates)#
+root_probs_single[sum(include_null_range)] = 0#
+#root_probs_single[1+include_null_range] = 1#
+#root_probs_single = root_probs_single / sum(root_probs_single)#
 #
-# Let's add a title#
-title("This is a randomly-generated phylogenetic tree, with 10 tips.")
-tr = rtree(n=40, rooted=TRUE)#
-plot(tr)#
-title("This is a randomly-generated phylogenetic tree, with 40 tips.")
-library(ape)#
-library(phytools)#
-library(phangorn)
-great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
-great_ape_phylogeny = read.tree(file="", text=great_ape_newick_string)#
-great_ape_phylogeny
-plot(great_ape_phylogeny)#
-axisPhylo()#
-mtext(side=1, text="Millions of years ago", line=2)#
-title("Simple phylogeny of the great apes")
-great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
-great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
+# Do the ClaSSE calculation, under many different assumptions#
+res1 = classe_16states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
+res2 = classe_16states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
+root_probs = root_probs_equal#
+res3 = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
+root_probs = root_probs_biased#
+res4 = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
+root_probs = root_probs_single#
+res5 = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
+res6 = classe_16states(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
 #
-# Plot 2 graphics on same page:#
-dev.off()   # (closes previous graphics windows)#
+res1t = classe_16states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
+res2t = classe_16states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
+root_probs = root_probs_equal#
+res3t = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
+root_probs = root_probs_biased#
+res4t = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
+root_probs = root_probs_single#
+res5t = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
+res6t = classe_16states(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
 #
-# Plot into a PDF#
-pdffn = "compare_2_great_ape_phylogenies.pdf"#
-pdf(file=pdffn, width=8.5, height=11)#
+# get_classe_LnLs returns the total log-likelihood, and #
+# the total of the branch likelihoods#
+LnLs1 = get_classe_LnLs(res1)#
+LnLs2 = get_classe_LnLs(res2)#
+LnLs3 = get_classe_LnLs(res3)#
+LnLs4 = get_classe_LnLs(res4)#
+LnLs5 = get_classe_LnLs(res5)#
+LnLs6 = get_classe_LnLs(res6)#
+LnLs1t = get_classe_LnLs(res1t)#
+LnLs2t = get_classe_LnLs(res2t)#
+LnLs3t = get_classe_LnLs(res3t)#
+LnLs4t = get_classe_LnLs(res4t)#
+LnLs5t = get_classe_LnLs(res5t)#
+LnLs6t = get_classe_LnLs(res6t)#
 #
-par(mfrow=c(2,1))#
-plot(great_ape_phylo1)#
-title("Tree from great_ape_newick_string1")#
+LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs6, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t, LnLs6t), stringsAsFactors=FALSE)#
+names(LnLst) = c("ttl_LnL", "branch_LnL")#
+ObsDiff = (LnLst$ttl_LnL - LnLst$branch_LnL)#
+exp_ObsDiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL))#
+LnLdiff = round((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)), digits=4)#
+exp_LnLdiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))#
+LnLst2 = cbind(LnLst, ObsDiff, LnLdiff, exp_ObsDiff, exp_LnLdiff)#
+all_lnLs = cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)#
+all_lnLs$ttl_LnL = as.numeric(all_lnLs$ttl_LnL)#
+cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
+LnLs2[2]
+LnLs2[1] - cache$const - log(birthRate)
+LnLs2[1] + cache$const + log(birthRate)
+cache$const
+sum(lq) - cache$const
+sum(lq) + cache$const
+sum(lq) + cache$const + log(1/15)
+sum(lq) + cache$const + log(1/16)
+sum(lq) + cache$const + log(1/16) + log(birthRate)
+sum(lq) + cache$const + log(1/15) + log(birthRate)
+sum(lq) + cache$const + log(1/15) + log(birthRate)
+LnLs4[1] - res$total_loglikelihood
+LnLs4[1] + cache$const + log(birthRate)
+LnLs4[1] + cache$const
+log(1/15)
+LnLs4[1] + cache$const + log(1/15)
+LnLs4[1] + cache$const - log(1/15)
+LnLs4[1] + cache$const - log(1/15) - log(-1)
+LnLs4[1] + cache$const - log(1/15) - log(birthRate)
+LnLs4[1] + cache$const - log(1/15) - log(birthRate)
+exp(-1)
+LnLs4[1] + cache$const - log(1/15) - 1
+LnLs4[1] + cache$const - log(1/15) + 1
+res$total_loglikelihood
+LnLs4[1] + cache$const - log(1/16) - 1
+LnLs4[1] + cache$const - log(1/15) - 1
+LnLs4[1] + cache$const - log(1/15) - birthRate
+LnLs4[1] + cache$const - log(1/15) + birthRate
+LnLs4[1] + cache$const - log(1/15) - 1 - birthRate
+LnLs4[1] + cache$const - log(1/15) - 1 + birthRate
+LnLs4[1] + cache$const - log(1/15) - 1
+LnLs4[1] + cache$const - log(1/15)
+LnLs4[1] + cache$const - log(1/15) + 1
+LnLs4[1] + cache$const - log(1/16) + 1
+LnLs4[1] + cache$const - log(1/16) + 1 + birthRate
+LnLs4[1] + cache$const - log(1/16) + 1 - birthRate
+LnLs4[1] + cache$const - log(1/15) + 1 - birthRate
+LnLs4[1] + cache$const - log(1/15) + birthRate
+LnLs4[1] + cache$const - log(1/16) + birthRate
+res$condlikes[20,]
+sum(res$condlikes[20,])
+log(sum(res$condlikes[20,]))
+log(1/16)
+LnLs4[1] + cache$const - log(sum(res$condlikes[20,]))
+res$total_loglikelihood
+log(1/15)
+log(15/16)
+LnLs4[1] + cache$const + log(sum(res$condlikes[20,]))
+LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) + log(1/15)
+LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) - log(1/15)
+LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) - log(1/15) + log(birthRate)
+LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) - log(1/15) - log(birthRate)
+LnLs4[1] + cache$const + log(sum(res$condlikes[20,]))
+LnLs4[1] + cache$const - log(sum(res$condlikes[20,]))
+-35.27541 - res$total_loglikelihood
+0.7322835#
+/birthRate
+0.7322835/birthRate
+1-birthRate
+log(1-birthRate)
+LnLs4[1] + cache$const
+LnLs4[1] + cache$const - sum(lq)
+d.root
+15/16
+log(15/16)
+sum(lq)
+lnlLnLs4
+LnLs4
+res4t
+res4
+root_probs_biased
+res5
+lq = t(attr(res5, "intermediates")$lq)			# Branch likelihoods#
+vals = t(attr(res5, "intermediates")$vals)	# Es and Ds at the root#
+nstates = length(vals) / 2#
+E_indices = 1:nstates#
+d_root_orig = vals[-E_indices]							# Original D likelihoods at root
+d_root_orig
+sum(d_root_orig)
+root.p = root_probs_single#
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
+loglik
+res5
+log(sum(root.p * d_root_orig)) #
+log(sum(d_root_orig))
+d_root_orig
+d_root_orig / res$condlines[20,]
+d_root_orig / res$condlikes[20,]
+birthRate
+log(sum(d_root_orig))#
 #
-plot(great_ape_phylo2)#
-title("Tree from great_ape_newick_string2")#
+log(sum(res$condlikes[20,])) + 1
+log(sum(res$condlikes[20,])) - 1
+log(sum(d_root_orig))#
+log(sum(res$condlikes[20,])) - 1
+sum(lq)
+c(res5) - sum(lq)
+log(sum(d_root_orig))#
+log(sum(res$condlikes[20,])) - 1#
+c(res5) - sum(lq)
+res$total_loglikelihood
+res$total_loglikelihood - (log(sum(res$condlikes[20,])) - 1)
+sum(lq)
+sum(lq) - const
+sum(lq) - cache$const
+sum(lq) + cache$const
+res$total_loglikelihood - log(sum(res$condlikes[20,]))
+x=sum(lq) + cache$const
+y=res$total_loglikelihood - log(sum(res$condlikes[20,]))
+x-y
+exp(x-y)
+1/exp(x-y)
+1-birthRate
+birthRate
+exp(-1)
+sum(lq)
+sum(lq)+(log(sum(res$condlikes[20,])) - 1)
+c(LnLs4)
+all_lnLs
+sum(log(rowSums(res$condlikes)))
+sum(log(rowSums(res$condlikes)[-20]))
+names(res)
+res$relative_probs_of_each_state_at_bottom_of_root_branch
+log(rowSums(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))
+log(rowSums(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))
+res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
+base /res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
+dim(base)
+base = t(attr(res2, "intermediates")$base)#
+base
+base = t(attr(res2, "intermediates")$base)#
+base
+base_likes
+base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
+tmp_rowSums = (base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)[,numstates]#
+tmp_rowSums#
+log(tmp_rowSums)#
+sum(log(tmp_rowSums), na.rm=TRUE)
+all_lnLs
+diversitree_bd
+tmp_rowSums
+attr(diversitree_bd,"intermediates")$lq
+log(tmp_rowSums) - attr(diversitree_bd,"intermediates")$lq
+log(tmp_rowSums) + attr(diversitree_bd,"intermediates")$lq
+log(tmp_rowSums) / attr(diversitree_bd,"intermediates")$lq
+tmp_rowSums -exp(attr(diversitree_bd,"intermediates")$lq)
+tmp_rowSums /exp(attr(diversitree_bd,"intermediates")$lq)
+attr(diversitree_bd,"intermediates")$lq
+sum(attr(diversitree_bd,"intermediates")$lq)
+log(tmp_rowSums)
+sum(log(tmp_rowSums), na.rm=TRUE)
+lq
+log(tmp_rowSums) - attr(res4,"intermediates")$lq
+names(res)
+log(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)
+res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
+rowSums(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)
+rowSums(log(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))
+rowSums(log(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))attr(diversitree_bd,"intermediates")$lq
+attr(diversitree_bd,"intermediates")$lq
+exp(attr(diversitree_bd,"intermediates")$lq)
+exp(attr(diversitree_bd,"intermediates")$lq)
+round(base_normlikes - res$condlikes_of_each_state / rowSums(res$condlikes_of_each_state), 5)
+round(base_normlikes - res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS, 5)#
+round(base_normlikes - res$condlikes_of_each_state / rowSums(res$condlikes_of_each_state), 5)
+res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * exp(attr(diversitree_bd,"intermediates")$lq)
+x = res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * exp(attr(diversitree_bd,"intermediates")$lq)#
 #
-dev.off()#
-cmdstr = paste0("open ", pdffn)#
-system(cmdstr)
-getwd()
-plot(great_ape_phylogeny, type="c")#
-axisPhylo()#
-mtext(side=1, text="Millions of years ago", line=2)#
-title("Simple phylogeny of the great apes,\ndiagonal branch view")#
-edgelabels()#
-#
-# Cladograms versus Phylograms#
-# Let's compare 2 versions of the great ape phylogeny:#
-#
-great_ape_newick_string1 = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
-#
-great_ape_newick_string2 = "(((human,chimpanzee),gorilla),orangutan);"#
-#
-# And, let's plot them both:#
-great_ape_phylo1 = read.tree(file="", text=great_ape_newick_string1)#
-great_ape_phylo2 = read.tree(file="", text=great_ape_newick_string2)#
-#
-# Plot 2 graphics on same page:#
-dev.off()   # (closes previous graphics windows)#
-#
-# Plot into a PDF#
-pdffn = "compare_2_great_ape_phylogenies.pdf"#
-pdf(file=pdffn, width=8.5, height=11)#
-#
-par(mfrow=c(2,1))#
-plot(great_ape_phylo1)#
-title("Tree from great_ape_newick_string1")#
-#
-plot(great_ape_phylo2)#
-title("Tree from great_ape_newick_string2")#
-#
-dev.off()#
-cmdstr = paste0("open ", pdffn)#
-system(cmdstr)
-dev.off()   # (closes previous graphics windows)#
-vert_newick_str = "(shark:471,(tuna:432,(lungfish:416,(frog:352.6457263,(((((kiwi:81.06707278,seagull:81.06707278):132.1992512,crocodile:213.266324):38.01256425,turtle:251.2788883):20.2733676,((wall_lizard:134.7070246,(snake:127.5268735,anole_lizard:127.5268735):7.180151025):85.293,Tuatara:220):51.5522313):42.65854432,(platypus:187.9246145,(opossum:147.3778793,human:147.3778793):40.5467352):126.2861857):38.43492607):63.35427375):16):41);"#
-vert_phylo = read.tree(file="", text=vert_newick_str)#
-plot(vert_phylo)#
-axisPhylo()#
-title("Lab Figure 1: Backbone phylogeny of vertebrates")#
-mtext(side=1, text="Ma (millions of years ago)", line=3)
-library(ape)
-?birthdeath
-library(gtools)
-?gtools
-?trim
-?odd
-OS.type
-.Platform
-.Platform$OS.type
-getwd()
-library(ape)#
-library(phangorn)#
-#
-# Also, to have R automatically open the PDFs, run this#
-if (.Platform$OS.type == "windows")#
-	{#
-	cmd_prefix = paste0("start chrome ", getwd())#
-	} else {#
-	cmd_prefix = "open "#
-	}#
-# A. Phylogenies: Basic terminology#
-#
-########################################################
-# START CODE CHUNK #1#
-########################################################
-#
-# Let's load a simple phylogeny#
-great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"#
-great_ape_phylogeny = read.tree(file="", text=great_ape_newick_string)#
-great_ape_phylogeny#
-#
-# And plot the phylogeny to a PDF#
-#
-# Open the PDF for writing#
-pdffn = "chunk01_Fig1_ape_phylo.pdf"#
-pdf(file=pdffn, width=6, height=6)#
-#
-# Send the plot to the PDF#
-plot(great_ape_phylogeny)#
-axisPhylo()#
-mtext(side=1, text="Millions of years ago", line=2)#
-title("Chunk 1, Fig.1: Simple phylogeny of the great apes")#
-#
-# Close the writing of the PDF, open for viewing#
-dev.off()#
-cmdstr = paste0(cmd_prefix, pdffn)#
-system(cmdstr)
-cmdstr
-?expand.grid
-expand.grid(height = seq(60, 80, 5), weight = seq(100, 300, 50),#
-            sex = c("Male","Female"))
-library(BioGeoBEARS)
-prt()
-# Example hominin tree with 2 fossils#
-library(ape)#
-#
-trstr = "(((((Hsapiens:0.4,Hneander:0.4):4.6,Ardi:0.4):1.0,Pan:6.0):1.0,Gorilla:7.0):6.0,Pongo:13.0);"#
-tr = read.tree(file="", text=trstr)#
-#
-pdffn = "Node_numbers_v1.pdf"#
-pdf(pdffn, height=11, width=11)#
-#
-####################################################
-# Plot APE/BioGeoBEARS node numbers#
-####################################################
-ntips = length(tr$tip.label)#
-Rnodenums = (ntips+1):(ntips+tr$Nnode)#
-tipnums = 1:ntips#
-plot(tr, label.offset=0.25, cex=1.25)#
-axisPhylo()#
-tiplabels(cex=1.5)#
-nodelabels(text=Rnodenums, node=Rnodenums, cex=1.5)#
-title("APE/BioGeoBEARS node numbers")#
-#
-# END PDF#
-dev.off()#
-cmdstr = paste("open ", pdffn, sep="")#
-system(cmdstr)#
-########################################################
-# Print a "tree table" with the #
-# BioGeoBEARS function prt()#
-########################################################
-#
-# Install BioGeoBEARS from GitHub#
-# https://github.com/nmatzke/BioGeoBEARS#
-#
-library(devtools)#
-devtools::install_github(repo="nmatzke/BioGeoBEARS")#
-#
-library(BioGeoBEARS)#
-#
-# Print the "tree table"#
-trtable = prt(tr, printflag=FALSE)#
-trtable
-library(BioGeoBEARS)
-trtable = prt(tr, printflag=FALSE)
-tr
-install.packages("ape")
-library(ape)
-library(BioGeoBEARS)
-library(ape)#
-#
-trstr = "(((((Hsapiens:0.4,Hneander:0.4):4.6,Ardi:0.4):1.0,Pan:6.0):1.0,Gorilla:7.0):6.0,Pongo:13.0);"#
-tr = read.tree(file="", text=trstr)#
-#
-pdffn = "Node_numbers_v1.pdf"#
-pdf(pdffn, height=11, width=11)#
-#
-####################################################
-# Plot APE/BioGeoBEARS node numbers#
-####################################################
-ntips = length(tr$tip.label)#
-Rnodenums = (ntips+1):(ntips+tr$Nnode)#
-tipnums = 1:ntips#
-plot(tr, label.offset=0.25, cex=1.25)#
-axisPhylo()#
-tiplabels(cex=1.5)#
-nodelabels(text=Rnodenums, node=Rnodenums, cex=1.5)#
-title("APE/BioGeoBEARS node numbers")#
-#
-# END PDF#
-dev.off()#
-cmdstr = paste("open ", pdffn, sep="")#
-system(cmdstr)#
-########################################################
-# Print a "tree table" with the #
-# BioGeoBEARS function prt()#
-########################################################
-#
-# Install BioGeoBEARS from GitHub#
-# https://github.com/nmatzke/BioGeoBEARS#
-#
-# install.packages("rexpokit")#
-# install.packages("cladoRcpp")#
-library(devtools)#
-# devtools::install_github(repo="nmatzke/BioGeoBEARS")#
-#
-library(BioGeoBEARS)#
-#
-# Print the "tree table"#
-trtable = prt(tr, printflag=FALSE)#
-trtable
-ace
-tr2 <- reorder(tr, "postorder")#
-#
-# Compare the edge matrices#
-tr$edge#
-tr2$edge#
-#
-nb.node = length(tr$tip.label + tr2$Nnode)  # The number of tip+internal nodes#
-for (i in seq(from = 1, by = 2, length.out = nb.node))#
-	{#
-	j <- i + 1L#
-	anc <- tr2$edge[i,1]#
-    des1 <- tr2$edge[i,2]#
-    des2 <- tr2$edge[j,2]#
-	txt = paste0("Ancestral node=", anc, "; Left descendant node=", des1, ", Right descendant node=", des2)#
-	cat("\n", txt, sep="")#
-	}#
-cat("\n\n")
-tr2 <- reorder(tr, "postorder")#
-#
-# Compare the edge matrices#
-tr$edge#
-tr2$edge#
-#
-nb.node = length(tr$tip.label) + tr2$Nnode  # The number of tip+internal nodes#
-for (i in seq(from = 1, by = 2, length.out = nb.node))#
-	{#
-	j <- i + 1L#
-	anc <- tr2$edge[i,1]#
-    des1 <- tr2$edge[i,2]#
-    des2 <- tr2$edge[j,2]#
-	txt = paste0("Ancestral node=", anc, "; Left descendant node=", des1, ", Right descendant node=", des2)#
-	cat("\n", txt, sep="")#
-	}#
-cat("\n\n")
-ace
-tr2 <- reorder(tr, "postorder")#
-#
-# Compare the edge matrices#
-tr$edge#
-tr2$edge#
-#
-nb.node = tr2$Nnode  # The number of internal nodes#
-for (i in seq(from = 1, by = 2, length.out = nb.node))#
-	{#
-	j <- i + 1L#
-	anc <- tr2$edge[i,1]#
-    des1 <- tr2$edge[i,2]#
-    des2 <- tr2$edge[j,2]#
-	txt = paste0("Ancestral node=", anc, "; Left descendant node=", des1, ", Right descendant node=", des2)#
-	cat("\n", txt, sep="")#
-	}#
-cat("\n\n")
-birthrates = seq(from=0, to=5, by=0.05)#
-deathrates = seq(from=0, to=5, by=0.05)#
-BDrates = expand.grid(birthrates, deathrates)
-dim(BDrates)
-birthrates = seq(from=0, to=10, by=0.05)#
-deathrates = seq(from=0, to=10, by=0.05)#
-BDrates = expand.grid(birthrates, deathrates)#
-dim(BDrates)
-head(BDrates)
-ace
-p = c(1, rep(mean(x), #
-                  nb.node)
-?ace
-library(diversitree)
-data(bird.orders)#
-set.seed(1)#
-x <- structure(rnorm(length(bird.orders$tip.label)), names = bird.orders$tip.label)
-x
-fit1 <- find.mle(make.bm(bird.orders, x), 0.1)
-lik.pruning <- make.bm(bird.orders, x, control = list(method = "pruning"))#
-fit2 <- find.mle(lik.pruning, 0.1)
-lik.pruning
-names(lik.pruning)
-fitContinuous
-library(geiger)
-fitContinuous
-? fitContinuous
-fitContinuous
-bm.lik
-library(phytools)
-fastBM
-simBM
-phytools::: simBM
-BMlk
-phytools::: BMlk
-(2^14)*(2^14)
-seq()
-?seq
-dnorm()
-########################################################
-# Basic statistical distributions#
-########################################################
-#
-# These are all sampling distributions, i.e. they arise#
-# under the frequentist idea of "if the data were #
-# generated again and again", under the model/experiment.#
-##
-# Probably in some sense they therefore all follow from#
-# the Central Limit Theorem#
-########################################################
-# z-distribution (standard normal distribution)#
-########################################################
-# The standard normal distribution is a normal #
-# distribution with mean=0, sd=1.#
-##
-# Let's plot it#
-# Set up a series of values on the x-axis#
-x = seq(from=-3, to=3, by=0.1)#
-#
-# Set up a series of corresponding y values, for #
-# the p.d.f. (probability density function) for #
-# the standard normaol distribution.#
-#
-# dnorm = *density* of normal distribution#
-y = dnorm(x=x, mean=0, sd=1, log=FALSE)#
-#
-plot(x, y, main="probability density of standard normal distribution")
-y = dnorm(x=x, mean=0, sd=1, log=TRUE)#
-#
-plot(x, y, main="probability density of standard normal distribution")
-plot(x^2, log(y), main="natural log of a standard normal distribution\nequals a parabola")
-y
-x = seq(from=-3, to=3, by=0.1)#
-#
-# Set up a series of corresponding y values, for #
-# the p.d.f. (probability density function) for #
-# the standard normaol distribution.#
-#
-# dnorm = *density* of normal distribution#
-y = dnorm(x=x, mean=0, sd=1, log=FALSE)#
-#
-plot(x, y, main="probability density of standard normal distribution")#
-#
-# That's just the "bell curve", you've seen it many times before.#
-# Let's investigate the shape. What happens if we take the#
-# natural log of the bell-curve?#
-plot(x, log(y), main="natural log of a standard normal distribution\nequals a parabola")#
-#
-# That looks suspiciously like a parabola.#
-# You may vaguely recall that a parabola is a "quadratic" function,#
-# produced by something like y=x^2.  Or, in this case, since#
-# the parabola is pointing down, something like y = -1*(x^2).#
-##
-# We can check if it is a parabola by plotting log(y) against x^2:#
-plot(x^2, log(y), main="natural log of a standard normal distribution\nequals a parabola")
-plot(x, sqrt(abs(log(y))), main="natural log of a standard normal distribution\nequals a parabola")
-x
-x^2
-hist(x)
-hist(x^2)
-plot(x^2, log(y), main="natural log of a standard normal distribution\nequals a parabola")
-max( log(y))
-max(h)
-max(y)
-exp()
-exp(1)
-# 1. start with x#
-x = seq(from=-3, to=3, by=0.1)#
-#
-# 2. square it#
-x2 = x^2#
-#
-# 3. Take the reverse of the natural log -- the natural exponent#
-# exp(a) = e^a = 2.718282^a#
-exp_x2 = exp(x^2)#
-#
-plot(x, exp_x2, main="generating a normal distribution"
+rowSums(x)
+rowSums(x)#
+sum(log(rowSums(x))
 )
-?dnorm
-exp_x2 = exp((x^2)/2)#
-#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp((x^2)/2)#
-plot(x, exp_x2, main="generating a normal distribution")#
-#
-exp_x2 = exp(x^2)#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(2*x^2)#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(4*x^2)#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(40*x^2)#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(0.001*x^2)#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(-(x^2)/2)#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(-(x^2))#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(1/(x^2))#
-plot(x, exp_x2, main="generating a normal distribution")
-exp_x2 = exp(-(x^2))#
-plot(x, exp_x2, main="generating a normal distribution")#
-# Here, x is the deviation from the estimated mean.#
-#
-# So, sum-of-squared errors, times -1, put into the natural exponent,#
-# is proportional to the likelihood#
-# more errors = lower likelihood#
-#
-# If we take the log of the negative sum-of-squared errors,#
-# then we get proportional to the likelihood#
-#
-plot(x, log(exp_x2), main="log-likelihood")
-plot(x, log(log(exp_x2)), main="log-likelihood")
-plot(x, sqrt(-log(exp_x2)), main="log-likelihood")
-plot(x, log(exp_x2), main="log-likelihood")#
-plot(x, sqrt(-log(exp_x2)), main="sqrt(~log-likelihood)")
-plot(x, y^2, "standard-normal squared")
-y
-plot(x,y)
-plot(x, y^2, "standard-normal squared")
-?dchisq
-plot()
-plot(x=x, y=x^2, "standard-normal squared")
-plot(x=x, y=dchisq(x), "standard-normal squared")
-plot(x=x, y=dchisq(x, df=1), "chi-squared, df=1")
-plot(x=x, y=dchisq(x, df=1), main="chi-squared, df=1")
-dchisq(x, df=1)
-x = seq(0, 6, by=0.01)#
-plot(x=x, y=dchisq(x, df=1), main="chi-squared, df=1")
-x = seq(0, 6, by=0.01)#
-y = dchisq(x, df=1)#
-plot(x=x, y=y, main="chi-squared, df=1")#
-plot(x=x, y=log(y), main="chi-squared, df=1")#
-plot(x=x, y=sqrt(y), main="chi-squared, df=1")
-plot(x=x, y=log(sqrt(y)), main="chi-squared, df=1")#
-plot(x=x, y=sqrt(log(y)), main="chi-squared, df=1")
-plot(x=x, y=y, main="chi-squared, df=1")#
-plot(x=x, y=log(y), main="chi-squared, df=1")#
-plot(x=x, y=sqrt(y), main="chi-squared, df=1")#
-plot(x=x, y=log(sqrt(y)), main="chi-squared, df=1")#
-plot(x=x, y=sqrt(log(y)), main="chi-squared, df=1")
-# Standard normal squared#
-x = seq(0, 6, by=0.01)#
-y = dchisq(x, df=1)#
-plot(x=x, y=y, main="chi-squared, df=1")#
-plot(x=x, y=dnorm(x)^2, main="dnorm(x)^2")
-plot(x=x, y=(dnorm(x))^2, main="dnorm(x)^2")
-x = seq(0, 6, by=0.01)#
-y = dchisq(x, df=1)#
-plot(x=x, y=y, main="chi-squared, df=1")#
-plot(x=x, y=y/(sqrt(x)), main="")
-plot(x=x, y=y*(sqrt(x)), main="")
-plot(x=x, y=y, main="chi-squared, df=1")#
-plot(x=x, y=y*(sqrt(x)), main="")#
-plot(x=x, y=y*(sqrt(x)), main="")#
-plot(x=x, y=log(y*(sqrt(x))), main="")
-exp(2*pi)
-pi
-exp(-2*pi)
-exp(-*pi)
-exp(-pi)
-sqrt(-1)
-complex(1,0,-1)
-exp(complex(1,0,-1))
-exp(complex(1,0,-1)*2)
-exp(complex(1,0,-1)*2*pi)
-exp(complex(1,0,-1)*pi)
-exp(complex(1,0,-1)*2*pi)
-rstanarm
-install.packages("rstanarm")
-library(rstanarm)
-install.packages("LearnBayes")
-library(LearnBayes)
-?LearnBayes
-install.packages("arm")
-library(arm)
-?arm
-?ranef
-?glm
-?invlogit
-n <- 100#
-  x1 <- rnorm (n)#
-  x2 <- rbinom (n, 1, .5)#
-  b0 <- 1#
-  b1 <- 1.5#
-  b2 <- 2#
-  y <- rbinom (n, 1, invlogit(b0+b1*x1+b2*x2))#
-#
-  M1 <- glm (y ~ x1 + x2, family=binomial(link="logit"))#
-  display (M1)#
-#
-  M2 <- bayesglm (y ~ x1 + x2, family=binomial(link="logit"),#
-    prior.scale=Inf, prior.df=Inf)#
-  display (M2)  # just a test:  this should be identical to classical logit
-M1
-M2
-display (M1)
-plot(M1)
-?laplace
-chirps=c(20,16.0,19.8,18.4,17.1,15.5,14.7,17.1,15.4,16.2,15,17.2,16,17,14.1)#
-temp=c(88.6,71.6,93.3,84.3,80.6,75.2,69.7,82,69.4,83.3,78.6,82.6,80.6,83.5,76.3)#
-X=cbind(1,chirps)#
-m=1000#
-s=blinreg(temp,X,m)
-s
-hist(s)
-names(s)
-class(s)
-plot(s$beta, s$sigma)
-length(s$sigma)
-length(s$bea)
-length(s$beta)
-rdirichlet
-library(LaplacesDemon)
-install.packages(c("TeachBayes"))
-install.packages(c("LaplacesDemon"))
-library(LaplacesDemon)
-? LaplacesDemon
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (numHeads^paramval) * (numTails^(1-paramval))#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-paramvals = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=paramvals, numHeads, numTails)#
-likelihoods
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHead_values, likelihoods)#
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHead_values, likelihoods, pch=1, col="blue")#
-numHeads = 140#
-numTails = 300#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHead_values, likelihoods, pch=1, col="blue")
-probHeads_values
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, likelihoods)#
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods, pch=1, col="blue")#
-numHeads = 140#
-numTails = 300#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods, pch=1, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, log(likelihoods))#
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, log(likelihoods), pch=1, col="blue")#
-numHeads = 140#
-numTails = 300#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, log(likelihoods), pch=1, col="blue")
-plot(probHeads_values, log(likelihoods))#
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, log(likelihoods), pch=1, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, log(likelihoods))#
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, log(likelihoods), pch=1, col="blue")
-pch
-?par
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, log(likelihoods), pch=19, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, log(likelihoods))#
-numHeads = 14#
-numTails = 6#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, log(likelihoods), pch=19, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, likelihoods)#
-numHeads = 14#
-numTails = 6#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods, pch=19, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, likelihoods/max(likelihoods))#
-numHeads = 14#
-numTails = 6#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-numHeads = 140#
-numTails = 300#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods/max(likelihoods), pch=1, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-plot(probHeads_values, likelihoods/max(likelihoods))#
-numHeads = 70#
-numTails = 30#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-numHeads = 700#
-numTails = 300#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-#
-points(probHeads_values, likelihoods/max(likelihoods), pch=1, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-plot(probHeads_values, likelihoods/max(likelihoods))#
-numHeads = 70#
-numTails = 30#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-points(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-#
-numHeads = 700#
-numTails = 300#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-points(probHeads_values, likelihoods/max(likelihoods), pch=1, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-plot(probHeads_values, likelihoods/max(likelihoods))#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-numHeads = 70#
-numTails = 30#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-#
-numHeads = 700#
-numTails = 300#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=1, col="blue")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.01)#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-plot(probHeads_values, likelihoods/max(likelihoods), col="white")#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="black")#
-numHeads = 70#
-numTails = 30#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-#
-numHeads = 700#
-numTails = 300#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=1, col="green4")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.001)#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-plot(probHeads_values, likelihoods/max(likelihoods), col="white")#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="black")#
-numHeads = 70#
-numTails = 30#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")#
-#
-numHeads = 700#
-numTails = 300#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=1, col="green4")
-like_HT <- function(paramval, numHeads, numTails)#
-	{#
-	like = (paramval^numHeads) * (1-paramval)^numTails#
-	}#
-numHeads = 7#
-numTails = 3#
-#
-probHeads_values = seq(0.01, 0.99, 0.001)#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods
-plot(probHeads_values, likelihoods/max(likelihoods), col="white")#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="black")
-numHeads = 70#
-numTails = 30#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=19, col="blue")
-numHeads = 700#
-numTails = 300#
-likelihoods = like_HT(paramval=probHeads_values, numHeads, numTails)#
-likelihoods#
-lines(probHeads_values, likelihoods/max(likelihoods), pch=1, col="green4")
-ln(0.05)
-log(0.05)
-log(0.15)
-Qmat
-temp=c(-0.5,1,0.5,-1)
-Qmat=matrix(temp,nrow=2)
-expm(Qmat*1)
-install.packages("expm")
-library(expm)
-expm(Qmat*1)
-expm(Qmat*1)*c(1,0)
-expm(Qmat*1) %*% c(1,0)
-expm(Qmat*2) %*% c(1,0)
-expm(Qmat*20) %*% c(1,0)
-Qmat
-library(ape)#
-library(diversitree)#
-library(rexpokit)#
-library(cladoRcpp)#
-library(BioGeoBEARS)#
-#
-source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")  # utility functions from diversitree#
-source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_pureR_v1.R") # simple implementations in plain-R#
-source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R") # simple implementations in plain-R
-wd = "/GitHub/BioGeoJulia.jl/Rsrc/"#
-setwd(wd)#
-trfn = "Psychotria_tree.newick"#
-tr = read.tree(trfn)#
-#
-trstr = "((((((((P_hawaiiensis_WaikamoiL1:0.9665748366,P_mauiensis_Eke:0.9665748366):0.7086257935,(P_fauriei2:1.231108298,P_hathewayi_1:1.231108298):0.4440923324):0.1767115552,(P_kaduana_PuuKukuiAS:1.851022399,P_mauiensis_PepeAS:1.851022399):0.0008897862802):0.3347375986,P_kaduana_HawaiiLoa:2.186649784):0.302349378,(P_greenwelliae07:1.132253042,P_greenwelliae907:1.132253042):1.35674612):1.689170274,((((P_mariniana_MauiNui:1.99490084,P_hawaiiensis_Makaopuhi:1.99490084):0.7328279804,P_mariniana_Oahu:2.72772882):0.2574151709,P_mariniana_Kokee2:2.985143991):0.4601084855,P_wawraeDL7428:3.445252477):0.732916959):0.7345185743,(P_grandiflora_Kal2:2.480190277,P_hobdyi_Kuia:2.480190277):2.432497733):0.2873119899,((P_hexandra_K1:2.364873976,P_hexandra_M:2.364873976):0.4630447802,P_hexandra_Oahu:2.827918756):2.372081244);"#
-tr = read.tree(file="", text=trstr)#
-#
-# Run a ClaSSE model from diversitree#
-#
-# Setup#
-# Island numbers (KOMH = 1234) in Rnodenums order:#
-island_nums = c(3, 3, 2, 2, 3, 3, 2, 1, 1, 3, 4, 2, 1, 1, 1, 1, 1, 1, 2)#
-states = c(island_nums + 1)		# Tip states#
-names(states) = tr$tip.label#
-states#
-#
-sampling.f = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)		# Proportion of species in each state; for 2 states#
-											# (Let's assume we have all species)#
-k = length(sampling.f)#
-#
-# Create the BiSSE likelihood function. #
-# (strict=FALSE means that some states in the state space can be absent from the tips)#
-classe_16states = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f, strict=FALSE)#
-#
-# The names of the parameters:#
-param_names = argnames(classe_16states)#
-param_names#
-#
-# Most parameters will be zero#
-classe_params = rep(0, times=length(param_names))#
-names(classe_params) = param_names
-library(BioGeoBEARS)#
-trfn = "Psychotria_tree.newick"#
-geogfn = "Psychotria_geog.data"#
-max_range_size = 4#
-BioGeoBEARS_run_object = define_BioGeoBEARS_run()#
-BioGeoBEARS_run_object$trfn = trfn#
-BioGeoBEARS_run_object$geogfn = geogfn#
-BioGeoBEARS_run_object$max_range_size = max_range_size#
-BioGeoBEARS_run_object$min_branchlength = 0.000001    # Min to treat tip as a direct ancestor (no speciation event)#
-BioGeoBEARS_run_object$include_null_range = TRUE    # set to FALSE for e.g. DEC* model, DEC*+J, etc.#
-BioGeoBEARS_run_object$on_NaN_error = -1e50    # returns very low lnL if parameters produce NaN error (underflow check)#
-BioGeoBEARS_run_object$speedup = TRUE          # shorcuts to speed ML search; use FALSE if worried (e.g. >3 params)#
-BioGeoBEARS_run_object$use_optimx = "GenSA"    # if FALSE, use optim() instead of optimx()#
-BioGeoBEARS_run_object$num_cores_to_use = 1#
-BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathology & isn't much faster at this scale#
-BioGeoBEARS_run_object = readfiles_BioGeoBEARS_run(BioGeoBEARS_run_object)#
-BioGeoBEARS_run_object$return_condlikes_table = TRUE#
-BioGeoBEARS_run_object$calc_TTL_loglike_from_condlikes_table = TRUE#
-BioGeoBEARS_run_object$calc_ancprobs = TRUE    # get ancestral states from optim run#
-check_BioGeoBEARS_run(BioGeoBEARS_run_object)#
-include_null_range = BioGeoBEARS_run_object$include_null_range#
-#
-res = bears_optim_run(BioGeoBEARS_run_object)#
-mats = get_Qmat_COOmat_from_res(res, numstates=ncol(res$ML_marginal_prob_each_state_at_branch_top_AT_node), include_null_range=TRUE, max_range_size=res$inputs$max_range_size, timeperiod_i=1)#
-numstates = length(mats$states_list)
-numstates
-res
-source('/GitHub/BioGeoBEARS/R/BioGeoBEARS_extract_Qmat_COOmat_v1.R', chdir = TRUE)#
-source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)#
-Carray_df = get_Cevent_probs_df_from_mats(mats, include_null_range=include_null_range)#
-head(Carray_df)#
-tail(Carray_df)
-lambda_ijk_df = classe_lambdas_to_df(classe_params, k=numstates)#
-head(lambda_ijk_df)
-tr
-yule(tr)
-birthRate = 0.3288164#
-deathRate = 0.0#
-d_val = 0.03505038#
-e_val = 0.02832370#
-j_val = 0.0#
-#
-# Blank out the params#
-classe_params = rep(0, times=length(param_names))#
-names(classe_params) = param_names#
-#
-# Fill in the params from the BioGeoBEARS "res" results#
-classe_params = BGBres_into_classe_params(res, classe_params, birthRate=birthRate)#
-classe_params[153]#
-classe_params["lambda020202"]#
-classe_params["lambda060203"]#
-classe_params["q0206"]#
-classe_params["q1516"]#
-classe_params[classe_params != 0.0]
-classe_params = rep(0, times=length(param_names))#
-names(classe_params) = param_names#
-#
-# Fill in the params from the BioGeoBEARS "res" results#
-classe_params = BGBres_into_classe_params(res, classe_params, birthRate=birthRate)
-classe_params
-classe_params = rep(0, times=length(param_names))#
-names(classe_params) = param_names#
-#
-# Fill in the params from the BioGeoBEARS "res" results#
-classe_params = BGBres_into_classe_params(res, classe_params, birthRate=birthRate)
-classe_params
-birthRate=0.2
-mats = get_Qmat_COOmat_from_res(res, numstates=ncol(res$ML_marginal_prob_each_state_at_branch_top_AT_node), include_null_range=TRUE, max_range_size=res$inputs$max_range_size, timeperiod_i=1)#
-	numstates = length(mats$states_list)#
-	include_null_range = res$inputs$include_null_range#
-	# BioGeoBEARS Cevent weights into DF#
-	Carray_df = get_Cevent_probs_df_from_mats(mats, include_null_range=include_null_range)
-Carray_df
-hard(Carray_df)
-head(Carray_df)
-lambda_ijk_df = classe_lambdas_to_df(classe_params, k=numstates)
-lambda_ijk_df
-head(lambda_ijk_df)
-k=16
-nsum <- k * (k + 1)/2#
-#
-	# Convert the classe_params lambdas to a table#
-	lambda_vals = classe_params[grepl(pattern="lambda", x=names(classe_params))]
-lambda_vals
-names(classe_params
-)
-classe_params[grepl(pattern="lambda", x=names(classe_params))]
-classe_params = rep(0, times=length(param_names))#
-names(classe_params) = param_names#
-#
-# Fill in the params from the BioGeoBEARS "res" results#
-classe_params = BGBres_into_classe_params(res, classe_params, birthRate=birthRate)
-classe_params
-classe_params = rep(0, times=length(param_names))#
-names(classe_params) = param_names
-classe_params
-ttail
+rowSums(x)#
+log(rowSums(x))#
+sum(log(rowSums(x)), na.rm=TRUE)
+log(tmp_rowSums)
+sum(lq)
+sum(lq)-cache$const
+sum(lq)+cache$const
+bd_lq = attr(diversitree_bd,"intermediates")$lq#
+sum(bd_lq)
+diversitree_bd
+bd
+exp(-18.90835)
+bd$lnl_Births_above_root + bd$lnl_branching_times
+diversitree_bd
+sum(diversitree_bd$lq)
+sum(attr(diversitree_bd, "intermediates")$lq)
+sum(attr(diversitree_bd, "intermediates")$lq[-20])
+attr(diversitree_bd, "intermediates")$lq
+attr(diversitree_bd, "intermediates")$lq - bd$$lnl_branching_times
+attr(diversitree_bd, "intermediates")$lq - bd$lnl_branching_times
+sum(attr(diversitree_bd, "intermediates")$lq) - bd$lnl_branching_times
+exp(attr(diversitree_bd, "intermediates")$lq)
+exp(-5.328037)
