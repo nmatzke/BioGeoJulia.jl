@@ -298,6 +298,10 @@ all_lnLs$exp_ObsDiff = as.numeric(all_lnLs$exp_ObsDiff)
 all_lnLs$exp_LnLdiff = as.numeric(all_lnLs$exp_LnLdiff)
 all_lnLs
 
+DEC_all_lnLs = all_lnLs
+dput(DEC_all_lnLs)
+
+
 # The diversitree outputs, with intermediates stored, are useful for 
 # branch-by-branch comparison. However, they have to be transposed to 
 # compare to BioGeoBEARS (so that rows = nodes).
@@ -500,32 +504,147 @@ log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
 TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))
 sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
 R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
-# [1] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000
-# [11] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0030120892
-# [21] 0.0146278153 0.0008237083 0.0219630219 0.0014211027 0.0015674712 0.0025679570 0.0026336079 0.0032434018 0.0045208603 0.0001462228
-# [31] 0.0169898783 0.0174508596 0.0223597758 0.0485992833 0.0005969967 0.0047083257 0.0005500863
-# [1]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf
-# [14]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf -5.805121 -4.224830 -7.101694 -3.818395 -6.556322 -6.458292 -5.964645
-# [27] -5.939401 -5.731133 -5.399053 -8.830379 -4.075138 -4.048366 -3.800492 -3.024146 -7.423599 -5.358423 -7.505435
-# [1] -101.0649
-
-
+# > rowSums(computed_likelihoods_at_each_node_just_before_speciation)
+#  [1] 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+#  [8] 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000
+# [15] 0.000000000 0.000000000 0.000000000 0.000000000 0.000000000 0.019560684 0.031880406
+# [22] 0.001104266 0.026160645 0.047882797 0.052434844 0.052130315 0.287861948 0.277916166
+# [29] 0.256410560 0.281575666 0.018628353 0.017883012 0.024094055 0.049780977 0.236860054
+# [36] 0.049857979 0.240287100
+# > log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+#  [1]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf
+# [10]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf
+# [19]      -Inf -3.934234 -3.445764 -6.808575 -3.643499 -3.038999 -2.948184 -2.954009 -1.245274
+# [28] -1.280436 -1.360975 -1.267354 -3.983070 -4.023904 -3.725790 -3.000122 -1.440286 -2.998577
+# [37] -1.425921
+# > TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))
+# > sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+# [1] -52.52497
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
-# -168.6944
+# -120.1545
+
+# res5 uses root.p of e.g.:
+# 0,1,1,1,1,1,1,1,1,1....
+c(res5)
+
+# DEC
+DEC_lnL = -34.54313
+DEC_R_result_branch_lnL = -67.6295
+DEC_R_result_total_LnLs1 = -72.60212
+DEC_R_result_total_LnLs1t = -71.48986
+DEC_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -120.1545
+DEC_R_result_total_LnLs5 = -71.56373
+
+# DEC+J
+DECj_lnL = -20.94759
+DECj_R_result_branch_lnL = -55.37332
+DECj_R_result_total_LnLs1 = -58.83758
+DECj_R_result_total_LnLs1t = -57.72533
+DECj_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -96.34151
+DECj_R_result_total_LnLs5 = -57.96819
+
+# DEC+J
+DECj_lnL = -20.94759
+R_result_branch_lnL = -55.37332
+R_result_total_LnLs1 = -58.83758
+R_result_total_LnLs1t = -57.72533
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -96.34151
+R_result_total_LnLs5 = -57.96819
+
+# Differences between DEC and DEC+J
+DEC_lnL - DECj_lnL
+DEC_R_result_branch_lnL - DECj_R_result_branch_lnL
+DEC_R_result_total_LnLs1 - DECj_R_result_total_LnLs1
+DEC_R_result_total_LnLs1t - DECj_R_result_total_LnLs1t
+DEC_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda - DECj_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+DEC_R_result_total_LnLs5 - DECj_R_result_total_LnLs5 # EXACT MATCH
+
+# EXACT MATCH
+DEC_lnL - DECj_lnL
+-13.59554
+DEC_R_result_total_LnLs5 - DECj_R_result_total_LnLs5 # EXACT MATCH
+-13.59554
 
 
 
-R_result_branch_lnL = -67.6295
-R_result_total_LnLs1 = -72.60212
-R_result_total_LnLs1t = -71.48986
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -120.1545
+DEC_all_lnLs = structure(list(ttl_LnL = c(-72.602116, -74.33632, -74.271782, 
+-74.605042, -71.563731, -74.263777, -71.48986, -73.159526, -73.159526, 
+-73.492786, -73.159526, -73.079568), branch_LnL = c(-67.629498, 
+-67.629498, -67.629498, -67.629498, -67.629498, -67.629498, -67.629498, 
+-67.629498, -67.629498, -67.629498, -67.629498, -67.629498), 
+    ObsDiff = c(-4.972618, -6.706822, -6.642284, -6.975544, -3.934234, 
+    -6.634279, -3.860362, -5.530028, -5.530028, -5.863288, -5.530028, 
+    -5.45007), LnLdiff = c(-3.8604, -5.5946, -5.53, -5.8633, 
+    -2.822, -5.522, -2.7481, -4.4178, -4.4178, -4.751, -4.4178, 
+    -4.3378), exp_ObsDiff = c(0.00692499, 0.00122254, 0.00130405, 
+    0.00093446, 0.0195607, 0.00131453, 0.0210604, 0.00396588, 
+    0.00396588, 0.00284188, 0.00396588, 0.004296), exp_LnLdiff = c(0.0210604, 
+    0.00371801, 0.00396588, 0.00284188, 0.0594882, 0.00399775, 
+    0.064049, 0.0120611, 0.0120611, 0.00864277, 0.0120611, 0.0130651
+    )), .Names = c("ttl_LnL", "branch_LnL", "ObsDiff", "LnLdiff", 
+"exp_ObsDiff", "exp_LnLdiff"), row.names = c("LnLs1", "LnLs2", 
+"LnLs3", "LnLs4", "LnLs5", "LnLs6", "LnLs1t", "LnLs2t", "LnLs3t", 
+"LnLs4t", "LnLs5t", "LnLs6t"), class = "data.frame")
 
 
 
+DECj_all_lnLs = 
+structure(list(ttl_LnL = c(-58.837585, -60.740782, -60.676244, 
+-61.330746, -57.968194, -59.96035, -57.725329, -59.563988, -59.563988, 
+-60.218491, -59.563988, -58.848094), branch_LnL = c(-55.37332, 
+-55.37332, -55.37332, -55.37332, -55.37332, -55.37332, -55.37332, 
+-55.37332, -55.37332, -55.37332, -55.37332, -55.37332), ObsDiff = c(-3.464265, 
+-5.367462, -5.302924, -5.957426, -2.594874, -4.58703, -2.352009, 
+-4.190668, -4.190668, -4.845171, -4.190668, -3.474774), LnLdiff = c(-2.352, 
+-4.2552, -4.1907, -4.8452, -1.4826, -3.4748, -1.2398, -3.0784, 
+-3.0784, -3.7329, -3.0784, -2.3625), exp_ObsDiff = c(0.031296, 
+0.00466596, 0.00497702, 0.00258656, 0.0746553, 0.0101831, 0.0951777, 
+0.0151362, 0.0151362, 0.00786628, 0.0151362, 0.0309688), exp_LnLdiff = c(0.0951777, 
+0.0141902, 0.0151362, 0.00786628, 0.227043, 0.0309688, 0.289456, 
+0.0460323, 0.0460323, 0.023923, 0.0460323, 0.0941827)), .Names = c("ttl_LnL", 
+"branch_LnL", "ObsDiff", "LnLdiff", "exp_ObsDiff", "exp_LnLdiff"
+), row.names = c("LnLs1", "LnLs2", "LnLs3", "LnLs4", "LnLs5", 
+"LnLs6", "LnLs1t", "LnLs2t", "LnLs3t", "LnLs4t", "LnLs5t", "LnLs6t"
+), class = "data.frame")
+
+
+# BioGeoBEARS differences
+DEC_lnL - DECj_lnL
+
+# Diversitree differences
+DEC_R_result_total_LnLs5 - DECj_R_result_total_LnLs5
+DEC_all_lnLs$branch_LnL - DECj_all_lnLs$branch_LnL
+DEC_all_lnLs$ttl_LnL - DECj_all_lnLs$ttl_LnL
 
 
 
+# BioGeoBEARS
+# DEC_lnL - DECj_lnL
+# -13.59554
+
+DEC_R_result_total_LnLs5 - DECj_R_result_total_LnLs5 # EXACT MATCH
+# -13.59554
+
+# Diversitree branch likelihoods
+DEC_all_lnLs$branch_LnL - DECj_all_lnLs$branch_LnL
+#  [1] -12.25618 -12.25618 -12.25618 -12.25618 -12.25618 -12.25618
+#  [7] -12.25618 -12.25618 -12.25618 -12.25618 -12.25618 -12.25618
+
+# Diversitree branch likelihoods
+DEC_all_lnLs$ttl_LnL - DECj_all_lnLs$ttl_LnL
+#  [1] -13.76453 -13.59554 -13.59554 -13.27430 -13.59554 -14.30343
+#  [7] -13.76453 -13.59554 -13.59554 -13.27429 -13.59554 -14.23147
+
+# Exact matches in lnL difference occur with:
+# res2: If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE
+root.p = rep(1/nstates, times=nstates)
+
+# res3: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+root_probs = root_probs_equal
+
+# res5: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+root_probs = root_probs_single   # 0,1,1,1,1,1...
 
 
 
@@ -540,31 +659,36 @@ nstates = length(vals) / 2
 E_indices = 1:nstates
 d_root_orig = vals[-E_indices]							# Original D likelihoods at root
 
-# If root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
+# res1: If root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
 root.p = d_root_orig/sum(d_root_orig)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
-# If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE
+# res2: If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE
 root.p = rep(1/nstates, times=nstates)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
-# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
-root.p = c(0.3333333, 0.3333333, 0.3333333)
+# res3: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+root_probs = root_probs_equal
+root.p = root_probs
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
-# If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=FALSE
-root.p = c(0.1, 0.1, 0.8)
+# res4: If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=FALSE
+root_probs = root_probs_biased
+root.p = root_probs
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
-# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+# res5: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+root_probs = root_probs_single
+root.p = root_probs
 root.p = c(0, 0, 1)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
+# res6: Equilibrium root frequencies
 # If root=ROOT.EQUI, condition.surv=FALSE
 
 # Project the ClaSSE model onto an instantaneous rate matrix, A
@@ -599,10 +723,11 @@ i <- seq_len(k)
 e.root <- vals[i]
 d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
 
+# res1t: If root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
 loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
-# If root=ROOT.FLAT, root.p=NULL, condition.surv=TRUE
+# res2t: If root=ROOT.FLAT, root.p=NULL, condition.surv=TRUE
 root.p = rep(1/nstates, times=nstates)
 pars = classe_params
 nsum <- k * (k + 1)/2
@@ -613,8 +738,9 @@ d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
 loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
-# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
-root.p = c(0.3333333, 0.3333333, 0.3333333)
+# res3t: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
+root_probs = root_probs_equal
+root.p = root_probs
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -624,8 +750,9 @@ d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
 loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
-# If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=TRUE
-root.p = c(0.1, 0.1, 0.8)
+# res4t: If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=TRUE
+root_probs = root_probs_biased
+root.p = root_probs
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -635,8 +762,9 @@ d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
 loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
-# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
-root.p = c(0, 0, 1)
+# res5t: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
+root_probs = root_probs_biased
+root.p = root_probs
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -647,11 +775,8 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 
-yule(tr)$loglik - log(birthRate)
-
-
+# res6t: Equilibrium root frequencies
 # If root=ROOT.EQUI, condition.surv=TRUE
-
 # Project the ClaSSE model onto an instantaneous rate matrix, A
 A = projection.matrix.classe(pars=classe_params, k) 
 
