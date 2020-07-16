@@ -78,10 +78,16 @@ BioGeoBEARS_run_object$calc_ancprobs = TRUE    # get ancestral states from optim
 check_BioGeoBEARS_run(BioGeoBEARS_run_object)
 include_null_range = BioGeoBEARS_run_object$include_null_range
 
+# Add j as a free parameter
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["j","type"] = "free"
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["j","init"] = 0.001
+BioGeoBEARS_run_object$BioGeoBEARS_model_object@params_table["j","est"] = 0.001
+
+
 # Run the Maximum Likelihood optimization
 res = bears_optim_run(BioGeoBEARS_run_object)
 res$total_loglikelihood
-# -34.54313 for Psychotria, under DEC
+# -20.94759 for Psychotria, under DEC
 
 # Extract the ML model's transition matrices
 mats = get_Qmat_COOmat_from_res(res, numstates=ncol(res$ML_marginal_prob_each_state_at_branch_top_AT_node), include_null_range=res$inputs$include_null_range, max_range_size=res$inputs$max_range_size, timeperiod_i=1)
@@ -147,12 +153,12 @@ birthRate
 (tr$Nnode-1)/sum(tr$edge.length)
 
 deathRate = 0.0     # Yule process means 0.0 extinction rate
-d_val = 0.03505038	# ML estimate for Psychotria under DEC model
-e_val = 0.02832370	# ML estimate for Psychotria under DEC model
-j_val = 0.0         # Under DEC, j=0.0
+d_val = 1e-12	# ML estimate for Psychotria under DEC model
+e_val = 1e-12	# ML estimate for Psychotria under DEC model
+j_val = 0.1142057         # Under DEC, j=0.0
 d_val = res$output@params_table["d","est"] # Extract from ML result
 e_val = res$output@params_table["e","est"] # Extract from ML result
-j_val = 0.0
+j_val = res$output@params_table["j","est"]
 
 
 
@@ -500,33 +506,39 @@ log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
 TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))
 sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
 R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
-# [1] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000
-# [11] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0030120892
-# [21] 0.0146278153 0.0008237083 0.0219630219 0.0014211027 0.0015674712 0.0025679570 0.0026336079 0.0032434018 0.0045208603 0.0001462228
-# [31] 0.0169898783 0.0174508596 0.0223597758 0.0485992833 0.0005969967 0.0047083257 0.0005500863
+# [1] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000
+# [13] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.07465531 0.10248791 0.04328323 0.05983194 0.08319813
+# [25] 0.09497955 0.09637997 0.19202615 0.19202615 0.19202615 0.19202615 0.06934985 0.05259861 0.06293141 0.09637997 0.19202615 0.09637997
+# [37] 0.19202615
 # [1]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf
-# [14]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf -5.805121 -4.224830 -7.101694 -3.818395 -6.556322 -6.458292 -5.964645
-# [27] -5.939401 -5.731133 -5.399053 -8.830379 -4.075138 -4.048366 -3.800492 -3.024146 -7.423599 -5.358423 -7.505435
-# [1] -101.0649
-
-
+# [14]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf -2.594874 -2.278010 -3.139990 -2.816216 -2.486530 -2.354094 -2.339457
+# [27] -1.650124 -1.650124 -1.650124 -1.650124 -2.668591 -2.945065 -2.765710 -2.339457 -1.650124 -2.339457 -1.650124
+# [1] -40.96819
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 # -168.6944
 
 
+# DEC
+DEC_lnL = -34.54313
+DEC_R_result_branch_lnL = -67.6295
+DEC_R_result_total_LnLs1 = -72.60212
+DEC_R_result_total_LnLs1t = -71.48986
+DEC_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -120.1545
 
-R_result_branch_lnL = -67.6295
-R_result_total_LnLs1 = -72.60212
-R_result_total_LnLs1t = -71.48986
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -120.1545
+# DEC+J
+DECj_lnL = -20.94759
+R_result_branch_lnL = -55.37332
+R_result_total_LnLs1 = -58.83758
+R_result_total_LnLs1t = -57.72533
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -96.34151
 
 
-
-
-
-
-
+DEC_lnL - DECj_lnL
+DEC_R_result_branch_lnL - R_result_branch_lnL
+DEC_R_result_total_LnLs1 - R_result_total_LnLs1
+DEC_R_result_total_LnLs1t - R_result_total_LnLs1t
+DEC_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda - R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 
 
 

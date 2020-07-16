@@ -331,7 +331,12 @@ get_sum_log_computed_likes_at_each_node <- function(tr, base, lq, classe_params)
 	base_normlikes = base_likes / rowSums(base_likes)
 	
 	# Get a data.frame tabulating the lambdas
-	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=3)
+	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=k)
+	lambda_ijk_df$i = as.numeric(as.character(lambda_ijk_df$i))
+	lambda_ijk_df$j = as.numeric(as.character(lambda_ijk_df$j))
+	lambda_ijk_df$k = as.numeric(as.character(lambda_ijk_df$k))
+	lambda_ijk_df$lambda = as.numeric(as.character(lambda_ijk_df$lambda))
+	
 	
 	# Go through the ancestral states
 	computed_likelihoods_at_each_node_just_before_speciation = matrix(0.0, nrow=nrow(base), ncol=k)
@@ -354,31 +359,38 @@ get_sum_log_computed_likes_at_each_node <- function(tr, base, lq, classe_params)
 		# And for the ancestor edge (i or j shouldn't matter, should produce the same result!!!)
 		anc <- tr2$edge[i, 1]
 		
-		# For this node, go through the states and sum the likes
+		# For this anc node, go through the states and sum the likes
 		tmp_likes_AT_node = rep(0.0, times=k)
-		for (l in 1:k) # l = ancestral node number
+		for (l in 1:k) # l = ancestral state number
 			{
 			i_TF = lambda_ijk_df$i == l
 			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k
 			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2
 			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1
-			
 			lambda_ijk_df[rows_use_lambda_div1_TF,]
 			lambda_ijk_df[rows_use_lambda_div2_TF,]
 			
-			# Sum likes where the daughters the same
-			ind = rows_use_lambda_div1_TF
-			lcol = lambda_ijk_df$k[ind]
-			rcol = lambda_ijk_df$j[ind]
-			tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
-			# Sum likes where the daughters are NOT the same
-			# (divide lambda by 2, but use twice)
-			ind = rows_use_lambda_div2_TF
-			lcol = lambda_ijk_df$k[ind]
-			rcol = lambda_ijk_df$j[ind]
-			# Left, then right
-			tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
-			tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,rcol] * base_normlikes[right_desc_nodenum,lcol])
+			# Skip e.g. null-range states
+			if (sum(rows_use_lambda_div1_TF) > 0)
+				{
+				# Sum likes where the daughters the same
+				ind = rows_use_lambda_div1_TF
+				lcol = lambda_ijk_df$j[ind]
+				rcol = lambda_ijk_df$k[ind]
+				tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
+				} # END if (sum(rows_use_lambda_div1_TF) > 0)
+
+			if (sum(rows_use_lambda_div2_TF) > 0)
+				{
+				# Sum likes where the daughters are NOT the same
+				# (divide lambda by 2, but use twice)
+				ind = rows_use_lambda_div2_TF
+				lcol = lambda_ijk_df$j[ind]
+				rcol = lambda_ijk_df$k[ind]
+				# Left, then right
+				tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
+				tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,rcol] * base_normlikes[right_desc_nodenum,lcol])
+				} # END if (sum(rows_use_lambda_div1_TF) > 0)
 			} # END for (l in 1:k)
 		
 		computed_likelihoods_at_each_node_just_before_speciation[anc,] = tmp_likes_AT_node

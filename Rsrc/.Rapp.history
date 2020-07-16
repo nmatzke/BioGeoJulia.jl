@@ -1,358 +1,700 @@
-all_lnLs$ttl_LnL - sum(bd_lq)#
-LnLs2[2] - sum(bd_lq)
-sum(log(tmp_rowSums))
+)
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+log(rowSums(init[,(numstates+1):(2*numstates)])
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+log(rowSums(init[,(numstates+1):(2*numstates)]))
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+log(rowSums(base[,(numstates+1):(2*numstates)]))
+base
+rowSums(base[,(numstates+1):(2*numstates)])
+base[,(numstates+1):(2*numstates)] * lq
+base[,(numstates+1):(2*numstates)]
+base[,(numstates+1):(2*numstates)] * t(lq)
+lq
+lq
+t(lq)
+base[,(numstates+1):(2*numstates)] * exp(c(lq))
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+rowSums(base[,(numstates+1):(2*numstates)])#
+base[,(numstates+1):(2*numstates)] * exp(c(lq))#
+rowSums(base[,(numstates+1):(2*numstates)] * exp(c(lq)))lq = t(attr(res2, "intermediates")$lq)#
+lq#
+rowSums(base[,(numstates+1):(2*numstates)])#
+base[,(numstates+1):(2*numstates)] * exp(c(lq))#
+rowSums(base[,(numstates+1):(2*numstates)] * exp(c(lq)))
+Ds_cols = (numstates+1):(2*numstates)#
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+rowSums(base[,Ds_cols])#
+base[,Ds_cols] * exp(c(lq))#
+rowSums(base[,Ds_cols] * exp(c(lq)))#
+log(rowSums(base[,Ds_cols] * exp(c(lq))))
+round(base_normlikes - res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS, 5)
+Ds_cols = (numstates+1):(2*numstates)#
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+rowSums(base[,Ds_cols])#
+base[,Ds_cols] * exp(c(lq))#
+rowSums(base[,Ds_cols] * exp(c(lq)))#
+log(rowSums(base[,Ds_cols] * exp(c(lq))))#
+#
+# Store the likelihoods at branch-bottoms for comparison#
+base_likes = apply(X=base[,Ds_cols], MARGIN=2, FUN="*", exp(lq))#
+base_normlikes = base_likes / rowSums(base_likes)#
+#
+# Diversitree normalized likelihoods at branch bottoms match BioGeoBEARS#
+round(base_normlikes - res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS, 5)
+base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
 tmp_rowSums = (base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)[,numstates]#
 tmp_rowSums#
 log(tmp_rowSums)#
-sum(log(tmp_rowSums))
-sum(log(tmp_rowSums), na.rm=TRUE)
-res$total_loglikelihood
-sum(log(tmp_rowSums), na.rm=TRUE)#
-# Log-likelihoods#
-#
-res$total_loglikelihood#
-#
-all_lnLs$ttl_LnL - res$total_loglikelihood - log(1/16)#
-LnLs2[2] - res$total_loglikelihood - log(1/16)#
-#
-all_lnLs$ttl_LnL - res$total_loglikelihood#
-LnLs2[2] - res$total_loglikelihood#
-# Diversitree birthdeath calculation#
+sum(log(tmp_rowSums), na.rm=TRUE) # matches sum(lq)
+log(tmp_rowSums) - attr(res4,"intermediates")$lq
 lik.bd <- make.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))#
-diversitree_bd = lik.bd(pars=c(birthRate=0.3288164, deathRate=0.0), intermediates=TRUE)#
-bd_lq = attr(diversitree_bd,"intermediates")$lq#
-sum(bd_lq)#
-#
-all_lnLs$ttl_LnL - sum(bd_lq)#
-LnLs2[2] - sum(bd_lq)#
-#
-bd = bd_liks(tr, birthRate=birthRate, deathRate=deathRate)#
-bd
-all_lnLs
-sum(bd_lq)
-sum(bd_lq) + sum(lq)
-sum(bd_lq) - sum(lq)
-sum(lq) - sum(bd_lq)
-all_lnLs
-bd
-dput(lik.bd)
-rootfunc
-diversitree::: rootfunc
-cache <- make.cache.bd(tree, sampling.f, unresolved, times, control)
-cache <- diversitree:::make.cache.bd(tree, sampling.f, unresolved, times, control)
-cache <- diversitree:::make.cache.bd(tree, sampling.f, unresolved, times, control=list(method="ode"))
-cache <- diversitree:::make.cache.bd(tree=tr, sampling.f, unresolved, times, control=list(method="ode"))
-cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
-cache
-cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
-cache$const
-bd
-diversitree:::rootfunc.bd.ode
+diversitree_bd = lik.bd(pars=c(birthRate=birthRate, deathRate=deathRate), intermediates=TRUE)#
+diversitree_bd(tree=tr)
 diversitree_bd
-diversitree_bd - cache$const
-c(diversitree_bd) - cache$const
-names(res)
-diversitree_bd_lnL_minus_const - res$total_loglikelihood
-diversitree_bd_lnL_minus_const = c(diversitree_bd) - cache$const#
-diversitree_bd_lnL_minus_const#
-# -35.90835#
+yule(tr)
+yule(tr)$loglike
+yule(tr)$loglik
+bd_ape = bd_liks(tr, birthRate=birthRate, deathRate=deathRate)
+bd_ape
+bd_ape$lnL
+bd_ape = bd_liks(tr, birthRate=birthRate, deathRate=deathRate)#
+bd_ape
+bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times#
+-(tr$Nnode-1)
+bd_lq = attr(diversitree_bd,"intermediates")$lq
+bd_lq
+sum(bd_lq)
+sum(bd_lq)+17
+tmp_rowSums
+log(tmp_rowSums)
+bd_lq$lnl_numBirths
+bd_ape$lnl_numBirths
+sum(bd_lq)#
+sum(bd_lq) - -(tr$Nnode-1)#
+bd_ape$lnl_numBirths
+tmp_rowSums
+tmp_rowSums / exp(bd_lq)
+bd_lq
+bd_lq
+bd_lq#
+-birthRate * trtable$edge.length
+prt()
+trtable = prt(tr, printflag=FALSE) # prints the tree to node-order table#
+bd_lq#
+-birthRate * trtable$edge.length
+bd_lq - (-birthRate * trtable$edge.length)
+round(bd_lq - (-birthRate * trtable$edge.length), digits=4)
+-1 + log(birthRate)
+log(birthRate)
+root_nodenum = length(tr$tip.label) + 1#
+sumBGBlike_not_root = sum(log(res$computed_likelihoods_at_each_node[-root_nodenum]))#
+sumBGBlike_not_root
+sum(bd_lq)#
+sum(-birthRate * trtable$edge.length)
+sum(bd_lq)#
+sum(-birthRate * trtable$edge.length, na.rm=TRUE)
+sum(bd_lq)#
+sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate)
+bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times
+bd_ape
+sum(bd_lq)
+sum(bd_lq)#
+bd_ape$lnl_numBirths + bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times#
+bd_ape$lnl_numBirths + -(tr$Nnode-1)#
+sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate)
+log(birthRate)
+log(1/birthRate)
+log(birthRate)+1
+sumBGBlike_not_root + sum_branchlikes + log(1/birthRate) - 1
+root_nodenum = length(tr$tip.label) + 1#
+sumBGBlike_not_root = sum(log(res$computed_likelihoods_at_each_node[-root_nodenum]))#
+sumBGBlike_not_root#
 #
-diversitree_bd_lnL_minus_const - res$total_loglikelihood
-exp(-1.365222)
-log(1/16)
+# Let's take the sum of the branch likelihoods from the birth-death#
+# process#
+sum(bd_lq)#
+bd_ape$lnl_numBirths + bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times#
+bd_ape$lnl_numBirths + -(tr$Nnode-1)#
+sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate) #
+sum_branchlikes = sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate) #
+#
+# Add the lnL of root speciation event, -1 for extra node#
+sumBGBlike_not_root + sum_branchlikes + log(1/birthRate) - 1
+all_lnLs
+all_lnLs#
+sumBGBlike_not_root + sum_branchlikes - log(1/birthRate) - 1
+all_lnLs#
+sumBGBlike_not_root + sum_branchlikes - (log(1/birthRate) - 1)
+sumBGBlike_not_root + sum_branchlikes + log(1/birthRate) + 1
+sumBGBlike_not_root + sum_branchlikes + -log(1/birthRate) + 1
+sumBGBlike_not_root + sum_branchlikes - (log(1/birthRate) - 1)#
+sumBGBlike_not_root + sum_branchlikes + -log(1/birthRate) + 1
+all_lnLs#
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1)#
+sumBGBlike_not_root + sum_branchBot_likes + -log(1/birthRate) + 1
+root_nodenum = length(tr$tip.label) + 1#
+sumBGBlike_not_root = sum(log(res$computed_likelihoods_at_each_node[-root_nodenum]))#
+sumBGBlike_not_root#
+#
+# Let's take the sum of the branch-bottom likelihoods from the birth-death#
+# process#
+sum(bd_lq)#
+bd_ape$lnl_numBirths + bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times#
+bd_ape$lnl_numBirths + -(tr$Nnode-1)#
+sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate) #
+sum_branchBot_likes = sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate) #
+#
+# Add the lnL of root speciation event, -1 for extra node#
+all_lnLs#
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1)#
+sumBGBlike_not_root + sum_branchBot_likes + -log(1/birthRate) + 1
 names(res)
-res$ML_marginal_prob_each_state_at_branch_top_AT_node
-res$ML_marginal_prob_each_state_at_branch_top_AT_node[20,]
-sum(res$ML_marginal_prob_each_state_at_branch_top_AT_node[20,])
-names(res)
-sum(res$condlikes_of_each_state[20,])
-sqrt(sum(res$condlikes_of_each_state[20,]))
-diversitree_bd_lnL_minus_const - res$total_loglikelihood
-lq = t(attr(res2, "intermediates")$lq)			# Branch likelihoods#
+res$
+d_root_orig = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,]
+d_root_orig
+sum(d_root_orig)
+d_root_orig = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,]#
+root.p = d_root_orig/sum(d_root_orig)#
+loglik = log(sum(root.p * d_root_orig)) + sum(bd_lq)#
+loglik
+sum(bd_lq)
+rootlikes = log(sum(root.p * d_root_orig))#
+rootlikes
+rootlikes = log(sum(root.p * d_root_orig)) + (log(1/birthRate) - 1)#
+rootlikes
 vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root#
 nstates = length(vals) / 2#
 E_indices = 1:nstates#
 d_root_orig = vals[-E_indices]							# Original D likelihoods at root
 d_root_orig
+sum9 d_root_orig
 sum(d_root_orig)
-tr
-res$condlikes[20,]
-sum(res$condlikes[20,])
-d_root_orig  / res$condlikes[20,]
-log(0.3678631)
-diversitree_bd_lnL_minus_const
-diversitree_bd_lnL_minus_const - res$total_loglikelihood
-exp(-1.365222)
-0.255324/0.05317382
-exp(.365222)
-1/exp(.365222)
-diversitree_bd_lnL_minus_const
-sum(lq)
-sum(lq) - cache$const
-sum(lq) + cache$const
-c(diversitree_bd)
-diversitree:::rootfunc.bd.ode
-diversitree_bd
-log(0.3288164 )
-c(diversitree_bd) - cache$const - log(birthRate)
-exp(-1)
-c(diversitree_bd) - cache$const - log(birthRate) + exp(-1)
-res$total_loglikelihood
-log(-birthRate)
-c(diversitree_bd) - cache$const - log(birthRate) + exp(-1)
--34.54313 - -34.42821
-c(diversitree_bd) - cache$const - log(birthRate) + exp(-(15/16))
-exp(-0.11492)
-c(diversitree_bd) - cache$const - log(15/16*birthRate) + exp(-1)
-c(diversitree_bd) - cache$const - log(16/15*birthRate) + exp(-1)
-c(diversitree_bd) - cache$const - log(16/15*birthRate) + exp(-15/16)
-c(diversitree_bd) - cache$const - log(16/15*birthRate) + exp(-16/15)
-root_probs_single = rep(1, times=numstates)#
-root_probs_single[sum(include_null_range)] = 0
-root_probs_single
+d_root_orig / res$computed_likelihoods_at_each_node[-root_nodenum]
+d_root_orig / res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,]
+exp(0.01956068)
+log(0.01956068)
+es$computed_likelihoods_at_each_node[root_nodenum]
+res$computed_likelihoods_at_each_node[root_nodenum]
+log(res$computed_likelihoods_at_each_node[root_nodenum])
+log(res$computed_likelihoods_at_each_node[root_nodenum]) - 1
+BGBlnL_at_root = log(res$computed_likelihoods_at_each_node[root_nodenum]) - 1#
+d_root_orig = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,] * exp(BGBlnL_at_root)#
+d_root_orig#
+#
+vals = t(attr(res1, "intermediates")$vals)	# Es and Ds at the root#
+E_indices = 1:numstates#
+vals[E_indices]
+BGBlnL_at_root = log(res$computed_likelihoods_at_each_node[root_nodenum]) - 1#
+d_root_orig = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,] * exp(BGBlnL_at_root)#
+d_root_orig#
+sum(d_root_orig)#
+#
+vals = t(attr(res1, "intermediates")$vals)	# Es and Ds at the root#
+E_indices = 1:numstates#
+sum(vals[-E_indices])
+BGBlnL_at_root = log(res$computed_likelihoods_at_each_node[root_nodenum]) - 1#
+d_root_orig_BGB = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,] * exp(BGBlnL_at_root)#
+d_root_orig_BGB#
+sum(d_root_orig_BGB)#
+#
+vals = t(attr(res1, "intermediates")$vals)	# Es and Ds at the root#
+E_indices = 1:numstates#
+d_root_orig_diversitree = vals[-E_indices]#
+d_root_orig_diversitree#
+sum(d_root_orig_diversitree)
+root.p = d_root_orig/sum(d_root_orig)#
+rootlikes = log(sum(root.p * d_root_orig))#
+rootlikes
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes#
+(res1)
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes#
+c(res1)
+root.p = rep(1/numstates, times=nstates)#
+rootlikes = log(sum(root.p * d_root_orig))#
+rootlikes#
+#
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes#
+c(res2)
+all_lnLs
 root_probs_single = rep(1, times=numstates)#
 root_probs_single[sum(include_null_range)] = 0#
-#root_probs_single[1+include_null_range] = 1#
-#root_probs_single = root_probs_single / sum(root_probs_single)#
-#
-# Do the ClaSSE calculation, under many different assumptions#
-res1 = classe_16states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
-res2 = classe_16states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
-root_probs = root_probs_equal#
-res3 = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
-root_probs = root_probs_biased#
-res4 = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
-root_probs = root_probs_single#
-res5 = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)#
-res6 = classe_16states(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)#
-#
-res1t = classe_16states(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
-res2t = classe_16states(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
-root_probs = root_probs_equal#
-res3t = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
-root_probs = root_probs_biased#
-res4t = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
-root_probs = root_probs_single#
-res5t = classe_16states(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)#
-res6t = classe_16states(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)#
-#
-# get_classe_LnLs returns the total log-likelihood, and #
-# the total of the branch likelihoods#
-LnLs1 = get_classe_LnLs(res1)#
-LnLs2 = get_classe_LnLs(res2)#
-LnLs3 = get_classe_LnLs(res3)#
-LnLs4 = get_classe_LnLs(res4)#
-LnLs5 = get_classe_LnLs(res5)#
-LnLs6 = get_classe_LnLs(res6)#
-LnLs1t = get_classe_LnLs(res1t)#
-LnLs2t = get_classe_LnLs(res2t)#
-LnLs3t = get_classe_LnLs(res3t)#
-LnLs4t = get_classe_LnLs(res4t)#
-LnLs5t = get_classe_LnLs(res5t)#
-LnLs6t = get_classe_LnLs(res6t)#
-#
-LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs6, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t, LnLs6t), stringsAsFactors=FALSE)#
-names(LnLst) = c("ttl_LnL", "branch_LnL")#
-ObsDiff = (LnLst$ttl_LnL - LnLst$branch_LnL)#
-exp_ObsDiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL))#
-LnLdiff = round((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)), digits=4)#
-exp_LnLdiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))#
-LnLst2 = cbind(LnLst, ObsDiff, LnLdiff, exp_ObsDiff, exp_LnLdiff)#
-all_lnLs = cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)#
-all_lnLs$ttl_LnL = as.numeric(all_lnLs$ttl_LnL)#
-cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
-LnLs2[2]
-LnLs2[1] - cache$const - log(birthRate)
-LnLs2[1] + cache$const + log(birthRate)
-cache$const
-sum(lq) - cache$const
-sum(lq) + cache$const
-sum(lq) + cache$const + log(1/15)
-sum(lq) + cache$const + log(1/16)
-sum(lq) + cache$const + log(1/16) + log(birthRate)
-sum(lq) + cache$const + log(1/15) + log(birthRate)
-sum(lq) + cache$const + log(1/15) + log(birthRate)
-LnLs4[1] - res$total_loglikelihood
-LnLs4[1] + cache$const + log(birthRate)
-LnLs4[1] + cache$const
-log(1/15)
-LnLs4[1] + cache$const + log(1/15)
-LnLs4[1] + cache$const - log(1/15)
-LnLs4[1] + cache$const - log(1/15) - log(-1)
-LnLs4[1] + cache$const - log(1/15) - log(birthRate)
-LnLs4[1] + cache$const - log(1/15) - log(birthRate)
-exp(-1)
-LnLs4[1] + cache$const - log(1/15) - 1
-LnLs4[1] + cache$const - log(1/15) + 1
-res$total_loglikelihood
-LnLs4[1] + cache$const - log(1/16) - 1
-LnLs4[1] + cache$const - log(1/15) - 1
-LnLs4[1] + cache$const - log(1/15) - birthRate
-LnLs4[1] + cache$const - log(1/15) + birthRate
-LnLs4[1] + cache$const - log(1/15) - 1 - birthRate
-LnLs4[1] + cache$const - log(1/15) - 1 + birthRate
-LnLs4[1] + cache$const - log(1/15) - 1
-LnLs4[1] + cache$const - log(1/15)
-LnLs4[1] + cache$const - log(1/15) + 1
-LnLs4[1] + cache$const - log(1/16) + 1
-LnLs4[1] + cache$const - log(1/16) + 1 + birthRate
-LnLs4[1] + cache$const - log(1/16) + 1 - birthRate
-LnLs4[1] + cache$const - log(1/15) + 1 - birthRate
-LnLs4[1] + cache$const - log(1/15) + birthRate
-LnLs4[1] + cache$const - log(1/16) + birthRate
-res$condlikes[20,]
-sum(res$condlikes[20,])
-log(sum(res$condlikes[20,]))
-log(1/16)
-LnLs4[1] + cache$const - log(sum(res$condlikes[20,]))
-res$total_loglikelihood
-log(1/15)
-log(15/16)
-LnLs4[1] + cache$const + log(sum(res$condlikes[20,]))
-LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) + log(1/15)
-LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) - log(1/15)
-LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) - log(1/15) + log(birthRate)
-LnLs4[1] + cache$const + log(sum(res$condlikes[20,])) - log(1/15) - log(birthRate)
-LnLs4[1] + cache$const + log(sum(res$condlikes[20,]))
-LnLs4[1] + cache$const - log(sum(res$condlikes[20,]))
--35.27541 - res$total_loglikelihood
-0.7322835#
-/birthRate
-0.7322835/birthRate
-1-birthRate
-log(1-birthRate)
-LnLs4[1] + cache$const
-LnLs4[1] + cache$const - sum(lq)
-d.root
-15/16
-log(15/16)
-sum(lq)
-lnlLnLs4
-LnLs4
-res4t
-res4
-root_probs_biased
-res5
-lq = t(attr(res5, "intermediates")$lq)			# Branch likelihoods#
-vals = t(attr(res5, "intermediates")$vals)	# Es and Ds at the root#
-nstates = length(vals) / 2#
-E_indices = 1:nstates#
-d_root_orig = vals[-E_indices]							# Original D likelihoods at root
-d_root_orig
-sum(d_root_orig)
 root.p = root_probs_single#
-loglik = log(sum(root.p * d_root_orig)) + sum(lq)#
-loglik
-res5
-log(sum(root.p * d_root_orig)) #
-log(sum(d_root_orig))
-d_root_orig
-d_root_orig / res$condlines[20,]
-d_root_orig / res$condlikes[20,]
-birthRate
-log(sum(d_root_orig))#
+rootlikes = log(sum(root.p * d_root_orig))#
+rootlikes#
 #
-log(sum(res$condlikes[20,])) + 1
-log(sum(res$condlikes[20,])) - 1
-log(sum(d_root_orig))#
-log(sum(res$condlikes[20,])) - 1
-sum(lq)
-c(res5) - sum(lq)
-log(sum(d_root_orig))#
-log(sum(res$condlikes[20,])) - 1#
-c(res5) - sum(lq)
-res$total_loglikelihood
-res$total_loglikelihood - (log(sum(res$condlikes[20,])) - 1)
-sum(lq)
-sum(lq) - const
-sum(lq) - cache$const
-sum(lq) + cache$const
-res$total_loglikelihood - log(sum(res$condlikes[20,]))
-x=sum(lq) + cache$const
-y=res$total_loglikelihood - log(sum(res$condlikes[20,]))
-x-y
-exp(x-y)
-1/exp(x-y)
-1-birthRate
-birthRate
-exp(-1)
-sum(lq)
-sum(lq)+(log(sum(res$condlikes[20,])) - 1)
-c(LnLs4)
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes#
+c(res5)
+root_probs_equal = rep(1, times=numstates)#
+root_probs_equal[sum(include_null_range)] = 0#
+root_probs_equal = root_probs_equal / sum(root_probs_equal)#
+root.p = root_probs_equal#
+rootlikes = log(sum(root.p * d_root_orig))#
+rootlikes#
+#
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes#
+c(res3)
+LnLs4[1]
+cache$const
+cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))#
+cache$const
+LnLs4[1] + cache$const + log(birthRate)
+cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))#
+cache$const#
+# In diversitree:::rootfunc.bd.ode#
+# loglik <- log(d.root) + sum(lq) + const#
+diversitree_bd_lnL_minus_const = c(diversitree_bd) - cache$const - log(birthRate)#
+diversitree_bd_lnL_minus_const
+cache$const
+bd_ape
+bd_ape$lnl_topology#
+lfactorial(tr$Nnode-1)
+bd_ape$lnl_topology#
+lfactorial(tr$Nnode)
+R_result_branch_lnL = sum(lq)
+R_result_branch_lnL
+R_result_total_LnLs1t = c(res1t)
+R_result_total_LnLs1t
+R_result_total_LnLs1 = c(res1)
+R_result_total_LnLs1
 all_lnLs
-sum(log(rowSums(res$condlikes)))
-sum(log(rowSums(res$condlikes)[-20]))
-names(res)
-res$relative_probs_of_each_state_at_bottom_of_root_branch
-log(rowSums(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))
-log(rowSums(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))
-res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
-base /res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
-dim(base)
-base = t(attr(res2, "intermediates")$base)#
+all_lnLs#
+R_result_branch_lnL = sum(lq)#
+R_result_total_LnLs1 = c(res1)#
+R_result_total_LnLs1t = c(res1t)#
+#
+# Does the total of branch likelihoods (lq) + node likelihoods match R?#
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
+#
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+R_result_branch_lnL
+R_result_total_LnLs1
+R_result_total_LnLs1t
+R_result_sum_log_computed_likelihoods_at_each_node
+sum(lq)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+warnings()
+computed_likelihoods_at_each_node_just_before_speciation
 base
-base = t(attr(res2, "intermediates")$base)#
-base
+get_sum_log_computed_likes_at_each_node()
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base=base_normlikes, lq, classe_params)
+dim(base_normlikes)
+t(base)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base=t(base), lq, classe_params)
 base_likes
-base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
-tmp_rowSums = (base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)[,numstates]#
-tmp_rowSums#
-log(tmp_rowSums)#
-sum(log(tmp_rowSums), na.rm=TRUE)
-all_lnLs
-diversitree_bd
-tmp_rowSums
-attr(diversitree_bd,"intermediates")$lq
-log(tmp_rowSums) - attr(diversitree_bd,"intermediates")$lq
-log(tmp_rowSums) + attr(diversitree_bd,"intermediates")$lq
-log(tmp_rowSums) / attr(diversitree_bd,"intermediates")$lq
-tmp_rowSums -exp(attr(diversitree_bd,"intermediates")$lq)
-tmp_rowSums /exp(attr(diversitree_bd,"intermediates")$lq)
-attr(diversitree_bd,"intermediates")$lq
-sum(attr(diversitree_bd,"intermediates")$lq)
-log(tmp_rowSums)
-sum(log(tmp_rowSums), na.rm=TRUE)
-lq
-log(tmp_rowSums) - attr(res4,"intermediates")$lq
-names(res)
-log(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)
-res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS
-rowSums(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)
-rowSums(log(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))
-rowSums(log(res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS))attr(diversitree_bd,"intermediates")$lq
-attr(diversitree_bd,"intermediates")$lq
-exp(attr(diversitree_bd,"intermediates")$lq)
-exp(attr(diversitree_bd,"intermediates")$lq)
-round(base_normlikes - res$condlikes_of_each_state / rowSums(res$condlikes_of_each_state), 5)
-round(base_normlikes - res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS, 5)#
-round(base_normlikes - res$condlikes_of_each_state / rowSums(res$condlikes_of_each_state), 5)
-res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * exp(attr(diversitree_bd,"intermediates")$lq)
-x = res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS * exp(attr(diversitree_bd,"intermediates")$lq)#
+# Does the total of branch likelihoods (lq) + node likelihoods match R?#
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
 #
-rowSums(x)
-rowSums(x)#
-sum(log(rowSums(x))
-)
-rowSums(x)#
-log(rowSums(x))#
-sum(log(rowSums(x)), na.rm=TRUE)
-log(tmp_rowSums)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+# [1] 0.00000000 0.00000000 0.00000000 0.06912288 0.10564300#
+# [1]      -Inf      -Inf      -Inf -2.671869 -2.247690#
+# [1] -4.919559#
+#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+computed_likelihoods_at_each_node_just_before_speciation
+base
+get_sum_log_computed_likes_at_each_node
+base
+k = ncol(base) / 2#
+	nsum <- k * (k + 1)/2#
+	Ds_cols = (k+1):(2*k)#
+	base_likes = apply(X=base[,Ds_cols], MARGIN=2, FUN="*", exp(lq))#
+	base_normlikes = base_likes / rowSums(base_likes)
+base_likes
+base_normlikes
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+all_lnLs#
+R_result_branch_lnL = sum(lq)#
+R_result_total_LnLs1 = c(res1)#
+R_result_total_LnLs1t = c(res1t)#
+#
+# Does the total of branch likelihoods (lq) + node likelihoods match R?#
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
+#
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+k = ncol(base) / 2#
+	nsum <- k * (k + 1)/2#
+	Ds_cols = (k+1):(2*k)#
+	base_likes = apply(X=base[,Ds_cols], MARGIN=2, FUN="*", exp(lq))#
+	base_normlikes = base_likes / rowSums(base_likes)#
+	# Get a data.frame tabulating the lambdas#
+	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=k)#
+	# Go through the ancestral states#
+	computed_likelihoods_at_each_node_just_before_speciation = matrix(0.0, nrow=nrow(base), ncol=k)#
+	# Reorder the edge matrix into pruningwise order#
+	# This is CRUCIAL!!#
+	tr2 <- reorder(tr, "pruningwise")#
+	num_internal_nodes = tr$Nnode
+i = 1#
+	edges_to_visit = seq(from=1, by=2, length.out=num_internal_nodes)#
+	for (i in edges_to_visit)#
+		{#
+		# Get the node numbers at the tips of these two edges		#
+		j = i+1#
+		left_desc_nodenum <- tr2$edge[i, 2]#
+		right_desc_nodenum <- tr2$edge[j, 2]#
+		# And for the ancestor edge (i or j shouldn't matter, should produce the same result!!!)#
+		anc <- tr2$edge[i, 1]#
+		# For this node, go through the states and sum the likes#
+		tmp_likes_AT_node = rep(0.0, times=k)#
+		for (l in 1:k) # l = ancestral node number#
+			{#
+			i_TF = lambda_ijk_df$i == l#
+			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k#
+			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2#
+			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1#
+			lambda_ijk_df[rows_use_lambda_div1_TF,]#
+			lambda_ijk_df[rows_use_lambda_div2_TF,]#
+			# Sum likes where the daughters the same#
+			ind = rows_use_lambda_div1_TF#
+			lcol = lambda_ijk_df$k[ind]#
+			rcol = lambda_ijk_df$j[ind]#
+			tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])#
+			# Sum likes where the daughters are NOT the same#
+			# (divide lambda by 2, but use twice)#
+			ind = rows_use_lambda_div2_TF#
+			lcol = lambda_ijk_df$k[ind]#
+			rcol = lambda_ijk_df$j[ind]#
+			# Left, then right#
+			tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])#
+			tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,rcol] * base_normlikes[right_desc_nodenum,lcol])#
+			} # END for (l in 1:k)#
+		computed_likelihoods_at_each_node_just_before_speciation[anc,] = tmp_likes_AT_node#
+		} # END for (i in edges_to_visit)
+i
+base_normlikes[left_desc_nodenum,lcol]
+base_normlikes
+base_normlikes[left_desc_nodenum,lcol]
+left_desc_nodenum
+lcol
+l
+i_TF = lambda_ijk_df$i == l#
+			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k#
+			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2#
+			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1#
+			lambda_ijk_df[rows_use_lambda_div1_TF,]#
+			lambda_ijk_df[rows_use_lambda_div2_TF,]
+rows_use_lambda_div1_TF
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+# Number of lambdas per state (e.g., for 3 states, this is 6 lambdas per state#
+	k = ncol(base) / 2#
+	nsum <- k * (k + 1)/2#
+	Ds_cols = (k+1):(2*k)#
+	base_likes = apply(X=base[,Ds_cols], MARGIN=2, FUN="*", exp(lq))#
+	base_normlikes = base_likes / rowSums(base_likes)#
+	# Get a data.frame tabulating the lambdas#
+	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=k)#
+	# Go through the ancestral states#
+	computed_likelihoods_at_each_node_just_before_speciation = matrix(0.0, nrow=nrow(base), ncol=k)#
+	# Reorder the edge matrix into pruningwise order#
+	# This is CRUCIAL!!#
+	tr2 <- reorder(tr, "pruningwise")#
+	num_internal_nodes = tr$Nnode#
+	# DEFINE DOWNPASS THROUGH THE BRANCHES	#
+	i = 1#
+	edges_to_visit = seq(from=1, by=2, length.out=num_internal_nodes)
+for (i in edges_to_visit)#
+		{#
+		# Get the node numbers at the tips of these two edges		#
+		j = i+1#
+		left_desc_nodenum <- tr2$edge[i, 2]#
+		right_desc_nodenum <- tr2$edge[j, 2]#
+		# And for the ancestor edge (i or j shouldn't matter, should produce the same result!!!)#
+		anc <- tr2$edge[i, 1]#
+		# For this node, go through the states and sum the likes#
+		tmp_likes_AT_node = rep(0.0, times=k)#
+		for (l in 1:k) # l = ancestral node number#
+			{#
+			i_TF = lambda_ijk_df$i == l#
+			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k#
+			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2#
+			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1#
+			lambda_ijk_df[rows_use_lambda_div1_TF,]#
+			lambda_ijk_df[rows_use_lambda_div2_TF,]#
+			# Skip e.g. null-range states#
+			if (sum(rows_use_lambda_div1_TF) > 0)#
+				{#
+				# Sum likes where the daughters the same#
+				ind = rows_use_lambda_div1_TF#
+				lcol = lambda_ijk_df$k[ind]#
+				rcol = lambda_ijk_df$j[ind]#
+				tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])#
+				} # END if (sum(rows_use_lambda_div1_TF) > 0)#
+#
+			if (sum(rows_use_lambda_div2_TF) > 0)#
+				{#
+				# Sum likes where the daughters are NOT the same#
+				# (divide lambda by 2, but use twice)#
+				ind = rows_use_lambda_div2_TF#
+				lcol = lambda_ijk_df$k[ind]#
+				rcol = lambda_ijk_df$j[ind]#
+				# Left, then right#
+				tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])#
+				tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,rcol] * base_normlikes[right_desc_nodenum,lcol])#
+				} # END if (sum(rows_use_lambda_div1_TF) > 0)#
+			} # END for (l in 1:k)#
+		computed_likelihoods_at_each_node_just_before_speciation[anc,] = tmp_likes_AT_node#
+		} # END for (i in edges_to_visit)
+i
+l
+i_TF = lambda_ijk_df$i == l#
+			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k#
+			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2#
+			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1#
+			lambda_ijk_df[rows_use_lambda_div1_TF,]#
+			lambda_ijk_df[rows_use_lambda_div2_TF,]
+# Sum likes where the daughters the same#
+				ind = rows_use_lambda_div1_TF#
+				lcol = lambda_ijk_df$k[ind]#
+				rcol = lambda_ijk_df$j[ind]#
+				tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
+ind
+sum(ind)
+idn
+ind
+lambda_ijk_df$k[ind]
+lcol
+base_normlikes[left_desc_nodenum,lcol]
+base_normlikes[right_desc_nodenum,rcol]
+lcol
+rcol
+left_desc_nodenum
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+computed_likelihoods_at_each_node_just_before_speciation
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+TF
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+rowSums(base)
+k = ncol(base) / 2#
+	nsum <- k * (k + 1)/2#
+	Ds_cols = (k+1):(2*k)#
+	base_likes = apply(X=base[,Ds_cols], MARGIN=2, FUN="*", exp(lq))#
+	base_normlikes = base_likes / rowSums(base_likes)#
+	# Get a data.frame tabulating the lambdas#
+	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=k)#
+	# Go through the ancestral states#
+	computed_likelihoods_at_each_node_just_before_speciation = matrix(0.0, nrow=nrow(base), ncol=k)#
+	# Reorder the edge matrix into pruningwise order#
+	# This is CRUCIAL!!#
+	tr2 <- reorder(tr, "pruningwise")#
+	num_internal_nodes = tr$Nnode#
+	# DEFINE DOWNPASS THROUGH THE BRANCHES	#
+	i = 1#
+	edges_to_visit = seq(from=1, by=2, length.out=num_internal_nodes)
+base_likes
+rowSums(base_likes)
+log(rowSums(base_likes))
+base_normlikes = base_likes / rowSums(base_likes)#
+	# Get a data.frame tabulating the lambdas#
+	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=k)#
+	# Go through the ancestral states#
+	computed_likelihoods_at_each_node_just_before_speciation = matrix(0.0, nrow=nrow(base), ncol=k)#
+	# Reorder the edge matrix into pruningwise order#
+	# This is CRUCIAL!!#
+	tr2 <- reorder(tr, "pruningwise")#
+	num_internal_nodes = tr$Nnode#
+	# DEFINE DOWNPASS THROUGH THE BRANCHES	#
+	i = 1#
+	edges_to_visit = seq(from=1, by=2, length.out=num_internal_nodes)
+base_normlikes
+lambda_ijk_df
+cls.df(lambda_ijk_df)
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+all_lnLs#
+R_result_branch_lnL = sum(lq)#
+R_result_total_LnLs1 = c(res1)#
+R_result_total_LnLs1t = c(res1t)#
+#
+# Does the total of branch likelihoods (lq) + node likelihoods match R?#
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
+#
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+# [1] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000#
+# [11] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0030120892#
+# [21] 0.0146278153 0.0008237083 0.0219630219 0.0014211027 0.0015674712 0.0025679570 0.0026336079 0.0032434018 0.0045208603 0.0001462228#
+# [31] 0.0169898783 0.0174508596 0.0223597758 0.0485992833 0.0005969967 0.0047083257 0.0005500863#
+# [1]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf#
+# [14]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf -5.805121 -4.224830 -7.101694 -3.818395 -6.556322 -6.458292 -5.964645#
+# [27] -5.939401 -5.731133 -5.399053 -8.830379 -4.075138 -4.048366 -3.800492 -3.024146 -7.423599 -5.358423 -7.505435#
+# [1] -101.0649#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda#
+# -168.6944#
+R_result_branch_lnL = -67.6295#
+R_result_total_LnLs1 = -72.60212#
+R_result_total_LnLs1t = -71.48986#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -168.6944
+R_result_sum_log_computed_likelihoods_at_each_node
 sum(lq)
-sum(lq)-cache$const
-sum(lq)+cache$const
-bd_lq = attr(diversitree_bd,"intermediates")$lq#
-sum(bd_lq)
-diversitree_bd
-bd
-exp(-18.90835)
-bd$lnl_Births_above_root + bd$lnl_branching_times
-diversitree_bd
-sum(diversitree_bd$lq)
-sum(attr(diversitree_bd, "intermediates")$lq)
-sum(attr(diversitree_bd, "intermediates")$lq[-20])
-attr(diversitree_bd, "intermediates")$lq
-attr(diversitree_bd, "intermediates")$lq - bd$$lnl_branching_times
-attr(diversitree_bd, "intermediates")$lq - bd$lnl_branching_times
-sum(attr(diversitree_bd, "intermediates")$lq) - bd$lnl_branching_times
-exp(attr(diversitree_bd, "intermediates")$lq)
-exp(-5.328037)
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+rowSums(base)
+classe_params
+classe_params[classe_params!=0]
+log(birthRate)
+-168.6944 - -120.15446838861902
+-1.112256*17
+-168.6944 - -120.15446838861902 - (-1.112256*17)
+R_result_sum_log_computed_likelihoods_at_each_node
+sum(lq)
+-120.15446838861902 - R_result_sum_log_computed_likelihoods_at_each_node
+lambda_ijk_df
+sum(lambda_ijk_df$lambda)
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
+#
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+sum(TF)
+-120.15446838861902/18
+-52.52497080956703 - -101.0649
+bd_ape
+i_TF = lambda_ijk_df$i == l#
+			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k#
+			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2#
+			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1#
+			lambda_ijk_df[rows_use_lambda_div1_TF,]
+lambda_ijk_df[rows_use_lambda_div2_TF,]
+cls.df(			lambda_ijk_df[rows_use_lambda_div2_TF,])
+l
+computed_likelihoods_at_each_node_just_before_speciation
+computed_likelihoods_at_each_node_just_before_speciation / birthRate
+rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)[is.finite(rowSums(computed_likelihoods_at_each_node_just_before_speciation)]))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)[is.finite(rowSums(computed_likelihoods_at_each_node_just_before_speciation))]))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)[is.finite(rowSums(computed_likelihoods_at_each_node_just_before_speciation))]))
+rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)[rowSums(computed_likelihoods_at_each_node_just_before_speciation)>0]))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation / birthRate)[rowSums(computed_likelihoods_at_each_node_just_before_speciation)>0])) + sum(lq)
+bd_ape
+base = t(attr(res2, "intermediates")$base)#
+base#
+#
+all_lnLs#
+R_result_branch_lnL = sum(lq)#
+R_result_total_LnLs1 = c(res1)#
+R_result_total_LnLs1t = c(res1t)#
+#
+# Does the total of branch likelihoods (lq) + node likelihoods match R?#
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
+#
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+# [1] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000#
+# [11] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0030120892#
+# [21] 0.0146278153 0.0008237083 0.0219630219 0.0014211027 0.0015674712 0.0025679570 0.0026336079 0.0032434018 0.0045208603 0.0001462228#
+# [31] 0.0169898783 0.0174508596 0.0223597758 0.0485992833 0.0005969967 0.0047083257 0.0005500863#
+# [1]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf#
+# [14]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf -5.805121 -4.224830 -7.101694 -3.818395 -6.556322 -6.458292 -5.964645#
+# [27] -5.939401 -5.731133 -5.399053 -8.830379 -4.075138 -4.048366 -3.800492 -3.024146 -7.423599 -5.358423 -7.505435#
+# [1] -101.0649#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+lq = t(attr(res2, "intermediates")$lq)#
+lq
+base = t(attr(res2, "intermediates")$base)#
+base#
+lq = t(attr(res2, "intermediates")$lq)#
+lq#
+all_lnLs#
+R_result_branch_lnL = sum(lq)#
+R_result_total_LnLs1 = c(res1)#
+R_result_total_LnLs1t = c(res1t)#
+#
+# Does the total of branch likelihoods (lq) + node likelihoods match R?#
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))#
+#
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+# [1] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000#
+# [11] 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0030120892#
+# [21] 0.0146278153 0.0008237083 0.0219630219 0.0014211027 0.0015674712 0.0025679570 0.0026336079 0.0032434018 0.0045208603 0.0001462228#
+# [31] 0.0169898783 0.0174508596 0.0223597758 0.0485992833 0.0005969967 0.0047083257 0.0005500863#
+# [1]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf#
+# [14]      -Inf      -Inf      -Inf      -Inf      -Inf      -Inf -5.805121 -4.224830 -7.101694 -3.818395 -6.556322 -6.458292 -5.964645#
+# [27] -5.939401 -5.731133 -5.399053 -8.830379 -4.075138 -4.048366 -3.800492 -3.024146 -7.423599 -5.358423 -7.505435#
+# [1] -101.0649#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+R_result_sum_log_computed_likelihoods_at_each_node - sum(lq)
+sum(lq)
+R_result_sum_log_computed_likelihoods_at_each_node
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)#
+computed_likelihoods_at_each_node_just_before_speciation#
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)#
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))#
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))#
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))#
+# [1] 0.00000000 0.00000000 0.00000000 0.07471615 0.06750957#
+# [1]      -Inf      -Inf      -Inf -2.594059 -2.695486#
+# [1] -5.289545#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)#
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
