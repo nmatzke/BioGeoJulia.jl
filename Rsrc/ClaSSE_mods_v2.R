@@ -1,7 +1,8 @@
 
 #######################################################
 # Likelihood equation in the birthdeath function
-# (derived by pulling apart the birthdeath() function from ape
+# (derived by pulling apart the birthdeath() function from ape)
+# This version stores all of the piece, for comparison
 #######################################################
 bd_liks <- function(tr, birthRate=1.0, deathRate=0.0)
 	{

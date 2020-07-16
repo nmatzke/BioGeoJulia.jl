@@ -50,10 +50,10 @@ using BioGeoJulia.SSEs
 # Run with:
 # source("/GitHub/BioGeoJulia.jl/Rsrc/_compare_ClaSSE_calcs_n8_compare2julia.R")
 # Truth:
-R_result_branch_lnL = -7.337676
-R_result_total_LnLs1 = -11.105443
-R_result_total_LnLs1t = -5.932152
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -12.25723
+R_result_branch_lnL = -67.6295
+R_result_total_LnLs1 = -72.60212
+R_result_total_LnLs1t = -71.48986
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -207.6288
 #######################################################
 
 
@@ -69,7 +69,7 @@ island_nums = [3, 3, 2, 2, 3, 3, 2, 1, 1, 3, 4, 2, 1, 1, 1, 1, 1, 1, 2]
 
 # Psychotria tree
 tr = readTopology("((((((((P_hawaiiensis_WaikamoiL1:0.9665748366,P_mauiensis_Eke:0.9665748366):0.7086257935,(P_fauriei2:1.231108298,P_hathewayi_1:1.231108298):0.4440923324):0.1767115552,(P_kaduana_PuuKukuiAS:1.851022399,P_mauiensis_PepeAS:1.851022399):0.0008897862802):0.3347375986,P_kaduana_HawaiiLoa:2.186649784):0.302349378,(P_greenwelliae07:1.132253042,P_greenwelliae907:1.132253042):1.35674612):1.689170274,((((P_mariniana_MauiNui:1.99490084,P_hawaiiensis_Makaopuhi:1.99490084):0.7328279804,P_mariniana_Oahu:2.72772882):0.2574151709,P_mariniana_Kokee2:2.985143991):0.4601084855,P_wawraeDL7428:3.445252477):0.732916959):0.7345185743,(P_grandiflora_Kal2:2.480190277,P_hobdyi_Kuia:2.480190277):2.432497733):0.2873119899,((P_hexandra_K1:2.364873976,P_hexandra_M:2.364873976):0.4630447802,P_hexandra_Oahu:2.827918756):2.372081244);")
-in_params = (birthRate=0.2, deathRate=1.0, d_val=0.5, e_val=0.4, a_val=0.0, j_val=1.5)
+in_params = (birthRate=0.3288164, deathRate=0.0, d_val=0.03505038, e_val=0.02832370, a_val=0.0, j_val=0.0)
 numareas = 4
 n = 16            # 4 areas, 16 states
 
@@ -89,13 +89,14 @@ sort!(trdf,:nodeIndex) # Return to original PhyloNetworks sort order
 
 inputs.res.likes_at_each_nodeIndex_branchTop
 for i in 1:tr.numTaxa
-	blankLikes = repeat([0.0], numstates)
-	blankLikes[island_nums[i]+1] = 1.0
-	inputs.res.likes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]][:] .= blankLikes[:]
-	inputs.res.normlikes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]][:] .= blankLikes[:]
-	inputs.res.inputs.res.sumLikes_at_node_at_branchTop[trdf_tiprows_in_Rnodenums_order[i]] = 1.0
+	inputs.res.likes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]] .= 0.0
+	inputs.res.normlikes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]] .= 0.0
+	inputs.res.likes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]][island_nums[i]+1] = 1.0
+	inputs.res.normlikes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]][island_nums[i]+1] = 1.0
+	inputs.res.sumLikes_at_node_at_branchTop[trdf_tiprows_in_Rnodenums_order[i]] = 1.0
 end
 inputs.res.likes_at_each_nodeIndex_branchTop
+res = inputs.res
 
 trdf = inputs.trdf
 p_Ds_v5 = inputs.p_Ds_v5
@@ -120,7 +121,9 @@ Es_interpolator(1.0)
 # Parameters
 
 # Do downpass
+res.likes_at_each_nodeIndex_branchTop
 (total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+res.likes_at_each_nodeIndex_branchTop
 
 Rnames(res)
 res.likes_at_each_nodeIndex_branchTop

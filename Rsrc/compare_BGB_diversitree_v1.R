@@ -1,0 +1,681 @@
+
+#######################################################
+# Compare BioGeoBEARS and diversitree-ClaSSE calculations
+#
+# This script will illustrate, for any input tree
+# and geography file, and BioGeoBEARS parameters, the 
+# equivalence of comparing BioGeoBEARS models (such as 
+# DEC and DEC+J, but this applies to any 2 models) and 
+# comparing 2 equivalent ClaSSE models, in the case where:
+#
+# * the claSSE lambdas = BGB_cladogenesis_probs * birthRate
+# * the birthRate = the Maximum Likelihood estimate under Yule
+# * the sampling is assumed to be 100%
+#
+# The key insight is that BioGeoBEARS calculates the 
+# likelihood of the geography data (just a complex 
+# character dataset). Adding a Yule process likelihood, 
+# i.e. the probability density of a tree under a pure-birth
+# process with an extinction rate of 0 and assuming 
+# complete sampling, creates a special case of the 
+# ClaSSE model.
+#
+# Therefore, comparing the likelihood difference between
+# two BioGeoBEARS models is exactly equivalent to comparing
+# two equivalent ClaSSE models. The likelihood difference
+# will be identical, because the Yule-process likelihood
+# is a constant across the different BioGeoBEARS of the 
+# geography data.
+#
+# Note: This is only set up for non-time-stratified analyses.
+# Also, the Yule-process assumption fails for a tree
+# that includes fossils (non-contemporaneous tips).
+# 
+#######################################################
+
+library(ape)
+library(diversitree)
+library(rexpokit)
+library(cladoRcpp)
+library(BioGeoBEARS)
+
+source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")  # utility functions from diversitree
+source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R")       # helper functions in plain-R
+
+
+wd = "/GitHub/BioGeoJulia.jl/Rsrc/"
+setwd(wd)
+
+# Load simple example tree (newick format, must be ultrametric, i.e. 
+# all the tips come to the present)
+trfn = "Psychotria_tree.newick"
+tr = read.tree(trfn)
+
+# Load geography data
+geogfn = "Psychotria_geog.data"
+
+
+#######################################################
+# BioGeoBEARS Q and C matrices
+#######################################################
+library(BioGeoBEARS)
+max_range_size = 4
+BioGeoBEARS_run_object = define_BioGeoBEARS_run()
+BioGeoBEARS_run_object$trfn = trfn
+BioGeoBEARS_run_object$geogfn = geogfn
+BioGeoBEARS_run_object$max_range_size = max_range_size
+BioGeoBEARS_run_object$min_branchlength = 0.000001    # Min to treat tip as a direct ancestor (no speciation event)
+BioGeoBEARS_run_object$include_null_range = TRUE    # set to FALSE for e.g. DEC* model, DEC*+J, etc.
+BioGeoBEARS_run_object$on_NaN_error = -1e50    # returns very low lnL if parameters produce NaN error (underflow check)
+BioGeoBEARS_run_object$speedup = TRUE          # shorcuts to speed ML search; use FALSE if worried (e.g. >3 params)
+BioGeoBEARS_run_object$use_optimx = "GenSA"    # if FALSE, use optim() instead of optimx()
+BioGeoBEARS_run_object$num_cores_to_use = 1
+BioGeoBEARS_run_object$force_sparse = FALSE    # force_sparse=TRUE causes pathology & isn't much faster at this scale
+BioGeoBEARS_run_object = readfiles_BioGeoBEARS_run(BioGeoBEARS_run_object)
+BioGeoBEARS_run_object$return_condlikes_table = TRUE
+BioGeoBEARS_run_object$calc_TTL_loglike_from_condlikes_table = TRUE
+BioGeoBEARS_run_object$calc_ancprobs = TRUE    # get ancestral states from optim run
+check_BioGeoBEARS_run(BioGeoBEARS_run_object)
+include_null_range = BioGeoBEARS_run_object$include_null_range
+
+# Run the Maximum Likelihood optimization
+res = bears_optim_run(BioGeoBEARS_run_object)
+res$total_loglikelihood
+# -34.54313 for Psychotria, under DEC
+
+# Extract the ML model's transition matrices
+mats = get_Qmat_COOmat_from_res(res, numstates=ncol(res$ML_marginal_prob_each_state_at_branch_top_AT_node), include_null_range=res$inputs$include_null_range, max_range_size=res$inputs$max_range_size, timeperiod_i=1)
+numstates = length(mats$states_list)
+
+# Explanation:
+# mats$Qmat = anagenetic transition matrix
+# mats$COO_weights_columnar = Cmat, the cladogenetic transition matrix.
+#      This is in a "table" format (COO-like), and includes only
+#      cladogenetic range-inheritance scenarios allowed under the 
+#      particular BioGeoBEARS model.
+#      COO_weights_columnar codes 4 columns, giving 0-based state-indices
+#        * for i, j, and k (ancestor, left descendant, right descendant)
+#        * per-event weights for each cladogenetic range-inheritance scenario
+#      The null_range is left out the Cmat, so to convert to 
+#        standard 1-based state counts, add (1+sum(include_null_range)).
+#      To convert the per-event weights to per-event probabilities:
+#      per-event_prob_of_scenario = per-weight_prob_of_scenario / sum_of_all_weights_for_that_ancestor_i
+# mats$Rsp_rowsums = the sum of the weights for each ancestor state i (again excluding null_range)
+#
+# To convert per-event probabilities to diversitree's lambdas, multiply by birthRate
+#
+# I.e. if
+# A = state 2
+# B = state 3
+# AB = state 4
+#
+# And if 
+# AB -> A, B  has probability 1/6 (vicariance)
+# AB -> B, A  has probability 1/6 (vicariance)
+# AB -> A, AB has probability 1/6 (subset sympatry)
+# AB -> AB, A has probability 1/6 (subset sympatry)
+# AB -> B, AB has probability 1/6 (subset sympatry)
+# AB -> AB, B has probability 1/6 (subset sympatry)
+# 
+# And the ML birthRate under the Yule model is 0.9, then the lambda rates of
+# each individual type of speciation event are:
+#
+# When birthRate = 0.9,
+#
+# AB -> A, B  has rate 1/6 * 0.9 = lambda423 = 0.15
+# AB -> B, A  has rate 1/6 * 0.9 = lambda432 = 0.15
+# AB -> A, AB has rate 1/6 * 0.9 = lambda424 = 0.15
+# AB -> AB, A has rate 1/6 * 0.9 = lambda442 = 0.15
+# AB -> B, AB has rate 1/6 * 0.9 = lambda434 = 0.15
+# AB -> AB, B has rate 1/6 * 0.9 = lambda443 = 0.15
+#
+# Total speciation rate when in state AB = 0.15*6 = 0.9
+# 
+# In diversitree, the lambdas of equivalent left/right scenarios are combined, so
+# diveristree will use:
+#
+# lambda423 = 0.3
+# lambda424 = 0.3
+# lambda434 = 0.3
+# 
+
+
+# Extract the parameters
+birthRate = 0.3288164        # 0.3288164 for Psychotria tree
+birthRate = yule(tr)$lambda  # The ML lambda from Yule. Equals (#speciations-1)/tree_length
+birthRate
+(tr$Nnode-1)/sum(tr$edge.length)
+
+deathRate = 0.0     # Yule process means 0.0 extinction rate
+d_val = 0.03505038	# ML estimate for Psychotria under DEC model
+e_val = 0.02832370	# ML estimate for Psychotria under DEC model
+j_val = 0.0         # Under DEC, j=0.0
+d_val = res$output@params_table["d","est"] # Extract from ML result
+e_val = res$output@params_table["e","est"] # Extract from ML result
+j_val = 0.0
+
+
+
+#######################################################
+# Set up an equivalent ClaSSE model in diversitree
+#######################################################
+
+# This .R file contains a bunch of extract functions that diversitree
+# uses behind the scenes. They are very hard to access normally, 
+# because diversitree does tons of "functions writing other functions".
+source('/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_mods_v2.R', chdir = TRUE)
+
+# Convert the BioGeoBEARS cladogenesis matrix into a data.frame
+# This handily shows the 
+# * per-event weights (column "wt") and 
+# * per-event probabilities (column "prob")
+include_null_range = res$inputs$include_null_range
+Carray_df = get_Cevent_probs_df_from_mats(mats, include_null_range=include_null_range)
+head(Carray_df)
+tail(Carray_df)
+
+# Set up a ClaSSE model from diversitree
+
+# Get the tip statenums
+numtips = length(tr$tip.label)
+numstates = ncol(res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS)
+tip_statenums = rep(0, times=numtips)
+for (i in 1:numtips)
+	{ # Find the "1" (the observed state for each tip)
+	TF = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[i,] == 1
+	tip_statenums[i] = (1:numstates)[TF]
+	}
+tip_statenums
+names(tip_statenums) = tr$tip.label
+states = tip_statenums
+
+# Set the sampling rate to 1 for each state
+sampling.f = rep(1, times=numstates)
+k = numstates
+
+# Create the ClaSSE likelihood function for k states
+# (strict=FALSE means that some states in the state space can be absent from the tips)
+classe_Kstates = make.classe(tree=tr, states=states, k=k, sampling.f=sampling.f, strict=FALSE)
+
+# The names of the ClaSSE parameters:
+# Note that diverstree creates ALL the possible parameters, which gets
+# ridiculous quickly, e.g. 
+# 4 areas = 16 geographic range states = 2432 parameters in param_names
+param_names = argnames(classe_Kstates)
+length(param_names)
+length(param_names[grepl(pattern="lambda", x=param_names)]) # 2176 speciation rates
+length(param_names[grepl(pattern="mu", x=param_names)])     #   16 extinction rates
+length(param_names[grepl(pattern="q", x=param_names)])      #  240 Q transition rates
+
+# Most parameters will be zero
+classe_params = rep(0, times=length(param_names))
+names(classe_params) = param_names
+head(classe_params)
+tail(classe_params)
+
+# Make a data.frame to match up with the BioGeoBEARS Carray_df
+lambda_ijk_df = classe_lambdas_to_df(classe_params, k=numstates)
+head(lambda_ijk_df)
+
+# Fill in the params from the BioGeoBEARS "res" results
+classe_params = BGBres_into_classe_params(res, classe_params, birthRate=birthRate)
+classe_params[153]
+classe_params["lambda020202"]
+classe_params["lambda060203"]
+classe_params["q0206"]
+classe_params["q1516"]
+classe_params[classe_params != 0.0]
+
+# Set up various assumptions about the root state probabilities
+# All probabilities equal, except null range has prob=0
+root_probs_equal = rep(1, times=numstates)
+root_probs_equal[sum(include_null_range)] = 0
+root_probs_equal = root_probs_equal / sum(root_probs_equal)
+
+# Highly biased towards the last state
+root_probs_biased = rep(0.01, times=numstates)
+root_probs_biased[sum(include_null_range)] = 0
+root_probs_biased[length(root_probs_biased)] = 0.01 * (numstates-include_null_range)
+root_probs_biased = root_probs_biased / sum(root_probs_biased)
+
+# All states, except null range, get "probability" 1
+# (i.e., ignore root state frequencies, like DEC-type models)
+root_probs_single = rep(1, times=numstates)
+root_probs_single[sum(include_null_range)] = 0
+
+# Do the ClaSSE calculation, under these different assumptions
+res1 = classe_Kstates(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
+res2 = classe_Kstates(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
+root_probs = root_probs_equal
+res3 = classe_Kstates(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
+root_probs = root_probs_biased
+res4 = classe_Kstates(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
+root_probs = root_probs_single
+res5 = classe_Kstates(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=FALSE)
+res6 = classe_Kstates(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=FALSE)
+
+res1t = classe_Kstates(pars=classe_params, root=ROOT.OBS, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
+res2t = classe_Kstates(pars=classe_params, root=ROOT.FLAT, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
+root_probs = root_probs_equal
+res3t = classe_Kstates(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)
+root_probs = root_probs_biased
+res4t = classe_Kstates(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)
+root_probs = root_probs_single
+res5t = classe_Kstates(pars=classe_params, root=ROOT.GIVEN, root.p=root_probs, intermediates=TRUE, condition.surv=TRUE)
+res6t = classe_Kstates(pars=classe_params, root=ROOT.EQUI, root.p=NULL, intermediates=TRUE, condition.surv=TRUE)
+
+# get_classe_LnLs returns the total log-likelihood, and 
+# the total of the branch likelihoods
+LnLs1 = get_classe_LnLs(res1)
+LnLs2 = get_classe_LnLs(res2)
+LnLs3 = get_classe_LnLs(res3)
+LnLs4 = get_classe_LnLs(res4)
+LnLs5 = get_classe_LnLs(res5)
+LnLs6 = get_classe_LnLs(res6)
+LnLs1t = get_classe_LnLs(res1t)
+LnLs2t = get_classe_LnLs(res2t)
+LnLs3t = get_classe_LnLs(res3t)
+LnLs4t = get_classe_LnLs(res4t)
+LnLs5t = get_classe_LnLs(res5t)
+LnLs6t = get_classe_LnLs(res6t)
+
+LnLst = as.data.frame(rbind(LnLs1, LnLs2, LnLs3, LnLs4, LnLs5, LnLs6, LnLs1t, LnLs2t, LnLs3t, LnLs4t, LnLs5t, LnLs6t), stringsAsFactors=FALSE)
+names(LnLst) = c("ttl_LnL", "branch_LnL")
+ObsDiff = (LnLst$ttl_LnL - LnLst$branch_LnL)
+exp_ObsDiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL))
+LnLdiff = round((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)), digits=4)
+exp_LnLdiff = exp((LnLst$ttl_LnL - LnLst$branch_LnL - log(birthRate)))
+LnLst2 = cbind(LnLst, ObsDiff, LnLdiff, exp_ObsDiff, exp_LnLdiff)
+
+# Put the total and branch lnLs in a table; other columns were experimenting
+# with various assumptions about constants (ignore except in ultra-simple cases)
+all_lnLs = cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
+all_lnLs$ttl_LnL = as.numeric(all_lnLs$ttl_LnL)
+all_lnLs$branch_LnL = as.numeric(all_lnLs$branch_LnL)
+all_lnLs$ObsDiff = as.numeric(all_lnLs$ObsDiff)
+all_lnLs$LnLdiff = as.numeric(all_lnLs$LnLdiff)
+all_lnLs$exp_ObsDiff = as.numeric(all_lnLs$exp_ObsDiff)
+all_lnLs$exp_LnLdiff = as.numeric(all_lnLs$exp_LnLdiff)
+all_lnLs
+
+# The diversitree outputs, with intermediates stored, are useful for 
+# branch-by-branch comparison. However, they have to be transposed to 
+# compare to BioGeoBEARS (so that rows = nodes).
+# The columns are the Es for each state, then the Ds for each state
+init = t(attr(res2, "intermediates")$init)
+init
+
+base = t(attr(res2, "intermediates")$base)
+base
+
+# lq is the Ds log-likelihood summed at each branch bottom, and extracted
+Ds_cols = (numstates+1):(2*numstates)
+lq = t(attr(res2, "intermediates")$lq)
+lq
+rowSums(base[,Ds_cols])
+base[,Ds_cols] * exp(c(lq))
+rowSums(base[,Ds_cols] * exp(c(lq)))
+log(rowSums(base[,Ds_cols] * exp(c(lq))))
+
+# Store the likelihoods at branch-bottoms for comparison
+base_likes = apply(X=base[,Ds_cols], MARGIN=2, FUN="*", exp(lq))
+base_normlikes = base_likes / rowSums(base_likes)
+
+# Diversitree normalized likelihoods at branch bottoms match BioGeoBEARS
+round(base_normlikes - res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS, 5)
+
+# These match the lqs, but this is because base_likes = base_normlikes * exp(lq)
+tmp_rowSums = (base_likes / res$relative_probs_of_each_state_at_branch_bottom_below_node_DOWNPASS)[,numstates]
+tmp_rowSums
+log(tmp_rowSums)
+sum(log(tmp_rowSums), na.rm=TRUE) # matches sum(lq)
+sum(lq)
+log(tmp_rowSums) - attr(res4,"intermediates")$lq
+
+
+# Diversitree birthdeath calculation
+lik.bd <- make.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
+diversitree_bd = lik.bd(pars=c(birthRate=birthRate, deathRate=deathRate), intermediates=TRUE)
+c(diversitree_bd)    # log-likelihood = 0.4870967
+yule(tr)$loglik      # log-likelihood = 0.4870968
+
+# Likelihood equation in the birthdeath function
+# (derived by pulling apart the birthdeath() function from ape)
+# This version stores all of the piece, for comparison
+# bd_ape$lnL = 0.4870968
+bd_ape = bd_liks(tr, birthRate=birthRate, deathRate=deathRate)
+bd_ape
+
+# Note how this equals -(tr$Nnode-1)
+bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times
+-(tr$Nnode-1)
+
+# The diversitree birth-death function also stores 
+# branch-bottom likelihoods in "lq"
+bd_lq = attr(diversitree_bd,"intermediates")$lq
+sum(bd_lq)
+sum(bd_lq) - -(tr$Nnode-1)
+bd_ape$lnl_numBirths
+
+# Compare bd_lq and -birthRate * trtable$edge.length
+trtable = prt(tr, printflag=FALSE) # prints the tree to node-order table
+bd_lq
+-birthRate * trtable$edge.length
+
+# Differences
+round(bd_lq - (-birthRate * trtable$edge.length), digits=4)
+
+# What is that -1.1123?
+log(birthRate) # i.e., a log(birthRate) for every internal node
+
+
+#######################################################
+# Matching diversitree and BioGeoBEARS
+#######################################################
+# BioGeoBEARS stores the likelihoods at each node, 
+# including the root node.
+#
+# But diversitree stores the likelihoods at branch bottoms,
+# and treats the root node differently, depending on 
+# various user options.
+#
+# So, let's start by summing the BioGeoBEARS likelihoods
+# but exclude the root node.
+root_nodenum = length(tr$tip.label) + 1
+sumBGBlike_not_root = sum(log(res$computed_likelihoods_at_each_node[-root_nodenum]))
+sumBGBlike_not_root
+
+# Let's take the sum of the branch-bottom likelihoods from the birth-death
+# process
+sum(bd_lq)
+bd_ape$lnl_numBirths + bd_ape$lnl_Births_above_root + bd_ape$lnl_branching_times
+bd_ape$lnl_numBirths + -(tr$Nnode-1)
+sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate) 
+sum_branchBot_likes = sum(-birthRate * trtable$edge.length, na.rm=TRUE) + (tr$Nnode-1)*log(birthRate) 
+
+# Add the lnL of root speciation event, -1 for extra node
+all_lnLs
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1)
+sumBGBlike_not_root + sum_branchBot_likes + -log(1/birthRate) + 1
+
+# Matches!
+
+# We can also add the root state likelihoods, if desired
+BGBlnL_at_root = log(res$computed_likelihoods_at_each_node[root_nodenum]) - 1
+d_root_orig_BGB = res$relative_probs_of_each_state_at_branch_top_AT_node_DOWNPASS[root_nodenum,] * exp(BGBlnL_at_root)
+d_root_orig_BGB
+sum(d_root_orig_BGB)
+
+vals = t(attr(res1, "intermediates")$vals)	# Es and Ds at the root
+E_indices = 1:numstates
+d_root_orig_diversitree = vals[-E_indices]
+d_root_orig_diversitree
+sum(d_root_orig_diversitree)
+
+# Match BioGeoBEARS to diverstree res1
+root.p = d_root_orig/sum(d_root_orig)
+rootlikes = log(sum(root.p * d_root_orig))
+rootlikes
+
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes
+c(res1)
+
+
+
+# Match BioGeoBEARS to diverstree res2
+root.p = rep(1/numstates, times=nstates)
+rootlikes = log(sum(root.p * d_root_orig))
+rootlikes
+
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes
+c(res2)
+
+# Match BioGeoBEARS to diverstree res3 (all equal, except null range)
+# Set up various assumptions about the root state probabilities
+# All probabilities equal, except null range has prob=0
+root_probs_equal = rep(1, times=numstates)
+root_probs_equal[sum(include_null_range)] = 0
+root_probs_equal = root_probs_equal / sum(root_probs_equal)
+root.p = root_probs_equal
+rootlikes = log(sum(root.p * d_root_orig))
+rootlikes
+
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes
+c(res3)
+
+
+
+# Match BioGeoBEARS to diverstree res5 (all 1s, except null range)
+# All states, except null range, get "probability" 1
+# (i.e., ignore root state frequencies, like DEC-type models)
+root_probs_single = rep(1, times=numstates)
+root_probs_single[sum(include_null_range)] = 0
+root.p = root_probs_single
+rootlikes = log(sum(root.p * d_root_orig))
+rootlikes
+
+sumBGBlike_not_root + sum_branchBot_likes - (log(1/birthRate) - 1) + rootlikes
+c(res5)
+
+
+
+
+#######################################################
+# NOTES
+#######################################################
+
+# To get the "cache" object from diversitree:
+
+# Get the constant part of bd_lq
+cache <- diversitree:::make.cache.bd(tree=tr, sampling.f=NULL, unresolved=NULL, times=NULL, control=list(method="ode"))
+cache$const             # 36.39545
+bd_ape$lnl_topology     # 36.39545
+lfactorial(tr$Nnode)    # 36.39545
+
+
+
+
+
+
+
+#######################################################
+# Compare to Julia
+#######################################################
+
+
+all_lnLs
+R_result_branch_lnL = sum(lq)
+R_result_total_LnLs1 = c(res1)
+R_result_total_LnLs1t = c(res1t)
+
+# Does the total of branch likelihoods (lq) + node likelihoods match R?
+computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))
+
+computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
+computed_likelihoods_at_each_node_just_before_speciation
+rowSums(computed_likelihoods_at_each_node_just_before_speciation)
+log(rowSums(computed_likelihoods_at_each_node_just_before_speciation))
+TF = is.finite(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)))
+sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+R_result_sum_log_computed_likelihoods_at_each_node = sum(log(rowSums(computed_likelihoods_at_each_node_just_before_speciation)[TF]))
+# [1] 0.00000000 0.00000000 0.00000000 0.06912288 0.10564300
+# [1]      -Inf      -Inf      -Inf -2.671869 -2.247690
+# [1] -4.919559
+
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = R_result_sum_log_computed_likelihoods_at_each_node + sum(lq)
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+# -9.861079
+
+
+
+R_result_branch_lnL = -67.6295
+R_result_total_LnLs1 = -72.60212
+R_result_total_LnLs1t = -71.48986
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -207.6288
+
+
+
+
+
+
+
+
+
+
+
+
+# Key parts of the calculation
+lq = t(attr(res2, "intermediates")$lq)			# Branch likelihoods
+vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root
+nstates = length(vals) / 2
+E_indices = 1:nstates
+d_root_orig = vals[-E_indices]							# Original D likelihoods at root
+
+# If root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
+root.p = d_root_orig/sum(d_root_orig)
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)
+loglik
+
+# If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE
+root.p = rep(1/nstates, times=nstates)
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)
+loglik
+
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+root.p = c(0.3333333, 0.3333333, 0.3333333)
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)
+loglik
+
+# If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=FALSE
+root.p = c(0.1, 0.1, 0.8)
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)
+loglik
+
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
+root.p = c(0, 0, 1)
+loglik = log(sum(root.p * d_root_orig)) + sum(lq)
+loglik
+
+# If root=ROOT.EQUI, condition.surv=FALSE
+
+# Project the ClaSSE model onto an instantaneous rate matrix, A
+A = projection.matrix.classe(pars=classe_params, k) 
+
+# Calculate equilibrium frequencies by eigenvectors
+evA <- eigen(A)
+i <- which(evA$values == max(evA$values))
+equilibrium_root_freqs = evA$vectors[, i]/sum(evA$vectors[, i])
+equilibrium_root_freqs
+# 0.2652666 0.2285983 0.2285983 0.2775368
+
+loglik = log(sum(equilibrium_root_freqs * d_root_orig)) + sum(lq)
+loglik
+# -12.269765 matches!
+
+
+
+# If root=ROOT.OBS, root.p=NULL, condition.surv=TRUE
+root.p = d_root_orig/sum(d_root_orig)
+#lambda <- classe_params[E_indices]
+e.root <- vals[E_indices]
+
+# BiSSE
+#d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
+
+# MuSSE/ClaSSE
+pars = classe_params
+nsum <- k * (k + 1)/2
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+i <- seq_len(k)
+e.root <- vals[i]
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
+
+loglik = log(sum(root.p * d.root)) + sum(lq)
+loglik
+
+# If root=ROOT.FLAT, root.p=NULL, condition.surv=TRUE
+root.p = rep(1/nstates, times=nstates)
+pars = classe_params
+nsum <- k * (k + 1)/2
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+i <- seq_len(k)
+e.root <- vals[i]
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
+loglik = log(sum(root.p * d.root)) + sum(lq)
+loglik
+
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
+root.p = c(0.3333333, 0.3333333, 0.3333333)
+pars = classe_params
+nsum <- k * (k + 1)/2
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+i <- seq_len(k)
+e.root <- vals[i]
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
+loglik = log(sum(root.p * d.root)) + sum(lq)
+loglik
+
+# If root=ROOT.GIVEN, root.p=c(0.75,0.25), condition.surv=TRUE
+root.p = c(0.1, 0.1, 0.8)
+pars = classe_params
+nsum <- k * (k + 1)/2
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+i <- seq_len(k)
+e.root <- vals[i]
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
+loglik = log(sum(root.p * d.root)) + sum(lq)
+loglik
+
+# If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=TRUE
+root.p = c(0, 0, 1)
+pars = classe_params
+nsum <- k * (k + 1)/2
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+i <- seq_len(k)
+e.root <- vals[i]
+d.root <- d_root_orig/sum(root.p * lambda * (1 - e.root)^2)
+loglik = log(sum(root.p * d.root)) + sum(lq)
+loglik
+
+
+yule(tr)$loglik - log(birthRate)
+
+
+# If root=ROOT.EQUI, condition.surv=TRUE
+
+# Project the ClaSSE model onto an instantaneous rate matrix, A
+A = projection.matrix.classe(pars=classe_params, k) 
+
+# Calculate equilibrium frequencies by eigenvectors
+evA <- eigen(A)
+i <- which(evA$values == max(evA$values))
+equilibrium_root_freqs = evA$vectors[, i]/sum(evA$vectors[, i])
+equilibrium_root_freqs
+# 0.2652666 0.2285983 0.2285983 0.2775368
+
+pars = classe_params
+nsum <- k * (k + 1)/2
+lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
+i <- seq_len(k)
+e.root <- vals[i]
+d.root <- d_root_orig/sum(equilibrium_root_freqs * lambda * (1 - e.root)^2)
+loglik = log(sum(equilibrium_root_freqs * d.root)) + sum(lq)
+loglik
+# -12.94599 matches!
+
+
+cft(LnLst2, numdigits_inbetween_have_fixed_digits=8)
+
+init = t(attr(res2, "intermediates")$init)
+init
+
+base = t(attr(res2, "intermediates")$base)
+base
+
+apply(X=base[,4:6], MARGIN=2, FUN="*", exp(lq))
+
+# Get Es,Ds matrix
+Dindexes = (nstates+1):(nstates*2)
+EsDs_branch_bottoms = base
+EsDs_branch_bottoms[,Dindexes] = EsDs_branch_bottoms[,Dindexes] * exp(attr(res2, "intermediates")$lq)
+EsDs_branch_bottoms[1,]
