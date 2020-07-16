@@ -27,7 +27,7 @@ using BioGeoJulia.SSEs
 # """
 # 
 # @testset "Example" begin
-# 	@test hello("runtests_ClaSSE_tree_n8.jl") == "runtests_ClaSSE_tree_n8.jl"
+# 	@test hello("runtests_ClaSSE_tree_n8_DEC.jl") == "runtests_ClaSSE_tree_n8_DEC.jl"
 # #	@test domath(2.0) ≈ 7.0
 # end
 # 
@@ -39,28 +39,19 @@ using BioGeoJulia.SSEs
 # # under a variety of simple and more complex models
 # #######################################################
 # 
-# @testset "runtests_ClaSSE_tree_n8.jl" begin
+# @testset "runtests_ClaSSE_tree_n8_DEC.jl" begin
 # 
 #######################################################
 # DEMONSTRATES MATCHING BETWEEN DIVERSITREE, BIOGEOBEARS, AND JULIA
 # ON HAWAIIAN PSYCHOTRIA, 16-STATE DEC MODEL
 #
 # Run with:
-# source("/GitHub/BioGeoJulia.jl/Rsrc/compare_BGB_diversitree_v1.R")
+# source("/GitHub/BioGeoJulia.jl/Rsrc/compare_BGB_diversitree_DEC_v1.R")
 # Truth:
-DEC_lnL = -34.54313
-DEC_R_result_branch_lnL = -67.6295
-DEC_R_result_total_LnLs1 = -72.60212
-DEC_R_result_total_LnLs1t = -71.48986
-DEC_R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -120.1545
-
-# DEC+J
-DECj_lnL = -20.94759
-R_result_branch_lnL = -55.37332
-R_result_total_LnLs1 = -58.83758
-R_result_total_LnLs1t = -57.72533
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -96.34151
-
+R_result_branch_lnL = -67.6295
+R_result_total_LnLs1 = -72.60212
+R_result_total_LnLs1t = -71.48986
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = -120.1545
 #######################################################
 
 
@@ -76,7 +67,7 @@ island_nums = [3, 3, 2, 2, 3, 3, 2, 1, 1, 3, 4, 2, 1, 1, 1, 1, 1, 1, 2]
 
 # Psychotria tree
 tr = readTopology("((((((((P_hawaiiensis_WaikamoiL1:0.9665748366,P_mauiensis_Eke:0.9665748366):0.7086257935,(P_fauriei2:1.231108298,P_hathewayi_1:1.231108298):0.4440923324):0.1767115552,(P_kaduana_PuuKukuiAS:1.851022399,P_mauiensis_PepeAS:1.851022399):0.0008897862802):0.3347375986,P_kaduana_HawaiiLoa:2.186649784):0.302349378,(P_greenwelliae07:1.132253042,P_greenwelliae907:1.132253042):1.35674612):1.689170274,((((P_mariniana_MauiNui:1.99490084,P_hawaiiensis_Makaopuhi:1.99490084):0.7328279804,P_mariniana_Oahu:2.72772882):0.2574151709,P_mariniana_Kokee2:2.985143991):0.4601084855,P_wawraeDL7428:3.445252477):0.732916959):0.7345185743,(P_grandiflora_Kal2:2.480190277,P_hobdyi_Kuia:2.480190277):2.432497733):0.2873119899,((P_hexandra_K1:2.364873976,P_hexandra_M:2.364873976):0.4630447802,P_hexandra_Oahu:2.827918756):2.372081244);")
-in_params = (birthRate=0.3288164, deathRate=0.0, d_val=1e-12, e_val=1e-12, a_val=0.0, j_val=0.1142057)
+in_params = (birthRate=0.3288164, deathRate=0.0, d_val=0.03505038, e_val=0.02832370, a_val=0.0, j_val=0.0)
 numareas = 4
 n = 16            # 4 areas, 16 states
 

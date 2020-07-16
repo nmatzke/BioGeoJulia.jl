@@ -427,7 +427,7 @@ c(res1)
 
 
 # Match BioGeoBEARS to diverstree res2
-root.p = rep(1/numstates, times=nstates)
+root.p = rep(1/numstates, times=numstates)
 rootlikes = log(sum(root.p * d_root_orig_BGB))
 rootlikes
 
@@ -638,7 +638,7 @@ DEC_all_lnLs$ttl_LnL - DECj_all_lnLs$ttl_LnL
 
 # Exact matches in lnL difference occur with:
 # res2: If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE
-root.p = rep(1/nstates, times=nstates)
+root.p = rep(1/numstates, times=numstates)
 
 # res3: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
 root_probs = root_probs_equal
@@ -655,8 +655,8 @@ root_probs = root_probs_single   # 0,1,1,1,1,1...
 # Key parts of the calculation
 lq = t(attr(res2, "intermediates")$lq)			# Branch likelihoods
 vals = t(attr(res2, "intermediates")$vals)	# Es and Ds at the root
-nstates = length(vals) / 2
-E_indices = 1:nstates
+numstates = length(vals) / 2
+E_indices = 1:numstates
 d_root_orig = vals[-E_indices]							# Original D likelihoods at root
 
 # res1: If root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
@@ -665,7 +665,7 @@ loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
 # res2: If root=ROOT.FLAT, root.p=NULL, condition.surv=FALSE
-root.p = rep(1/nstates, times=nstates)
+root.p = rep(1/numstates, times=numstates)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
@@ -684,7 +684,6 @@ loglik
 # res5: If root=ROOT.GIVEN, root.p=c(0.5,0.5), condition.surv=FALSE
 root_probs = root_probs_single
 root.p = root_probs
-root.p = c(0, 0, 1)
 loglik = log(sum(root.p * d_root_orig)) + sum(lq)
 loglik
 
@@ -728,7 +727,7 @@ loglik = log(sum(root.p * d.root)) + sum(lq)
 loglik
 
 # res2t: If root=ROOT.FLAT, root.p=NULL, condition.surv=TRUE
-root.p = rep(1/nstates, times=nstates)
+root.p = rep(1/numstates, times=numstates)
 pars = classe_params
 nsum <- k * (k + 1)/2
 lambda <- colSums(matrix(pars[1:(nsum * k)], nrow = nsum))
@@ -809,7 +808,7 @@ base
 apply(X=base[,4:6], MARGIN=2, FUN="*", exp(lq))
 
 # Get Es,Ds matrix
-Dindexes = (nstates+1):(nstates*2)
+Dindexes = (numstates+1):(numstates*2)
 EsDs_branch_bottoms = base
 EsDs_branch_bottoms[,Dindexes] = EsDs_branch_bottoms[,Dindexes] * exp(attr(res2, "intermediates")$lq)
 EsDs_branch_bottoms[1,]
