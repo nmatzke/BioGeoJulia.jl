@@ -242,6 +242,13 @@ LnLs1t
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 computed_likelihoods_at_each_node_x_lambda = rep(0.0, times=tr$Nnode + length(tr$tip.label))
 
+base = t(attr(res2, "intermediates")$base)
+base
+lq = t(attr(res2, "intermediates")$lq)
+lq
+all_lnLs
+
+
 computed_likelihoods_at_each_node_just_before_speciation = get_sum_log_computed_likes_at_each_node(tr, base, lq, classe_params)
 computed_likelihoods_at_each_node_just_before_speciation
 rowSums(computed_likelihoods_at_each_node_just_before_speciation)

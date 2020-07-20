@@ -1,3 +1,101 @@
+
+#######################################################
+# Likelihood equation in the birthdeath function
+# (derived by pulling apart the birthdeath() function from ape)
+# This version stores all of the piece, for comparison
+#######################################################
+bd_liks <- function(tr, birthRate=1.0, deathRate=0.0)
+	{
+	ex='
+	# Getting the birthRate and deathRate from
+	# a = deathRate / birthRate	# relative death rate
+	# r = birthRate - deathRate	# net diversification rate
+	BD =  birthdeath(tr)
+	BD
+	names(BD)
+
+	# Calculate the birthRate and deathRate from the outputs
+	x1 = unname(BD$para["d/b"])
+	x2 = unname(BD$para["b-d"])
+	deathRate = (x2*x1) / (1-x1)
+	birthRate = deathRate+x2
+	c(birthRate, deathRate)
+	'
+	
+	
+	a = deathRate / birthRate	# relative death rate
+	r = birthRate - deathRate	# net diversification rate
+
+	N <- length(tr$tip.label)
+	nb_node = tr$Nnode - 1
+	sptimes <- c(NA, branching.times(tr)) # NA so the number of times equals number of tips?
+	x = sptimes
+	# a = "d/b"
+	# r = "b-d"
+
+	# dev <- function(a=0.1, r=0.2, N, x, return_deviance=FALSE)
+	# 	{
+	if (r < 0 || a > 1)
+		{
+		return(1e+100)
+		}
+	
+	lnl_topology = lfactorial(tr$Nnode)
+	lnl_numBirths = nb_node * log(r)
+	lnl_Births_above_root = r * sum(sptimes[3:N])
+	
+	lnl_numtips_wOneMinusDeathRate = N * log(1 - a)
+	# Interpretation: more tips are less likely, if relativeDeathRate is >0
+	# If relativeDeathRate = 1, a=0, and lnl=-Inf... 
+	#    CLEARLY WRONG EXCEPT IN A MAXIMUM LIKELIHOOD CONTEXT!!!
+	# If relativeDeathRate = 0, a=0, and lnl=0, i.e. any number of tips is equiprobable
+	
+	lnl_branching_times = -2 * sum(log(exp(r * sptimes[2:N]) - a))
+	# For each observed branching,
+	# netDiversificationRate * timeOfEvent <- take exponent of that ; this means recorded events are less likely in the past
+	# <- subtract "a", a constant (relativeDeathRate)
+	#
+	# This would be a straight likelihood as:
+	# 1/
+	# (exp(r*branching_time)-a)^2
+	#
+	# Sum the logs of these
+	#
+	# If deathRate = 0
+	# lnl_branching_times = -2 * sum(log(exp(birthRate*sptimes[2:N]) - 0))
+	# lnl_branching_times = -2 * sum(log( exp(birthRate*sptimes[2:N]) )
+	# lnl_branching_times = -2 * sum( birthRate*sptimes[2:N] )
+	#
+	# Note: sum(X) = 9 = total branchlength of tr
+	# In BD:
+	# -2*sum(sptimes[2:N]) = -12
+	# sum(sptimes[3:N]) = 3
+	# So, lnl_branching_times + lnl_Births_above_root = yule's -lambda * X
+	lnL = lnl_topology + lnl_numBirths + lnl_Births_above_root + lnl_numtips_wOneMinusDeathRate + lnl_branching_times
+	dev =  -2 * lnL
+	
+	bd = NULL
+	bd$tr = tr
+	bd$birthRate = birthRate
+	bd$deathRate = deathRate
+	bd$relative_deathRate = a
+	bd$net_diversification_rate = r
+	bd$dev = dev
+	bd$lnl_topology = lnl_topology
+	bd$lnl_numBirths = lnl_numBirths
+	bd$lnl_Births_above_root = lnl_Births_above_root
+	bd$lnl_numtips_wOneMinusDeathRate = lnl_numtips_wOneMinusDeathRate
+	bd$lnl_branching_times = lnl_branching_times
+	bd$lnL = lnL
+	
+	return(bd)
+	}
+
+
+
+
+
+
 # Get total LnL and branch LnL from ClaSSE output
 get_classe_LnLs <- function(classe_res)
 	{
@@ -11,8 +109,119 @@ get_classe_LnLs <- function(classe_res)
 
 
 
+BGBres_into_classe_params <- function(res, classe_params, birthRate=0.2)
+	{
+	mats = get_Qmat_COOmat_from_res(res, numstates=ncol(res$ML_marginal_prob_each_state_at_branch_top_AT_node), include_null_range=TRUE, max_range_size=res$inputs$max_range_size, timeperiod_i=1)
+	numstates = length(mats$states_list)
+	include_null_range = res$inputs$include_null_range
+	
+	# BioGeoBEARS Cevent weights into DF
+	Carray_df = get_Cevent_probs_df_from_mats(mats, include_null_range=include_null_range)
+	
+	# Diversitree params into a df
+	lambda_ijk_df = classe_lambdas_to_df(classe_params, k=numstates)
+	
+	# Put the Cevent_weights * birthRate into diversitree table
+	lambda_ijk_df = get_Cevent_lambdas_from_BGB_Carray(lambda_ijk_df, Carray_df, birthRate=birthRate)
+	lambda_ijk_df[lambda_ijk_df$lambda != 0,]
+
+	# Convert the diversitree table back to classe_params
+	lambdas_to_put_in_params = rownames(lambda_ijk_df[lambda_ijk_df$lambda != 0,])
+	indices_in_classe_params = match(x=lambdas_to_put_in_params, table=names(classe_params))
+	classe_params[indices_in_classe_params] = lambda_ijk_df[lambdas_to_put_in_params,"lambda"]
+	classe_params[153]
+	classe_params["lambda020202"]
+	classe_params["lambda060203"]
+	
+	
+	# Now do the Qmat
+	Qij_df = classe_Qs_to_df(classe_params, k=numstates)
+	Qmat = mats$Qmat
+	Qij_df = get_Qijs_from_BGB_Qarray(Qij_df, Qmat)
+	Qs_to_put_in_params = rownames(Qij_df[Qij_df$q != 0,])
+	indices_in_classe_params = match(x=Qs_to_put_in_params, table=names(classe_params))
+	classe_params[indices_in_classe_params] = Qij_df[Qs_to_put_in_params,"q"]
+	
+	
+	# And the mus	
+	# Because mu (the lineage extinction rate) is always 0.0 in BioGeoBEARS models
+	# (i.e., a pure-birth Yule process is being assumed)
+	classe_params[grepl(pattern="mu", x=names(classe_params))] = 0.0 
+	
+	return(classe_params)
+	} # BGBres_into_classe_params <- function(res, classe_params, birthRate=0.2)
+
+# k= number of states
+# Note that diversitree classe includes only e.g. q123, not q 132
+classe_Qs_to_df <- function(classe_params, k=3)
+	{
+	ex='
+	k = 3
+	classe_params = c(lambda111 = 0.2, lambda112 = 0, lambda113 = 0, lambda122 = 0, 
+lambda123 = 0, lambda133 = 0, lambda211 = 0, lambda212 = 0, lambda213 = 0, 
+lambda222 = 0.2, lambda223 = 0, lambda233 = 0, lambda311 = 0, 
+lambda312 = 0.0666666666666667, lambda313 = 0.0666666666666667, 
+lambda322 = 0, lambda323 = 0.0666666666666667, lambda333 = 0, 
+mu1 = 0.1, mu2 = 0.1, mu3 = 0.1, q12 = 0, q13 = 0, q21 = 0, q23 = 0, 
+q31 = 0, q32 = 0)
+	
+	Qij_df = classe_qs_to_df(classe_params=classe_params, k=3)
+	Qij_df
+	' # end example
+	
+	# Number of qs per state (e.g., for 3 states, this is 6 qs per state
+	#nsum <- k * (k + 1)/2
+
+	# Convert the classe_params qs to a table
+	Q_vals = classe_params[grepl(pattern="q", x=names(classe_params))]
+	Q_names = names(Q_vals)
+	
+	# Get i, j, k indices
+	Qij_txt = gsub(pattern="q", replacement="", x=Q_names)
+	
+	if (k <= 9)
+		{
+		ijs_vector = unlist(sapply(X=Qij_txt, FUN=strsplit, split="", USE.NAMES=FALSE))
+		Qij_mat = matrix(as.numeric(ijs_vector), ncol=k, byrow=TRUE)
+		Qij_mat
+		} else {
+		# Split by 2
+		is_vec = unlist(sapply(X=Qij_txt, FUN=substr, start=1, stop=2, USE.NAMES=FALSE))
+		js_vec = unlist(sapply(X=Qij_txt, FUN=substr, start=3, stop=4, USE.NAMES=FALSE))
+		Qij_mat = cbind(is_vec, js_vec)
+		}
+	
+	Qij_df = as.data.frame(cbind(Qij_mat, Q_vals), stringsAsFactors=FALSE)
+	names(Qij_df) = c("i", "j", "q")
+	# Convert qs to numeric
+	Qij_df$q = as.numeric(as.character(Qij_df$q))
+	return(Qij_df)
+	} # END classe_Qs_to_df <- function(classe_params, k=3)
 
 
+get_Qijs_from_BGB_Qarray <- function(Qij_df, Qmat)
+	{
+	for (r in 1:nrow(Qij_df))
+		{
+		# r = 153
+		# Qij_df[153,]
+		#               i  j  k lambda
+		# lambda020202 02 02 02      0
+		i = as.numeric(Qij_df$i[r])
+		j = as.numeric(Qij_df$j[r])
+	
+		# Don't include the diagonals from Q
+		if (i == j)
+			{
+			next()
+			}
+
+		Qij_df$q[r] = Qij_df$q[r] + Qmat[i,j]
+		} # END for (r in nrow(Qij_df))
+
+	Qij_df[Qij_df$q != 0,]
+	return(Qij_df)
+	} # END get_Qijs_from_BGB_Qarray <- function(Qij_df, Qmat, birthRate=1.0)
 
 
 # k= number of states
@@ -50,19 +259,61 @@ q31 = 0, q32 = 0)
 		lambda_ijk_mat
 		} else {
 		# Split by 2
-		lambda_ijk_mat = matrix(0.0, ncol=k, nrow=nsum)
 		is_vec = unlist(sapply(X=lambda_ijk_txt, FUN=substr, start=1, stop=2, USE.NAMES=FALSE))
 		js_vec = unlist(sapply(X=lambda_ijk_txt, FUN=substr, start=3, stop=4, USE.NAMES=FALSE))
 		ks_vec = unlist(sapply(X=lambda_ijk_txt, FUN=substr, start=5, stop=6, USE.NAMES=FALSE))
-		lambda_ijk_mat[,1] = as.numeric(is_vec)
-		lambda_ijk_mat[,2] = as.numeric(js_vec)
-		lambda_ijk_mat[,3] = as.numeric(ks_vec)
+		lambda_ijk_mat = cbind(is_vec, js_vec, ks_vec)
 		}
 	
-	lambda_ijk_df = as.data.frame(cbind(lambda_ijk_mat, lambda_vals))
+	lambda_ijk_df = as.data.frame(cbind(lambda_ijk_mat, lambda_vals), stringsAsFactors=FALSE)
 	names(lambda_ijk_df) = c("i", "j", "k", "lambda")
+	# Convert lambdas to numeric
+	lambda_ijk_df$lambda = as.numeric(as.character(lambda_ijk_df$lambda))
 	return(lambda_ijk_df)
 	} # END classe_lambdas_to_df <- function(classe_params, k=3)
+
+
+get_Cevent_lambdas_from_BGB_Carray <- function(lambda_ijk_df, Carray_df, birthRate=1.0)
+	{
+	for (r in 1:nrow(lambda_ijk_df))
+		{
+		# r = 153
+		# lambda_ijk_df[153,]
+		#               i  j  k lambda
+		# lambda020202 02 02 02      0
+		i = as.numeric(lambda_ijk_df$i[r])
+		j = as.numeric(lambda_ijk_df$j[r])
+		k = as.numeric(lambda_ijk_df$k[r])
+	
+		iTF = Carray_df$i == i
+		jTF = Carray_df$j == j
+		kTF = Carray_df$k == k
+		TF = (iTF + jTF + kTF) == 3
+		if (sum(TF) == 1)
+			{
+			lambda_ijk_df$lambda[r] = lambda_ijk_df$lambda[r] + (Carray_df$prob[TF] * birthRate)
+			}
+	
+		# Don't repeat the search when j==k (left and right states are the same)
+		if (j == k)
+			{
+			next()
+			}
+	
+		# Repeat, switching j and k states
+		jTF = Carray_df$j == k
+		kTF = Carray_df$k == j
+		TF = (iTF + jTF + kTF) == 3
+		if (sum(TF) == 1)
+			{
+			lambda_ijk_df$lambda[r] = lambda_ijk_df$lambda[r] + (Carray_df$prob[TF] * birthRate)
+			} # END if (sum(TF) == 1)
+		} # END for (r in nrow(lambda_ijk_df))
+
+	lambda_ijk_df[lambda_ijk_df$lambda != 0,]
+	return(lambda_ijk_df)
+	} # END get_Cevent_lambdas_from_BGB_Carray <- function(lambda_ijk_df, Carray_df)
+
 
 
 # Calculate the sum of the log computed likelihoods at each node
@@ -80,7 +331,12 @@ get_sum_log_computed_likes_at_each_node <- function(tr, base, lq, classe_params)
 	base_normlikes = base_likes / rowSums(base_likes)
 	
 	# Get a data.frame tabulating the lambdas
-	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=3)
+	lambda_ijk_df = classe_lambdas_to_df(classe_params=classe_params, k=k)
+	lambda_ijk_df$i = as.numeric(as.character(lambda_ijk_df$i))
+	lambda_ijk_df$j = as.numeric(as.character(lambda_ijk_df$j))
+	lambda_ijk_df$k = as.numeric(as.character(lambda_ijk_df$k))
+	lambda_ijk_df$lambda = as.numeric(as.character(lambda_ijk_df$lambda))
+	
 	
 	# Go through the ancestral states
 	computed_likelihoods_at_each_node_just_before_speciation = matrix(0.0, nrow=nrow(base), ncol=k)
@@ -103,31 +359,38 @@ get_sum_log_computed_likes_at_each_node <- function(tr, base, lq, classe_params)
 		# And for the ancestor edge (i or j shouldn't matter, should produce the same result!!!)
 		anc <- tr2$edge[i, 1]
 		
-		# For this node, go through the states and sum the likes
+		# For this anc node, go through the states and sum the likes
 		tmp_likes_AT_node = rep(0.0, times=k)
-		for (l in 1:k) # l = ancestral node number
+		for (l in 1:k) # l = ancestral state number
 			{
 			i_TF = lambda_ijk_df$i == l
 			j_ne_k_TF = lambda_ijk_df$j != lambda_ijk_df$k
 			rows_use_lambda_div2_TF = (i_TF + j_ne_k_TF) == 2
 			rows_use_lambda_div1_TF = (i_TF + rows_use_lambda_div2_TF) == 1
-			
 			lambda_ijk_df[rows_use_lambda_div1_TF,]
 			lambda_ijk_df[rows_use_lambda_div2_TF,]
 			
-			# Sum likes where the daughters the same
-			ind = rows_use_lambda_div1_TF
-			lcol = lambda_ijk_df$k[ind]
-			rcol = lambda_ijk_df$j[ind]
-			tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
-			# Sum likes where the daughters are NOT the same
-			# (divide lambda by 2, but use twice)
-			ind = rows_use_lambda_div2_TF
-			lcol = lambda_ijk_df$k[ind]
-			rcol = lambda_ijk_df$j[ind]
-			# Left, then right
-			tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
-			tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,rcol] * base_normlikes[right_desc_nodenum,lcol])
+			# Skip e.g. null-range states
+			if (sum(rows_use_lambda_div1_TF) > 0)
+				{
+				# Sum likes where the daughters the same
+				ind = rows_use_lambda_div1_TF
+				lcol = lambda_ijk_df$j[ind]
+				rcol = lambda_ijk_df$k[ind]
+				tmp_likes_AT_node[l] = sum(lambda_ijk_df$lambda[ind] * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
+				} # END if (sum(rows_use_lambda_div1_TF) > 0)
+
+			if (sum(rows_use_lambda_div2_TF) > 0)
+				{
+				# Sum likes where the daughters are NOT the same
+				# (divide lambda by 2, but use twice)
+				ind = rows_use_lambda_div2_TF
+				lcol = lambda_ijk_df$j[ind]
+				rcol = lambda_ijk_df$k[ind]
+				# Left, then right
+				tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,lcol] * base_normlikes[right_desc_nodenum,rcol])
+				tmp_likes_AT_node[l] = tmp_likes_AT_node[l] + sum(lambda_ijk_df$lambda[ind]/2 * base_normlikes[left_desc_nodenum,rcol] * base_normlikes[right_desc_nodenum,lcol])
+				} # END if (sum(rows_use_lambda_div1_TF) > 0)
 			} # END for (l in 1:k)
 		
 		computed_likelihoods_at_each_node_just_before_speciation[anc,] = tmp_likes_AT_node

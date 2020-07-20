@@ -114,6 +114,45 @@ bisse_2areas_default <- function(pars, condition.surv=TRUE, root=ROOT.OBS, root.
 
 
 
+make_bd <- function(tree, sampling.f=NULL, unresolved=NULL, times=NULL, control = list()) 
+	{
+	ex='
+	sampling.f=NULL
+	unresolved=NULL
+	times=NULL
+	control = list()
+	'
+
+	control <- check.control.bd(control, times)
+	cache <- make.cache.bd(tree, sampling.f, unresolved, times, control)
+	const <- cache$const
+	if (control$method == "nee")
+		{
+		all.branches <- make.all.branches.bd.nee(cache, control)
+		rootfunc <- rootfunc.bd.nee
+		} else {
+		all.branches <- make.all.branches.dtlik(cache, control, initial.conditions.bd.ode)
+		rootfunc <- rootfunc.bd.ode
+		}
+	ll <- function(pars, condition.surv = TRUE, intermediates = FALSE)
+		{
+		check.pars.nonnegative(pars, 2)
+		ans <- all.branches(pars, intermediates)
+		rootfunc(ans, pars, condition.surv, intermediates, const)
+		}
+	class(ll) <- c("bd", "dtlik", "function")
+	return(ll)
+	}
+
+
+lik_bd_default <- function(pars, condition.surv=TRUE, intermediates=FALSE) 
+	{
+	check.pars.nonnegative(pars, 2)
+	ans <- all.branches(pars, intermediates)
+	rootfunc(ans, pars, condition.surv, intermediates, const)
+	}
+
+
 
 
 
@@ -446,6 +485,26 @@ rootfunc.classe <- function(res, pars, condition.surv, root, root.p, intermediat
 	loglik
 	}
 
+# Birth-death root function
+#diversitree:::rootfunc.bd.ode
+rootfunc.bd.ode <- function(res, pars, condition.surv, intermediates, const) 
+	{
+	vals <- res$vals
+	lq <- res$lq
+	d.root <- vals[2]
+	if (condition.surv) {
+			e.root <- vals[[1]]
+			lambda <- pars[[1]]
+			d.root <- d.root/(lambda * (1 - e.root)^2)
+	}
+	loglik <- log(d.root) + sum(lq) + const
+	names(loglik) <- NULL
+	if (intermediates) {
+			attr(loglik, "intermediates") <- res
+			attr(loglik, "vals") <- vals
+	}
+	loglik
+	}
 
 
 

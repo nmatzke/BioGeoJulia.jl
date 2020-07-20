@@ -10,3 +10,8 @@ deps/deps.jl
 # *.jl.mem
 /docs/build/
 /docs/Manifest.toml
+
+# MacOSX system files
+.DS_Store
+.Rapp.history
+Rsrc/.Rapp.history
