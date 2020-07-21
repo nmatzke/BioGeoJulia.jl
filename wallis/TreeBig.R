@@ -98,7 +98,7 @@ out <-  lsoda(xstart, times, SPCmod, parms)
 #######################################################
 #######################################################
 library(ape)
-#trfn = "tree_small.newick"
+#trfn = "tree.newick"
 trstr = "(((chimp:1,human:1):1,gorilla:2):1,orang:3);"
 tr = read.tree(file="", text=trstr)
 plot(tr)
