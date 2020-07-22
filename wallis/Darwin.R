@@ -1,126 +1,126 @@
 
-# Example likelihood calculation on a single branch
-# (binary discrete trait)
-# library(ape)
-# library(expm)
-# 
-# # NM2: load the "Darwin's Finches" tree (genus Geospiza)
-# nexfn = "https://www.r-phylo.org/w/images/0/02/Geospiza.nex"
-# phy = read.nexus(file=nexfn)
-# phy
-# 
-# # NM2: create some fake data
+#Example likelihood calculation on a single branch
+#(binary discrete trait)
+library(ape)
+library(expm)
+
+# NM2: load the "Darwin's Finches" tree (genus Geospiza)
+nexfn = "https://www.r-phylo.org/w/images/0/02/Geospiza.nex"
+phy = read.nexus(file=nexfn)
+phy
+
+# NM2: create some fake data
 fakedata = rep(2, times=length(phy$tip.label))
- fakedata[1:5] = 1
+fakedata[1:5] = 1
 
 
-# # Specifying the parameters
-# p12 = 0.1
-# p21 = 0.01
-# param_vector = c(p12, p21)
-# 
-# discrete_lnL_2x2 <- function(param_vector, fakedata, phy)
-# {
-#   
-#   # Specifying the Q transition matrix
-#   Qmat = matrix(data=0, nrow=2, ncol=2)
-#   Qmat
-#   
-#   Qmat[1,2] = param_vector[1]
-#   Qmat[2,1] = param_vector[2]
-#   
-#   # (the diagonals should be -1 * the sum of the rows)
-#   diag(Qmat) = -1 * rowSums(Qmat)
-#   Qmat
-#   
-#   # NM2: Store the likelihoods during the downpass
-#   number_of_discrete_states = 2
-#   number_of_tip_nodes = length(phy$tip.label)
-#   number_of_internal_nodes = phy$Nnode
-#   total_number_of_nodes = number_of_tip_nodes + number_of_internal_nodes
-#   
-#   TIPS = 1:number_of_tip_nodes
-#   
-#   # Table storing the likelihoods
-#   liks = matrix(data=0, nrow=total_number_of_nodes, ncol=number_of_discrete_states)
-#   
-#   # comp stores the likelihood computation results
-#   comp = rep(0, times=total_number_of_nodes)
-#   
-#   
-#   # Load the tip data into the liks table
-#   for (i in 1:length(fakedata))
-#   {
-#     liks[i,fakedata[i]] =1
-#   }
-#   liks
-#   
-#   # reorder edge matrix
-#   phy = reorder(phy, "postorder")
-#   
-#   # Load the edge matrix
-#   e1 = phy$edge[,1] # ancestor nodes
-#   e2 = phy$edge[,2] # descendant nodes
-#   EL = phy$edge.length # edge lengths
-#   
-#   for (i in seq(from=1, by=2, length.out=number_of_internal_nodes))
-#   {
-#     j <- i + 1L
-#     anc <- e1[i]
-#     des1 <- e2[i]
-#     des2 <- e2[j]
-#     v.l <- expm(Qmat * EL[i]) %*% liks[des1, ]
-#     v.r <- expm(Qmat * EL[j]) %*% liks[des2, ]
-#     v <- v.l * v.r
-#     txt = paste0("i=", i, ", j=", j)
-#     #	cat(txt, "\n")
-#     #	print(v)
-#     
-#     comp[anc] <- sum(v)
-#     liks[anc, ] <- v/comp[anc]
-#   }
-#   
-#   
-#   lnL = sum(log(comp[-TIPS]))
-#   
-#   # Error check
-#   if (is.finite(lnL) == FALSE)
-#   {
-#     lnL = -1e50
-#   }
-#   
-#   # print to screen during each optimization step
-#   txt = paste0("p1=", param_vector[1], ", p2=", param_vector[2], ", lnL=", lnL)
-#   cat(txt, "\n")
-#   
-#   return(lnL)
-# }
-# 
-# discrete_lnL_2x2(param_vector, fakedata, phy)
+# Specifying the parameters
+p12 = 0.1
+p21 = 0.01
+param_vector = c(p12, p21)
+
+discrete_lnL_2x2 <- function(param_vector, fakedata, phy)
+{
+
+  # Specifying the Q transition matrix
+  Qmat = matrix(data=0, nrow=2, ncol=2)
+  Qmat
+
+  Qmat[1,2] = param_vector[1]
+  Qmat[2,1] = param_vector[2]
+
+  # (the diagonals should be -1 * the sum of the rows)
+  diag(Qmat) = -1 * rowSums(Qmat)
+  Qmat
+
+  # NM2: Store the likelihoods during the downpass
+  number_of_discrete_states = 2
+  number_of_tip_nodes = length(phy$tip.label)
+  number_of_internal_nodes = phy$Nnode
+  total_number_of_nodes = number_of_tip_nodes + number_of_internal_nodes
+
+  TIPS = 1:number_of_tip_nodes
+
+  # Table storing the likelihoods
+  liks = matrix(data=0, nrow=total_number_of_nodes, ncol=number_of_discrete_states)
+
+  # comp stores the likelihood computation results
+  comp = rep(0, times=total_number_of_nodes)
+
+
+  # Load the tip data into the liks table
+  for (i in 1:length(fakedata))
+  {
+    liks[i,fakedata[i]] =1
+  }
+  liks
+
+  # reorder edge matrix
+  phy = reorder(phy, "postorder")
+
+  # Load the edge matrix
+  e1 = phy$edge[,1] # ancestor nodes
+  e2 = phy$edge[,2] # descendant nodes
+  EL = phy$edge.length # edge lengths
+
+  for (i in seq(from=1, by=2, length.out=number_of_internal_nodes))
+  {
+    j <- i + 1L
+    anc <- e1[i]
+    des1 <- e2[i]
+    des2 <- e2[j]
+    v.l <- expm(Qmat * EL[i]) %*% liks[des1, ]
+    v.r <- expm(Qmat * EL[j]) %*% liks[des2, ]
+    v <- v.l * v.r
+    txt = paste0("i=", i, ", j=", j)
+    #	cat(txt, "\n")
+    #	print(v)
+
+    comp[anc] <- sum(v)
+    liks[anc, ] <- v/comp[anc]
+  }
+
+
+  lnL = sum(log(comp[-TIPS]))
+
+  # Error check
+  if (is.finite(lnL) == FALSE)
+  {
+    lnL = -1e50
+  }
+
+  # print to screen during each optimization step
+  txt = paste0("p1=", param_vector[1], ", p2=", param_vector[2], ", lnL=", lnL)
+  cat(txt, "\n")
+
+  return(lnL)
+}
+
+discrete_lnL_2x2(param_vector, fakedata, phy)
 
 
 # Compare to ace's ML result for a 2-rate modle
-# "ARD" = "all rates different"
-# ace(x=fakedata, phy=phy, type="discrete", method="ML", model="ARD")
-# Log-likelihood: -5.057634
-# p2 = 0.4688
-# p1 = 2.1555
+"ARD" = "all rates different"
+ace(x=fakedata, phy=phy, type="discrete", method="ML", model="ARD")
+Log-likelihood: -5.057634
+p2 = 0.4688
+p1 = 2.1555
 
-# 
-# discrete_lnL_2x2(fakedata, phy, param_vector=c(2.1555,0.4688) )
+
+discrete_lnL_2x2(fakedata, phy, param_vector=c(2.1555,0.4688) )
 # -5.057634
 # matches, yay!
 
 # Optimization with optim
 # par = starting parameter guesses
 # fn = the function we are optimizing
-# method = L-BFGS-B (this searches within 
-#          lower/upper limits for params)
-# control=list(fnscale=-1) # change from minimizer
-#                          # to maximizer
+# method = L-BFGS-B (this searches within
+#         lower/upper limits for params)
+control=list(fnscale=-1) # change from minimizer
+                         # to maximizer
 # fakedata, phy : inputs to discrete_lnL_2x2
-# starting_parameters = c(0.1, 0.1)
-# optim(par=starting_parameters, fn=discrete_lnL_2x2, method="L-BFGS-B", lower=c(0,0), upper=c(100,100), control=list(fnscale=-1), fakedata=fakedata, phy=phy)
+starting_parameters = c(0.1, 0.1)
+optim(par=starting_parameters, fn=discrete_lnL_2x2, method="L-BFGS-B", lower=c(0,0), upper=c(100,100), control=list(fnscale=-1), fakedata=fakedata, phy=phy)
 
 
 
@@ -250,6 +250,8 @@ tr = read.nexus(file=nexfn)
 plot(tr)
 axisPhylo()
 
+
+
 # Get the ML estimates of birthRate (speciation rate) 
 # and deathRate (extinction rate)
 # ...using ape::birthdeath
@@ -295,7 +297,7 @@ dev <- function(a=0.1, r=0.2, N, x, return_deviance=FALSE)
 	
 	lnl_topology = lfactorial(tr$Nnode)
 	lnl_numBirths = nb_node * log(r)
-	lnl_Births_above_root = r * sum(sptimes[14:N])
+	lnl_Births_above_root = r * sum(sptimes[3:N])
 	
 	lnl_numtips_wOneMinusDeathRate = N * log(1 - a)
 	# Interpretation: more tips are less likely, if relativeDeathRate is >0
@@ -303,7 +305,7 @@ dev <- function(a=0.1, r=0.2, N, x, return_deviance=FALSE)
 	#    CLEARLY WRONG EXCEPT IN A MAXIMUM LIKELIHOOD CONTEXT!!!
 	# If relativeDeathRate = 0, a=0, and lnl=0, i.e. any number of tips is equiprobable
 	
-	lnl_branching_times = -2 * sum(log(exp(r * sptimes[13:N]) - a))
+	lnl_branching_times = -2 * sum(log(exp(r * sptimes[2:N]) - a))
 	# For each observed branching,
 	# netDiversificationRate * timeOfEvent <- take exponent of that ; this means recorded events are less likely in the past
 	# <- subtract "a", a constant (relativeDeathRate)
@@ -338,13 +340,13 @@ dev <- function(a=0.1, r=0.2, N, x, return_deviance=FALSE)
 	return(result)
 	}
 dev(a=0.1, r=0.2, N=N, x=x)
-# 2.164867
+# 2.869079
 
 dev(a=x1, r=x2, N=N, x=x)
-# 16.84649
+# 18.38194
 
 dev(a=deathRate/birthRate, r=birthRate-deathRate, N=N, x=x)
-# 16.84649
+# 18.38195
 
 dev(a=0/birthRate, r=birthRate-0, N=N, x=x)
 
@@ -462,9 +464,10 @@ source("/GitHub/BioGeoJulia.jl/Rsrc/ClaSSE_functions_v3.R")
 # ====================
 
 # States at the tips of the tree
-# (ranges A, A, A, B)
-#states = c(1, 1, 1, 1)
-states = c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1) # 14 states for 14 tips
+# (ranges A, A, A, A...)
+# states =  rep(2, times=length(tr$tip.label))
+# states[1:5] = 1
+states = rep(1, times=length(tr$tip.label)) # 14 states for 14 tips
 names(states) = tr$tip.label
 states
 
@@ -702,9 +705,14 @@ condlikes_of_each_treeState_BRANCHTOP_AT_NODE = matrix(data=0, nrow=numnodes, nc
 # Fill in the likelihoods of tip nodes manually
 #tip_states_Ds = y[c(((length(y)/2)+1), length(y))]
 
+fakedata = rep(1, times=numnodes)
+
+#fakedata = rep(2, times=length(phy$tip.label))
+#fakedata[1:5] = 1
+
 for (i in 1:length(fakedata))
    {
-  condlikes_of_each_treeState_BRANCHTOP_AT_NODE[i,fakedata[i]] =1
+  condlikes_of_each_treeState_BRANCHTOP_AT_NODE[i,1] =1
    }
   #   liks
 
@@ -1094,11 +1102,23 @@ R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 # 5.442733
 
 
-R_result_branch_lnL = -9.126511
-R_result_total_LnLs1 = -8.071427
-R_result_total_LnLs1t = -6.422516
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 5.442733
+R_result_branch_lnL = sum(lnls, na.rm=TRUE)
+R_result_total_LnLs1 = LnLs1
+R_result_total_LnLs1t = LnLs1t
 
+
+R_result_branch_lnL
+R_result_total_LnLs1
+R_result_total_LnLs1t
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
+
+#R_result_branch_lnL = -6.496757
+#R_result_total_LnLs1 = -4.991969
+#R_result_total_LnLs1t = -3.310171
+#R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 18.0192
+
+# When some are type 0 and some are type 1:
+#R_result_sum_log_computer_likelihoods_at_each_node_x_lambda = 5.442733 
 
 #######################################################
 #######################################################

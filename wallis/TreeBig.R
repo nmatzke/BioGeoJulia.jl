@@ -149,7 +149,10 @@ dev <- function(a=0.1, r=0.2, N, x, return_deviance=FALSE)
   
   lnl_topology = lfactorial(tr$Nnode)
   lnl_numBirths = nb_node * log(r)
-  lnl_Births_above_root = r * sum(sptimes[4:N])
+  lnl_Births_above_root = r * sum(sptimes[3:N])
+  
+  # MY QUESTION HERE IS DOES THE SPTIMES EVEN MATTER?
+  # WHAT IS REQUIRED TO CHANGE BETWEEN NODE CHANGES?
   
   lnl_numtips_wOneMinusDeathRate = N * log(1 - a)
   # Interpretation: more tips are less likely, if relativeDeathRate is >0

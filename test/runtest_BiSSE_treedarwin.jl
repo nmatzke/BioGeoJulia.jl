@@ -43,10 +43,10 @@ using BioGeoJulia.SSEs
 # R code based on
 # source("/GitHub/BioGeoJulia.jl/wallis/Darwin.r)
 # Truth:
-R_result_branch_lnL = -9.126511
-R_result_total_LnLs1 = -8.071427
-R_result_total_LnLs1t = -6.422516
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 5.442733 
+R_result_branch_lnL = -6.496757
+R_result_total_LnLs1 = -4.991969
+R_result_total_LnLs1t = -3.310171
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 18.0192
 #######################################################
 
 
@@ -57,8 +57,30 @@ import .TreePass
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
 
-tr = readNexusTrees("/Users/wbla447/GitHub/BioGeoJulia.jl/wallis/Geospiza.nex")
-in_params = (birthRate=3.682184, deathRate=2.263549, d_val=0.0, e_val=0.0, a_val=0.2, j_val=0.0)
+nexustr = readNexusTrees("/Users/wbla447/GitHub/BioGeoJulia.jl/wallis/Geospiza.nex")
+tr = single_element_array_to_scalar(nexustr)
+
+"""
+Original tr style is: 
+HybridNetwork, Rooted Network
+4 edges
+5 nodes: 3 tips, 0 hybrid nodes, 2 internal tree nodes.
+tip labels: chimp, human, gorilla
+((chimp:1.0,human:1.0):1.0,gorilla:2.0);
+
+the nexus tree turns it into:
+1-element Array{HybridNetwork,1}:
+ HybridNetwork, Rooted Network
+26 edges
+27 nodes: 14 tips, 0 hybrid nodes, 13 internal tree nodes.
+tip labels: 1, 2, 3, 4, ...
+((((((((((1:0.055,2:0.055):0.055,3:0.11):0.073,4:0.183):0.009,5:0.192):0.036,6:0.228):0.103,(7:0.087,((8:0.02,9:0.02):0.015,10:0.035):0.052):0.245):0.134,11:0.466):0.069,12:0.534):0.049,13:0.583):0.297,14:0.881);
+
+We need this to not be an array...
+"""
+
+
+in_params = (birthRate=3.682184, deathRate=2.263549, d_val=0.0, e_val=0.0, a_val=0.1, j_val=0.0)
 numstates = 2
 n = 2
 
