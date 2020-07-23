@@ -84,7 +84,7 @@ tip labels: 1, 2, 3, 4, ...
 We need this to not be an array...
 """
 
-in_params = (birthRate=0.222222222, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.1, j_val=0.0)
+in_params = (birthRate=3.682184, deathRate=2.263549, d_val=0.0, e_val=0.0, a_val=0.1, j_val=0.0)
 numstates = 2
 n = 2
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
