@@ -140,7 +140,7 @@ c(birthRate, deathRate)
 
 # You should get:
 # c(birthRate, deathRate)
-# [1] 0.2222222 0.0000000
+# [1] 3.682184 2.263549
 
 # Get the log-likelihood of the tree under the ML parameters
 # Convert the deviance to likelihood
@@ -150,7 +150,7 @@ BD_LnL
 
 
 # Set birthRate
-#birthRate = 0.22222222222222222222
+#birthRate = 0.3.682184
 
 
 #######################################################
@@ -212,17 +212,17 @@ dev <- function(a=0.1, r=0.2, N, x, return_deviance=FALSE)
   return(result)
 }
 dev(a=0.1, r=0.2, N=N, x=x)
-# -4.063987
+# 3.430055
 
 dev(a=x1, r=x2, N=N, x=x)
-# -3.216395
+# 22.36105
 
 dev(a=deathRate/birthRate, r=birthRate-deathRate, N=N, x=x)
-# -3.216395
+# 22.36105
 
 dev(a=0/birthRate, r=birthRate-0, N=N, x=x)
 
-birthRate = 0.222222222222
+birthRate = 3.682184
 dev(a=0/birthRate, r=birthRate-0, N=N, x=x)
 
 
@@ -245,13 +245,13 @@ bd.ext(phy=tr, S=S, conditional=FALSE) # same than older versions
 #######################################################
 yule(phy=tr)
 # $lambda
-# [1] 0.2222222
+# [1] 2.61642
 # 
 # $se
-# [1] 0.1571348
+# [1] 0.7552953
 # 
 # $loglik
-# [1] -3.216395
+# [1] 22.09385
 # 
 # attr(,"class")
 # [1] "yule"
@@ -293,7 +293,7 @@ yule_lik <- function(tr)
 }
 
 yule_lik(tr=tr)
-# -3.216395 
+# 22.09385
 
 
 
@@ -351,8 +351,8 @@ bisse_2areas = diversitree::make.bisse(tree=tr, states=states, sampling.f=sampli
 # lambdas = speciation rates
 # mus = extinction rates
 # qs = anagenetic transition rates
-birthRate = 0.222222222
-deathRate = 0.0
+birthRate = 3.682184
+deathRate = 2.263549
 
 lambda0 = birthRate
 lambda1 = birthRate
@@ -511,7 +511,7 @@ define_BiSSE_eqns_in_R <- function(t, y, parms)
 one_step_result = define_BiSSE_eqns_in_R(t=t, y=y, parms=parms)
 one_step_result
 # [[1]]
-# [1]  0.0000000  0.0000000  0.0000000 -0.2222222
+# [1]   0.000000  0.000000  0.000000 -2.616461
 
 # LSODA inputs:
 # y = initial state values

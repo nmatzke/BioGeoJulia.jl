@@ -106,19 +106,19 @@ classe_params[param_names=="lambda3333"] = 0
 # Jump dispersal speciation
 # We do x2, because lambda112 covers lambda121
 classe_params[param_names=="lambda112"] = jprob * birthRate * 2
-classe_params[param_names=="lambda121"] = jprob * birthRate * 2
+# classe_params[param_names=="lambda121"] = jprob * birthRate * 2
 classe_params[param_names=="lambda212"] = jprob * birthRate * 2
-classe_params[param_names=="lambda221"] = jprob * birthRate * 2
+# classe_params[param_names=="lambda221"] = jprob * birthRate * 2
 
 # Vicariance etc. -- still just 1/6 as there are 
 # no j events from AB in a 2-area system
 # We do x2, because lambda312 covers lambda321
 classe_params[param_names=="lambda312"] = 1/6 * birthRate * 2
-classe_params[param_names=="lambda321"] = 1/6 * birthRate * 2
+# classe_params[param_names=="lambda321"] = 1/6 * birthRate * 2
 classe_params[param_names=="lambda313"] = 1/6 * birthRate * 2
-classe_params[param_names=="lambda331"] = 1/6 * birthRate * 2
+# classe_params[param_names=="lambda331"] = 1/6 * birthRate * 2
 classe_params[param_names=="lambda323"] = 1/6 * birthRate * 2
-classe_params[param_names=="lambda332"] = 1/6 * birthRate * 2
+# classe_params[param_names=="lambda332"] = 1/6 * birthRate * 2
 
 # For diversitree ClaSSE, you have to lump lambda312 and lambda321
 # classe_params[param_names=="lambda312"] = 1/3 * birthRate
