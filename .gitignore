@@ -15,3 +15,4 @@ deps/deps.jl
 .DS_Store
 .Rapp.history
 Rsrc/.Rapp.history
+Rsrc/.DS_Store
