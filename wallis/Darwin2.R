@@ -366,13 +366,13 @@ parms
 bisse_params = parms
 
 # Constraint parameters so you are only fitting 1 birthRate
-constraints = list(lambda0~lambda1, mu0~0.0, mu1~0.0, q01~0.0, q10~0.0)
-bisse_2areas_constrained = diversitree::constrain(f=bisse_2areas, formulae=constraints)
+#constraints = list(lambda0~lambda1, mu0~0.0, mu1~0.0, q01~0.0, q10~0.0)
+#bisse_2areas_constrained = diversitree::constrain(f=bisse_2areas, formulae=constraints)
 
 # Wait 1 seconds
-fit <- find.mle(func=bisse_2areas_constrained, x.init=bisse_params, method="subplex")
-fit$par.full
-fit$lnLik
+#fit <- find.mle(func=bisse_2areas_constrained, x.init=bisse_params, method="subplex")
+#fit$par.full
+#fit$lnLik
 
 # Compare to Yule
 yule(tr)
@@ -451,8 +451,8 @@ birthRate
 lambda0 = bisse_params["lambda0"]
 lambda1 = bisse_params["lambda1"]
 # Extinction
-mu0 = 0
-mu1 = 0
+mu0 = deathRate
+mu1 = deathRate
 # Character transition
 q01 = 0.0 # ML
 q10 = 0.0
@@ -593,8 +593,8 @@ edges_to_visit = seq(from=1, by=2, length.out=num_internal_nodes)
 lambda0 = bisse_params["lambda0"]
 lambda1 = bisse_params["lambda1"]
 # Extinction
-mu0 = 0
-mu1 = 0
+mu0 = deathRate
+mu1 = deathRate
 # Character transition
 q01 = 0.0 # ML
 q10 = 0.0
@@ -879,17 +879,23 @@ sum(lq)
 # Assuming diversitree options:
 # root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
 # i.e., the root state probs are just the root_Ds/sum(root_Ds)
+
+LnLs1
 LnLs1t
-# -0.4583174 -0.4583174
+#[1] -0.4075469 -1.7110530
+LnLs1t
+#[1] -0.191117 -1.711053
 
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = sum(log(computed_likelihoods_at_each_node_x_lambda))
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
 # 12.04537
 
 
-R_result_branch_lnL = -0.4583174
-R_result_total_lnL = -0.4583174
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 12.04537
+R_result_branch_lnL = -1.711053
+R_result_total_LnLs1 = -0.4075469
+R_result_total_LnLs1t = -0.191117
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 15.23452
 
 
 #######################################################
