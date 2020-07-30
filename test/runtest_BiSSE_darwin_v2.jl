@@ -62,7 +62,7 @@ import .TreePass
 # Repeat calculation in Julia
 include("/GitHub/BioGeoJulia.jl/notes/ModelLikes.jl")
 import .ModelLikes
-nexustr = readNexusTrees("/Users/wbla447/GitHub/BioGeoJulia.jl/wallis/Geospiza.nex")
+nexustr = readNexusTrees("/GitHub/BioGeoJulia.jl/wallis/Geospiza.nex")
 tr = single_element_array_to_scalar(nexustr)
 
 """
