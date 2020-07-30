@@ -50,9 +50,10 @@ using BioGeoJulia.SSEs
 # Run with:
 # source("/GitHub/BioGeoJulia.jl/test/BiSSE_branchlikes_w_BD_v4_WORKING_n1.R")
 # Truth:
-R_result_branch_lnL = -0.4583174
-R_result_total_lnL = -0.4583174
-R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 12.04537
+R_result_branch_lnL = -1.711053
+R_result_total_LnLs1 = -0.4075469
+R_result_total_LnLs1t = -0.191117
+R_result_sum_log_computed_likelihoods_at_each_node_x_lambda = 15.23452
 #######################################################
 
 
@@ -84,7 +85,7 @@ tip labels: 1, 2, 3, 4, ...
 We need this to not be an array...
 """
 
-in_params = (birthRate=3.682184, deathRate=2.263549, d_val=0.0, e_val=0.0, a_val=0.1, j_val=0.0)
+in_params = (birthRate=3.682184, deathRate=2.263549, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
 numstates = 2
 n = 2
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
@@ -126,7 +127,7 @@ sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop)))
 Julia_sum_lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
 
 # Does the total of the branch log-likelihoods (lq) match?
-@test round(R_result_branch_lnL; digits=5) == round(Julia_sum_lq; digits=5)
+@test round(R_result_branch_lnL; digits=4) == round(Julia_sum_lq; digits=4)
 
 # Add the root probabilities
 # Assuming diversitree options:
@@ -138,7 +139,7 @@ rootstates_lnL = log(sum(root_stateprobs .* d_root_orig))
 Julia_total_lnL = Julia_sum_lq + rootstates_lnL
 
 # Does the total lnL match R?
-@test round(R_result_total_lnL; digits=5) == round(Julia_total_lnL; digits=5)
+@test round(R_result_total_LnLs1; digits=4) == round(Julia_total_lnL; digits=4)
 
 # Does the total of branch likelihoods (lq) + node likelihoods match R?
 # 
@@ -146,7 +147,7 @@ Julia_total_lnL = Julia_sum_lq + rootstates_lnL
 #    = sum(log(computed_likelihoods_at_each_node_x_lambda))
 Julia_sum_lq_nodes = sum(log.(sum.(res.likes_at_each_nodeIndex_branchTop))) + Julia_sum_lq
 R_sum_lq_nodes = R_result_sum_log_computed_likelihoods_at_each_node_x_lambda
-@test round(Julia_sum_lq_nodes; digits=5) == round(R_sum_lq_nodes; digits=5)
+@test round(Julia_sum_lq_nodes; digits=4) == round(R_sum_lq_nodes; digits=4)
 
 
 # The standard diversitree lnL calculation sums:
@@ -182,7 +183,7 @@ print("R_result_branch_lnL (lq) - Julia_sum_lq: ")
 print(R_result_branch_lnL - Julia_sum_lq)
 print("\n")
 print("R_result_total_lnL (lq) - Julia_total_lnL: ")
-print(R_result_total_lnL - Julia_total_lnL)
+print(R_result_total_LnLs1 - Julia_total_lnL)
 print("\n")
 print("R_result_total_lnL (lq) - Julia_sum_lq_nodes: ")
 print(R_sum_lq_nodes - Julia_sum_lq_nodes)
