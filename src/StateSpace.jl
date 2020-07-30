@@ -1094,7 +1094,7 @@ function discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas=6, ma
 	# This solution updates p (look in p.values)
 	problem = maximize(Convex.entropy(p), 0 <= p, p <= 1, sum(p) == 1, feature_constraints)
 	#sol = Convex.solve!(problem, SCS.SCSSolver(verbose=0))
-	sol = Convex.solve!(problem, SCS.Optimizer())
+	sol = Convex.solve!(problem, SCS.Optimizer(verbose=0))
 	maxent_result = abs.(round.(p.value; digits=3))
 	return maxent_result
 end

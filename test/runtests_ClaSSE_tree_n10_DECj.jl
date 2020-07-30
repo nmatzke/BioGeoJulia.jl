@@ -95,19 +95,62 @@ inputs.res.likes_at_each_nodeIndex_branchTop
 size(inputs.res.likes_at_each_nodeIndex_branchTop)
 numstates = length(inputs.res.likes_at_each_nodeIndex_branchTop[1])
 
-# Put island_nums in Julia order
-sort!(trdf,:Rnodenums)
-trdf_tiprows_in_Rnodenums_order = trdf[!,:nodeIndex][1:tr.numTaxa]
-sort!(trdf,:nodeIndex) # Return to original PhyloNetworks sort order
+# Get the states list
+dfnames = names(geog_df)
+area_column_nums = 2:length(dfnames)
+areas_txt_list = dfnames[area_column_nums]
+numareas = length(areas_list)
+areas_list = collect(1:numareas)
+maxareas = numareas
+include_null_range = true
+states_list = areas_list_to_states_list(areas_list, maxareas, include_null_range)
+statenums = collect(1:length(states_list))
+observed_statenums = collect(repeat([0], nrow(geog_df)))
+trdf_nodenums = collect(1:nrow(trdf))
 
-inputs.res.likes_at_each_nodeIndex_branchTop
-for i in 1:tr.numTaxa
-	inputs.res.likes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]] .= 0.0
-	inputs.res.normlikes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]] .= 0.0
-	inputs.res.likes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]][island_nums[i]+1] = 1.0
-	inputs.res.normlikes_at_each_nodeIndex_branchTop[trdf_tiprows_in_Rnodenums_order[i]][island_nums[i]+1] = 1.0
-	inputs.res.sumLikes_at_node_at_branchTop[trdf_tiprows_in_Rnodenums_order[i]] = 1.0
+# Convert the observed geography into a list of states comparable to states_list
+geog_observed_list = []  # empty array
+
+for i in 1:nrow(geog_df)
+	tmprow = geog_df[i,area_column_nums]
+	tmpnums = parse.(Int, flat2(tmprow))
+	range_as_areanums = areas_list[tmpnums .== 1]
+	# Compare observed range_as_areanums to full states_list
+	TF = [range_as_areanums] .== states_list
+	if (sum(TF) != 1)
+		txt = paste0(["STOP ERROR: An observed range in your geography file, from tipname '", geog_df[i,:tipnames], "', is not found in the list of states in states_list. Printing range_as_areanums, then states_list"])
+		print(txt)
+		print("\nrange_as_areanums (this is the observed range that was not found):\n")
+		print(range_as_areanums)
+		print("\nstates_list:\n")
+		print(states_list)
+		error(txt)
+	end
+	
+	# Yay, a single match to the states_list was found!
+	# Convert to a state index number
+	observed_statenums[i] = statenums[TF][1]
 end
+
+observed_statenums
+
+# Go through the geography file tips, match each one to the correct node of trdf,
+# then update the tip likelihoods at that node.
+
+for i in 1:nrow(geog_df)
+	spname = geog_df[i,:tipnames]
+	TF = spname .== trdf[!,:nodeName]
+	nodeNum = trdf_nodenums[TF][1]
+	
+	# Input likelihoods of 1 for the observed state, 0 otherwise
+	inputs.res.likes_at_each_nodeIndex_branchTop[nodeNum] .= 0.0
+	inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum] .= 0.0
+	inputs.res.likes_at_each_nodeIndex_branchTop[nodeNum][observed_statenums[i]] = 1.0
+	inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum][observed_statenums[i]] = 1.0
+	inputs.res.sumLikes_at_node_at_branchTop[nodeNum] = 1.0
+	
+end
+
 inputs.res.likes_at_each_nodeIndex_branchTop
 res = inputs.res
 
