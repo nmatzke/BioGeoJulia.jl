@@ -111,8 +111,6 @@ observed_statenums = collect(repeat([0], nrow(geog_df)))
 trdf_nodenums = collect(1:nrow(trdf))
 
 # Convert the observed geography into a list of states comparable to states_list
-geog_observed_list = []  # empty array
-
 for i in 1:nrow(geog_df)
 	tmprow = geog_df[i,area_column_nums]
 	tmpnums = parse.(Int, flat2(tmprow))
