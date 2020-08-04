@@ -270,7 +270,6 @@ inputs.p_Ds_v5.params.Qij_vals
 inputs = func_to_optimize(pars, parnames, inputs; returnval="inputs");
 inputs.p_Ds_v5.params.Qij_vals
 inputs.p_Ds_v5.params.Cijk_vals
-lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
 
 function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 	# Get the Q, C
@@ -314,6 +313,14 @@ function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 	# Shouldn't get here
 	return(NaN)
 end # END function func_to_optimize(pars, parnames)
+
+pars = [0.3, 0.2]
+parnames = ["d", "e"]
+lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
+
+pars = [0.03, 0.02]
+parnames = ["d", "e"]
+lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
 
 pars = [0.3, 0.2]
 parnames = ["d", "e"]
