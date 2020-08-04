@@ -176,7 +176,7 @@ function tipranges_to_tiplikes(inputs, geog_df)
 	dfnames = names(geog_df)
 	area_column_nums = 2:length(dfnames)
 	areas_txt_list = dfnames[area_column_nums]
-	numareas = length(areas_list)
+	numareas = length(inputs.setup.areas_list)
 	
 	# Check if the number of areas in the geography file matches the number in the geog_df
 	if (inputs.setup.numareas != numareas)
@@ -194,22 +194,22 @@ function tipranges_to_tiplikes(inputs, geog_df)
 	for i in 1:nrow(geog_df)
 		tmprow = geog_df[i,area_column_nums]
 		tmpnums = parse.(Int, flat2(tmprow))
-		range_as_areanums = areas_list[tmpnums .== 1]
+		range_as_areanums = inputs.setup.areas_list[tmpnums .== 1]
 		# Compare observed range_as_areanums to full states_list
-		TF = [range_as_areanums] .== states_list
+		TF = [range_as_areanums] .== inputs.setup.states_list
 		if (sum(TF) != 1)
-			txt = paste0(["STOP ERROR: An observed range in your geography file, from tipname '", geog_df[i,:tipnames], "', is not found in the list of states in states_list. Printing range_as_areanums, then states_list"])
+			txt = paste0(["STOP ERROR: An observed range in your geography file, from tipname '", geog_df[i,:tipnames], "', is not found in the list of states in inputs.setup.states_list. Printing range_as_areanums, then inputs.setup.states_list"])
 			print(txt)
 			print("\nrange_as_areanums (this is the observed range that was not found):\n")
 			print(range_as_areanums)
 			print("\nstates_list:\n")
-			print(states_list)
+			print(inputs.setup.states_list)
 			error(txt)
 		end
 	
 		# Yay, a single match to the states_list was found!
 		# Convert to a state index number
-		inputs.setup.observed_statenums[i] = statenums[TF][1]
+		inputs.setup.observed_statenums[i] = inputs.setup.statenums[TF][1]
 	end
 
 	# Go through the geography file tips, match each one to the correct node of trdf,
