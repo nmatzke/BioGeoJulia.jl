@@ -220,7 +220,11 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 																					# for lsoda, Tsit5; GMRES worked either way
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
-	
+
+	# Save some basic inputs
+	numstates = length(states_list)
+	setup = (areas_list=areas_list, states_list=states_list, numstates=numstates, numareas=total_numareas)
+		
 	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
 	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 	"""
@@ -230,7 +234,7 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	p_Ds_v5 = inputs.p_Ds_v5
 	"""
 	
-	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, Es_tspan=Es_tspan)
+	inputs = (setup=setup, res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, Es_tspan=Es_tspan)
 	
 	return inputs
 end # End function setup_MuSSE_biogeo
@@ -409,7 +413,11 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 																					# for lsoda, Tsit5; GMRES worked either way
 	solver_options.abstol = 1.0e-6
 	solver_options.reltol = 1.0e-6
-
+	
+	# Save some basic inputs
+	numstates = length(states_list)
+	setup = (areas_list=areas_list, states_list=states_list, numstates=numstates, numareas=total_numareas)
+	
 	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
 	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
 	
@@ -420,7 +428,7 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	p_Ds_v5 = inputs.p_Ds_v5
 	"""
 	
-	inputs = (res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, Es_tspan=Es_tspan)
+	inputs = (setup=setup, res=res, trdf=trdf, solver_options=solver_options, p_Ds_v5=p_Ds_v5, Es_tspan=Es_tspan)
 	
 	return inputs
 end # End function setup_DEC_SSE
