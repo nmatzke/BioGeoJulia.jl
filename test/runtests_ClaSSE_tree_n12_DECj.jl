@@ -266,6 +266,7 @@ pars = [0.3, 0.2, 1.0, 1.0, 1.0, 0.0]
 parnames = ["d", "e", "y", "s", "v", "j"]
 
 # Set inputs to starting values
+Rnames(p_Ds_v5)
 
 function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	# Get the Q, C
