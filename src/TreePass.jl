@@ -1526,7 +1526,7 @@ function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 		else
 			res.node_state[current_nodeIndex] = "ready_for_branchOp"
 		end
-		return()
+		return(res)  # 2020-08-04_NJM
 	elseif (sum(TF) == 0)
 	  # If a tip
 	  txt = join(["Error in nodeOp_ClaSSE_v5(current_nodeIndex=", string(current_nodeIndex), "): shouldn't be run on a tip node."], "")
@@ -1698,9 +1698,12 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 	diagnostics = collect(repeat([Dates.now()], 3))
 	diagnostics[1] = Dates.now()
 	
-	
-	#res = deepcopy(res2)
-	
+	# Get some local variables for local usage
+	likes_at_each_nodeIndex_branchBot = deepcopy(res.likes_at_each_nodeIndex_branchBot)
+	normlikes_at_each_nodeIndex_branchBot = deepcopy(res.normlikes_at_each_nodeIndex_branchBot)
+	lq_at_branchBot = deepcopy(res.lq_at_branchBot)
+	like_at_branchBot = deepcopy(res.like_at_branchBot)
+		
 	# Setup
 	current_nodeIndex = res.root_nodeIndex
 
@@ -1788,10 +1791,10 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 # 					print("\n\n12345\n\n")
 
 					sum_nodeData_at_bottom = sum(nodeData_at_bottom)
-					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex][:] = nodeData_at_bottom .+ 0.0
-					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex][:] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
-					res.lq_at_branchBot[spawned_nodeIndex][:] = log(sum_nodeData_at_bottom)
-					res.like_at_branchBot[spawned_nodeIndex][:] = sum_nodeData_at_bottom
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
+					res.lq_at_branchBot[spawned_nodeIndex] = log(sum_nodeData_at_bottom)
+					res.like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
 					
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
@@ -1831,7 +1834,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
 			# Combine the downpass branch likelihoods
 			#nodeOp(current_nodeIndex, res, nodeOp_function=nodeOp_average_likes)
-			nodeOp_ClaSSE_v5!(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
+			res = nodeOp_ClaSSE_v5!(current_nodeIndex, res, p_Ds_v5=p_Ds_v5)
 			# (updates res)
 		end
 	

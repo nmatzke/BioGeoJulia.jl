@@ -267,7 +267,7 @@ parnames = ["d", "e", "y", "s", "v", "j"]
 
 # Set inputs to starting values
 inputs.p_Ds_v5.params.Qij_vals
-inputs = func_to_optimize(pars, parnames, inputs; returnval="inputs");
+#inputs = func_to_optimize(pars, parnames, inputs; returnval="inputs");
 inputs.p_Ds_v5.params.Qij_vals
 inputs.p_Ds_v5.params.Cijk_vals
 
@@ -314,6 +314,8 @@ function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 	# Shouldn't get here
 	return(NaN)
 end # END function func_to_optimize(pars, parnames)
+
+func = x -> func_to_optimize(x, parnames, inputs; returnval="lnL")
 
 pars = [0.3, 0.2]
 parnames = ["d", "e"]
