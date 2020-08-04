@@ -289,22 +289,24 @@ function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 		TF1 = parnames[i] .== Qdf[:,:event]
 		Qdf[:,:val][TF1] .= pars[i]
 		p_Ds_v5.params.Qij_vals[TF1] .= pars[i]
+		#print(sum(TF1))
 		
 		# Update the C values
 		TF2 = parnames[i] .== Cdf[:,:event]
 		Cdf[:,:val][TF2] .= pars[i]
 		p_Ds_v5.params.Cijk_vals[TF2] .= pars[i]
+		#print(sum(TF2))
 	end
 	
-	(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
+	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
 
 	
-	txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lq=", round(Julia_sum_lq; digits=3), ", rootstates_lnL=", round(rootstates_lnL; digits=3), ",	Julia_total_lnLs1=", Julia_total_lnLs1])
+	txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lqA=", round(Julia_sum_lqA; digits=3), ", rootstates_lnLA=", round(rootstates_lnLA; digits=3), ",	Julia_total_lnLs1A=", Julia_total_lnLs1A])
 	print(txt) 
 	print("\n")
 	
 	if returnval == "lnL"
-		return(-Julia_total_lnLs1)
+		return(-Julia_total_lnLs1A)
 	end
 	if returnval == "inputs"
 		return(inputs)
