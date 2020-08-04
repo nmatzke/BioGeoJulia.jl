@@ -1694,9 +1694,11 @@ end
 Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
 Non-parallel version (no istaskdone, etc.)
 """
-function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10, return_lnLs=false)
+function iterative_downpass_nonparallel_ClaSSE_v5!(res2; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10, return_lnLs=false)
 	diagnostics = collect(repeat([Dates.now()], 3))
 	diagnostics[1] = Dates.now()
+	
+	res = deepcopy(res2)
 	
 	# Setup
 	current_nodeIndex = res.root_nodeIndex
