@@ -1694,7 +1694,7 @@ end
 Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
 Non-parallel version (no istaskdone, etc.)
 """
-function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10, return_lnLs=false)
 	diagnostics = collect(repeat([Dates.now()], 3))
 	diagnostics[1] = Dates.now()
 	
@@ -1864,7 +1864,27 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 	res.calctime_iterations[1] = total_calctime_in_sec
 	res.calctime_iterations[2] = iteration_number / 1.0
 	
-	return(total_calctime_in_sec, iteration_number)
+	Julia_sum_lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
+
+	# Add the root probabilities
+
+	# Assuming diversitree options:
+	# root=ROOT.OBS, root.p=NULL, condition.surv=FALSE
+	# i.e., the root state probs are just the root_Ds/sum(root_Ds)
+	d_root_orig = res.likes_at_each_nodeIndex_branchTop[length(res.likes_at_each_nodeIndex_branchTop)]
+	root_stateprobs = d_root_orig/sum(d_root_orig)
+	rootstates_lnL = log(sum(root_stateprobs .* d_root_orig))
+	Julia_total_lnLs1 = Julia_sum_lq + rootstates_lnL
+	
+	
+	if return_lnLs == true
+		return(total_calctime_in_sec, iteration_number, Julia_sum_lq, rootstates_lnL, Julia_total_lnLs1)
+	else
+		return(total_calctime_in_sec, iteration_number)
+	end
+	
+	# shouldn't get here
+	return NaN
 end # END iterative_downpass_nonparallel_ClaSSE_v5!
 
 

@@ -5,6 +5,7 @@ using PhyloNetworks					# most maintained, emphasize; for HybridNetwork
 using Distributed						# for e.g. @spawn
 using Combinatorics					# for e.g. combinations()
 using DataFrames
+using Optim                 # for e.g. L-BFGS-B Maximum Likelihood optimization
 
 using LinearAlgebra  # for "I" in: Matrix{Float64}(I, 2, 2)
 										 # https://www.reddit.com/r/Julia/comments/9cfosj/identity_matrix_in_julia_v10/
@@ -249,6 +250,75 @@ print("\n")
 print("R_result_total_lnL (lq) - Julia_sum_lq_nodes: ")
 print(R_sum_lq_nodes - Julia_sum_lq_nodes)
 print("\n")
+
+
+#######################################################
+# OK, let's do an ML inference
+#######################################################
+# 1. Figure out how ML inference works
+# 
+# https://julianlsolvers.github.io/Optim.jl/stable/#examples/generated/maxlikenlm/
+#
+# 
+# 2. Write function to update parameters
+
+pars = [0.3, 0.2, 1.0, 1.0, 1.0, 0.0]
+parnames = ["d", "e", "y", "s", "v", "j"]
+
+# Set inputs to starting values
+inputs.p_Ds_v5.params.Qij_vals
+inputs = func_to_optimize(pars, parnames, inputs; returnval="inputs");
+inputs.p_Ds_v5.params.Qij_vals
+inputs.p_Ds_v5.params.Cijk_vals
+lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
+
+function func_to_optimize(pars, parnames, inputs; returnval="lnL")
+	# Get the Q, C
+	local res = inputs.res
+	trdf=inputs.trdf
+	p_Ds_v5=inputs.p_Ds_v5
+	
+	Qdf = prtQi(inputs)
+	Cdf = prtCi(inputs)
+	# Rnames(inputs.p_Ds_v5.params)
+	
+	# Update the parameters
+	# (this will only work for simple cases where no formula is needed)
+	for i in 1:length(parnames)
+		# Update the Q values
+		TF1 = parnames[i] .== Qdf[:,:event]
+		Qdf[:,:val][TF1] .= pars[i]
+		p_Ds_v5.params.Qij_vals[TF1] .= pars[i]
+		
+		# Update the C values
+		TF2 = parnames[i] .== Cdf[:,:event]
+		Cdf[:,:val][TF2] .= pars[i]
+		p_Ds_v5.params.Cijk_vals[TF2] .= pars[i]
+	end
+	
+	(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
+
+	
+	txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lq=", round(Julia_sum_lq; digits=3), ", rootstates_lnL=", round(rootstates_lnL; digits=3), ",	Julia_total_lnLs1=", Julia_total_lnLs1])
+	print(txt) 
+	print("\n")
+	
+	if returnval == "lnL"
+		return(-Julia_total_lnLs1)
+	end
+	if returnval == "inputs"
+		return(inputs)
+	end
+	# Shouldn't get here
+	return(NaN)
+end # END function func_to_optimize(pars, parnames)
+
+pars = [0.3, 0.2]
+parnames = ["d", "e"]
+lower = [0.0, 0.0]
+upper = [5.0, 5.0]
+func = pars -> func_to_optimize(pars, parnames, inputs; returnval="lnL")
+MLres = optimize(func, lower, upper, pars[:], Fminbox(LBFGS()))
 
 end # END @testset "runtests_BiSSE_tree_n3" begin
 
