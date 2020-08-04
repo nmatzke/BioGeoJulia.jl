@@ -1726,6 +1726,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 
 	iteration_number = 0
 	while(are_we_done == false)
+		global res
 		iteration_number = iteration_number+1
 		# As long as all the nodes are not done,
 		# check for "ready" nodes
@@ -1733,6 +1734,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 		indexes_ready = findall(res.node_state .== "ready_for_branchOp")
 		for current_nodeIndex in indexes_ready
 			# Before spawning, do some checks
+			global res
 			res.node_state[current_nodeIndex] = "calculating_branchOp"
 			# Check for root; no calculation on root branch for now
 			if current_nodeIndex == res.root_nodeIndex
@@ -1775,6 +1777,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 		# Check which jobs are done, fetch them, and update status of that node
 		num_tasks = length(tasks)
 		for i in 1:num_tasks
+			global res
 			if (tasks_fetched_TF[i] == false)
 				#if (istaskdone(tasks[i]) == true)
 					# Get the results
@@ -1846,6 +1849,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 		# Update nodes when the branches above finish
 		indexes_ready = findall(res.node_state .== "ready_for_nodeOp")
 		for current_nodeIndex in indexes_ready
+			global res
 			# Spawn a node operation
 			#push!(tasks, @spawn nodeOp(current_nodeIndex, res))
 			# Combine the downpass branch likelihoods
