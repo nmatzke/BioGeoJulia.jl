@@ -266,12 +266,8 @@ pars = [0.3, 0.2, 1.0, 1.0, 1.0, 0.0]
 parnames = ["d", "e", "y", "s", "v", "j"]
 
 # Set inputs to starting values
-inputs.p_Ds_v5.params.Qij_vals
-#inputs = func_to_optimize(pars, parnames, inputs; returnval="inputs");
-inputs.p_Ds_v5.params.Qij_vals
-inputs.p_Ds_v5.params.Cijk_vals
 
-function func_to_optimize(pars, parnames, inputs; returnval="lnL")
+function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	# Get the Q, C
 	res = inputs.res
 	trdf = inputs.trdf
@@ -286,7 +282,9 @@ function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 	
 	
 	trdf=inputs.trdf
-	p_Ds_v5=inputs.p_Ds_v5
+	
+	# DON'T take p_Ds_v5 from inputs, because that nukes the sol_Es that you modified!
+	#p_Ds_v5=inputs.p_Ds_v5
 	
 	Qdf = prtQi(inputs)
 	Cdf = prtCi(inputs)
