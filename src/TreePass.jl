@@ -1788,10 +1788,10 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 # 					print("\n\n12345\n\n")
 
 					sum_nodeData_at_bottom = sum(nodeData_at_bottom)
-					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
-					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
-					res.lq_at_branchBot[spawned_nodeIndex] = log(sum_nodeData_at_bottom)
-					res.like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
+					res.likes_at_each_nodeIndex_branchBot[spawned_nodeIndex][:] = nodeData_at_bottom .+ 0.0
+					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex][:] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
+					res.lq_at_branchBot[spawned_nodeIndex][:] = log(sum_nodeData_at_bottom)
+					res.like_at_branchBot[spawned_nodeIndex][:] = sum_nodeData_at_bottom
 					
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
