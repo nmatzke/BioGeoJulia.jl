@@ -273,7 +273,7 @@ inputs.p_Ds_v5.params.Cijk_vals
 
 function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 	# Get the Q, C
-	local res = inputs.res
+	res = inputs.res
 	trdf=inputs.trdf
 	p_Ds_v5=inputs.p_Ds_v5
 	
@@ -317,17 +317,20 @@ end # END function func_to_optimize(pars, parnames)
 pars = [0.3, 0.2]
 parnames = ["d", "e"]
 lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
+func(pars)
 
 pars = [0.03, 0.02]
 parnames = ["d", "e"]
 lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
+func(pars)
+
 
 pars = [0.3, 0.2]
 parnames = ["d", "e"]
 lower = [0.0, 0.0]
 upper = [5.0, 5.0]
 func = pars -> func_to_optimize(pars, parnames, inputs; returnval="lnL")
-MLres = optimize(func, lower, upper, pars[:], Fminbox(LBFGS()))
+MLres = optimize(func, lower, upper, pars)#, Fminbox(LBFGS()))
 
 end # END @testset "runtests_BiSSE_tree_n3" begin
 
