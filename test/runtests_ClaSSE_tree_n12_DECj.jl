@@ -274,6 +274,17 @@ inputs.p_Ds_v5.params.Cijk_vals
 function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 	# Get the Q, C
 	res = inputs.res
+	trdf = inputs.trdf
+	# Re-set the node states for new downpass
+	TF = trdf[:,:nodeType] .== "tip"
+	res.node_state[TF] .= "ready_for_branchOp"
+	res.node_state[TF .== false] .= "not_ready"
+	res.node_Lparent_state[TF] .= "NA"
+	res.node_Lparent_state[TF .== false] .= "not_ready"
+	res.node_Rparent_state[TF] .= "NA"
+	res.node_Rparent_state[TF .== false] .= "not_ready"
+	
+	
 	trdf=inputs.trdf
 	p_Ds_v5=inputs.p_Ds_v5
 	
@@ -297,13 +308,13 @@ function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 		#print(sum(TF2))
 	end
 	
-	res2 = deepcopy(res)
-	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5!(res2; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
+	#res2 = deepcopy(res)
+	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
 
 	
-	txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lqA=", round(Julia_sum_lqA; digits=3), ", rootstates_lnLA=", round(rootstates_lnLA; digits=3), ",	Julia_total_lnLs1A=", Julia_total_lnLs1A])
-	print(txt) 
-	print("\n")
+	#txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lqA=", round(Julia_sum_lqA; digits=3), ", rootstates_lnLA=", round(rootstates_lnLA; digits=3), ",	Julia_total_lnLs1A=", Julia_total_lnLs1A])
+	#print(txt) 
+	#print("\n")
 	
 	if returnval == "lnL"
 		return(-Julia_total_lnLs1A)
@@ -334,6 +345,9 @@ lower = [0.0, 0.0]
 upper = [5.0, 5.0]
 func = x -> func_to_optimize(x, parnames, inputs; returnval="lnL")
 MLres = optimize(func, lower, upper, pars)#, Fminbox(LBFGS()))
+
+p_Ds_v5.params.Qij_vals .= 0.1
+iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
 
 end # END @testset "runtests_BiSSE_tree_n3" begin
 

@@ -1588,18 +1588,18 @@ function branchOp_ClaSSE_Ds_v5(current_nodeIndex, res; u0, tspan, p_Ds_v5, solve
 	
 	# Example slow operation
 	#y = countloop(num_iterations, current_nodeIndex)
-	print("\n")
-	print("branchOp_ClaSSE_Ds_v5: d: ")
-	print(p_Ds_v5.params.Qij_vals[1])
-	print("branchOp_ClaSSE_Ds_v5: e: ")
-	print(p_Ds_v5.params.Qij_vals[length(p_Ds_v5.params.Qij_vals)])
-	print("\n")
+# 	print("\n")
+# 	print("branchOp_ClaSSE_Ds_v5: d: ")
+# 	print(p_Ds_v5.params.Qij_vals[1])
+# 	print("branchOp_ClaSSE_Ds_v5: e: ")
+# 	print(p_Ds_v5.params.Qij_vals[length(p_Ds_v5.params.Qij_vals)])
+# 	print("\n")
 	
 	prob_Ds_v5 = DifferentialEquations.ODEProblem(parameterized_ClaSSE_Ds_v5, u0, tspan, p_Ds_v5)
 	sol_Ds = solve(prob_Ds_v5, solver_options.solver, save_everystep=solver_options.save_everystep, abstol=solver_options.abstol, reltol=solver_options.reltol)
 	
-	print(sol_Ds[length(sol_Ds)])
-	print("\n")
+# 	print(sol_Ds[length(sol_Ds)])
+# 	print("\n")
 	
 	#nodeData_at_top = res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
 	#nodeData_at_bottom = nodeData_at_top / 2.0
