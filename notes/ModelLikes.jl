@@ -222,8 +222,11 @@ function setup_MuSSE_biogeo(numstates=2, tr=readTopology("((chimp:1,human:1):1,g
 	solver_options.reltol = 1.0e-6
 
 	# Save some basic inputs
+	numtips = sum(trdf[!,:nodeType] .== "tip")
 	numstates = length(states_list)
-	setup = (areas_list=areas_list, states_list=states_list, numstates=numstates, numareas=total_numareas)
+	statenums = collect(1:numstates)
+	observed_statenums = collect(repeat([0], nrow(geog_df)))
+	setup = (areas_list=areas_list, states_list=states_list, statenums=statenums, observed_statenums=observed_statenums, numtips=numtips, numstates=numstates, numareas=total_numareas)
 		
 	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
 	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)
@@ -415,8 +418,11 @@ function setup_DEC_SSE(numareas=2, tr=readTopology("((chimp:1,human:1):1,gorilla
 	solver_options.reltol = 1.0e-6
 	
 	# Save some basic inputs
+	numtips = sum(trdf[!,:nodeType] .== "tip")
 	numstates = length(states_list)
-	setup = (areas_list=areas_list, states_list=states_list, numstates=numstates, numareas=total_numareas)
+	statenums = collect(1:numstates)
+	observed_statenums = collect(repeat([0], nrow(geog_df)))
+	setup = (areas_list=areas_list, states_list=states_list, statenums=statenums, observed_statenums=observed_statenums, numtips=numtips, numstates=numstates, numareas=total_numareas)
 	
 	#p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, prob=prob_Es_v5, sol_Es_v5=sol_Es_v5, uE=uE)
 	p_Ds_v5 = (n=n, params=params, p_indices=p_indices, p_TFs=p_TFs, uE=uE)

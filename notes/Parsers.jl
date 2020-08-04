@@ -169,6 +169,73 @@ function getranges_from_LagrangePHYLIP(lgdata_fn; block_allQs=true)
 end # END getranges_from_LagrangePHYLIP
 
 
+#######################################################
+# Put the tip ranges into the likelihoods
+#######################################################
+function tipranges_to_tiplikes(inputs, geog_df)
+	dfnames = names(geog_df)
+	area_column_nums = 2:length(dfnames)
+	areas_txt_list = dfnames[area_column_nums]
+	numareas = length(areas_list)
+	
+	# Check if the number of areas in the geography file matches the number in the geog_df
+	if (inputs.setup.numareas != numareas)
+		txt = paste0(["STOP ERROR in tipranges_to_tiplikes(): inputs.setup.numareas=", numareas, ", but the number of areas in geog_df is ", numareas, ". Please fix and re-run."])
+		error(txt)
+	end
+	
+# 	statenums = collect(1:length(states_list))
+# 	observed_statenums = collect(repeat([0], nrow(geog_df)))
+	trdf_nodenums = collect(1:nrow(inputs.trdf))
+
+	# Convert the observed geography into a list of states comparable to states_list
+	geog_observed_list = []  # empty array
+
+	for i in 1:nrow(geog_df)
+		tmprow = geog_df[i,area_column_nums]
+		tmpnums = parse.(Int, flat2(tmprow))
+		range_as_areanums = areas_list[tmpnums .== 1]
+		# Compare observed range_as_areanums to full states_list
+		TF = [range_as_areanums] .== states_list
+		if (sum(TF) != 1)
+			txt = paste0(["STOP ERROR: An observed range in your geography file, from tipname '", geog_df[i,:tipnames], "', is not found in the list of states in states_list. Printing range_as_areanums, then states_list"])
+			print(txt)
+			print("\nrange_as_areanums (this is the observed range that was not found):\n")
+			print(range_as_areanums)
+			print("\nstates_list:\n")
+			print(states_list)
+			error(txt)
+		end
+	
+		# Yay, a single match to the states_list was found!
+		# Convert to a state index number
+		inputs.setup.observed_statenums[i] = statenums[TF][1]
+	end
+
+	# Go through the geography file tips, match each one to the correct node of trdf,
+	# then update the tip likelihoods at that node.
+
+	for i in 1:nrow(geog_df)
+		spname = geog_df[i,:tipnames]
+		TF = spname .== inputs.trdf[!,:nodeName]
+		nodeNum = trdf_nodenums[TF][1]
+	
+		# Input likelihoods of 1 for the observed state, 0 otherwise
+		inputs.res.likes_at_each_nodeIndex_branchTop[nodeNum] .= 0.0         # zero out
+		inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum] .= 0.0     # zero out
+		inputs.res.likes_at_each_nodeIndex_branchTop[nodeNum][inputs.setup.observed_statenums[i]] = 1.0
+		inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum][inputs.setup.observed_statenums[i]] = 1.0
+		inputs.res.sumLikes_at_node_at_branchTop[nodeNum] = 1.0
+	end
+
+	return inputs
+end # END function tipranges_to_tiplikes ()
+
+
+
+
+
+
 
 
 end # ENDING Parsers

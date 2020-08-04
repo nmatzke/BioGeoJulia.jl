@@ -95,6 +95,8 @@ inputs.res.likes_at_each_nodeIndex_branchTop
 size(inputs.res.likes_at_each_nodeIndex_branchTop)
 numstates = length(inputs.res.likes_at_each_nodeIndex_branchTop[1])
 
+inputs
+
 # Get the states list
 dfnames = names(geog_df)
 area_column_nums = 2:length(dfnames)
