@@ -1795,6 +1795,12 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 					res.normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
 					res.lq_at_branchBot[spawned_nodeIndex] = log(sum_nodeData_at_bottom)
 					res.like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
+
+					likes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = nodeData_at_bottom .+ 0.0
+					normlikes_at_each_nodeIndex_branchBot[spawned_nodeIndex] = (nodeData_at_bottom .+ 0.0) ./ sum_nodeData_at_bottom
+					lq_at_branchBot[spawned_nodeIndex] = log(sum_nodeData_at_bottom)
+					like_at_branchBot[spawned_nodeIndex] = sum_nodeData_at_bottom
+
 					
 					# Get the ancestor nodeIndex
 					uppass_edgematrix = res.uppass_edgematrix
@@ -1870,7 +1876,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 	res.calctime_iterations[1] = total_calctime_in_sec
 	res.calctime_iterations[2] = iteration_number / 1.0
 	
-	Julia_sum_lq = sum(res.lq_at_branchBot[1:(length(res.lq_at_branchBot)-1)])
+	Julia_sum_lq = sum(lq_at_branchBot[1:(length(lq_at_branchBot)-1)])
 
 	# Add the root probabilities
 
