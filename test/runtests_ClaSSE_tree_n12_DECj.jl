@@ -131,7 +131,7 @@ Es_interpolator(1.0)
 
 # Do downpass
 res.likes_at_each_nodeIndex_branchTop
-(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
+(total_calctime_in_sec, iteration_number) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10)
 res.likes_at_each_nodeIndex_branchTop
 
 Rnames(res)
@@ -297,7 +297,8 @@ function func_to_optimize(pars, parnames, inputs; returnval="lnL")
 		#print(sum(TF2))
 	end
 	
-	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
+	res2 = deepcopy(res)
+	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5!(res2; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
 
 	
 	txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lqA=", round(Julia_sum_lqA; digits=3), ", rootstates_lnLA=", round(rootstates_lnLA; digits=3), ",	Julia_total_lnLs1A=", Julia_total_lnLs1A])

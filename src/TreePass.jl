@@ -9,7 +9,7 @@ using Distributed			# for e.g. @spawn
 using Random					# for MersenneTwister()
 using DifferentialEquations # for ODEProblem
 using LSODA						# for lsoda()
-export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, SolverOpt, construct_SolverOpt, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, nodeOp_Cmat, nodeOp_ClaSSE_v5!, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5, iterative_downpass_nonparallel!
+export get_nodenumbers_above_node, get_postorder_nodenumbers_above_node, initialize_edgematrix, get_pruningwise_postorder_edgematrix, get_LR_uppass_edgematrix, get_LR_downpass_edgematrix, get_LR_uppass_nodeIndexes, get_LR_downpass_nodeIndexes, get_Rnodenums, get_nodeIndex_PNnumber, get_nodeIndex_from_PNnumber, prt, get_taxa_descending_from_each_node, isTip_TF, get_NodeIndexes_from_edge, get_NodeIndex_df_by_tree_edges, get_node_heights, get_node_ages, SolverOpt, construct_SolverOpt, Res, construct_Res, count_nodes_finished, nodeOp_average_likes, nodeOp, nodeOp_Cmat, nodeOp_ClaSSE_v5!, branchOp_example, branchOp_ClaSSE_Ds_v5, branchOp, setup_inputs_branchOp_ClaSSE_Ds_v5, countloop, iterative_downpass!, iterative_downpass_nonparallel_ClaSSE_v5!, iterative_downpass_nonparallel!
 
 
 
@@ -1694,7 +1694,7 @@ end
 Iterate through the "res" object many times to complete the downpass, spawning jobs along the way
 Non-parallel version (no istaskdone, etc.)
 """
-function iterative_downpass_nonparallel_ClaSSE_v5(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10, return_lnLs=false)
+function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_options=construct_SolverOpt(), max_iterations=10^10, return_lnLs=false)
 	diagnostics = collect(repeat([Dates.now()], 3))
 	diagnostics[1] = Dates.now()
 	
