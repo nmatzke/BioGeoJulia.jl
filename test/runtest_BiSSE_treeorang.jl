@@ -65,7 +65,7 @@ n = 2
 
 # CHANGE PARAMETERS BEFORE E INTERPOLATOR
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
-(res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
+(setup, res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
 
 # Change parameter inputs manually
 inputs.p_Ds_v5.params.Qij_vals[1] = 2*inputs.p_Ds_v5.params.Qij_vals[2]

@@ -89,7 +89,7 @@ in_params = (birthRate=3.682184, deathRate=2.263549, d_val=0.0, e_val=0.0, a_val
 numstates = 2
 n = 2
 inputs = ModelLikes.setup_MuSSE_biogeo(numstates, tr; root_age_mult=1.5, in_params=in_params)
-(res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
+(setup, res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
 inputs.res.likes_at_each_nodeIndex_branchTop
 inputs.res.normlikes_at_each_nodeIndex_branchTop
 
