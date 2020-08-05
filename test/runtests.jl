@@ -12,6 +12,7 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.TrUtils
 using BioGeoJulia.SSEs
+using BioGeoJulia.Parsers
 
 @testset "Example" begin
 	@test hello("Julia") == "Hello, Julia"
@@ -324,5 +325,13 @@ end
 	# parameterized_ClaSSE_v5
 	# parameterized_ClaSSE_Es_v5
 	# parameterized_ClaSSE_Ds_v5
+
+end
+
+@testset "Parsers" begin
+	lgdata_fn = "/GitHub/BioGeoJulia.jl/Rsrc/Psychotria_geog.data"
+	geog_df = Parsers.getranges_from_LagrangePHYLIP(lgdata_fn)
+
+	
 
 end

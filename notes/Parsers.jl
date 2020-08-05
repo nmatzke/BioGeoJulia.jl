@@ -22,7 +22,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello3, getranges_from_LagrangePHYLIP
+export say_hello3, getranges_from_LagrangePHYLIP, tipranges_to_tiplikes
 
 #######################################################
 # Temporary file to store functions under development
@@ -230,12 +230,6 @@ function tipranges_to_tiplikes(inputs, geog_df)
 
 	return inputs
 end # END function tipranges_to_tiplikes ()
-
-
-
-
-
-
 
 
 end # ENDING Parsers

@@ -3,7 +3,7 @@ using DataFrames
 using Plots  # for savefig
 #using RCall
 
-export getwd, Rgetwd, setwd, recursive_find, include_jls, source, dim, Rdim, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, Rclass, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str
+export getwd, Rgetwd, setwd, recursive_find, include_jls, source, dim, Rdim, seq, Rchoose, Rcbind, Rrbind, paste, paste0, type, class, Rclass, slashslash, addslash, df_to_Rdata, Reval, Rdput, Rnames, Rtypes, ont, saveopen, Rnrow, Rncol, Rsize, Rorder, headLR, flat2, single_element_array_to_scalar, headf, moref, scr2str, lagrange_to_tip
 
 # Basic checks during Julia startup
 function hello_world_TrUtils()
@@ -418,7 +418,55 @@ function scr2str(obj)
 	return str
 end
 
+function lagrange_to_tip(inputs, geog_df)
+	dfnames = names(geog_df)
+	area_column_nums = 2:length(dfnames)
+	areas_txt_list = dfnames[area_column_nums]
+	numareas = length(inputs.setup.areas_list)
+	areas_list = collect(1:numareas)
+	maxareas = numareas
+	include_null_range = true
+	states_list = areas_list_to_states_list(areas_list, maxareas, include_null_range)
+	statenums = collect(1:length(states_list))
+	observed_statenums = collect(repeat([0], nrow(geog_df)))
+	trdf_nodenums = collect(1:nrow(trdf))
 
+	for i in 1:nrow(geog_df)
+		tmprow = geog_df[i,area_column_nums]
+		tmpnums = parse.(Int, flat2(tmprow))
+		range_as_areanums = inputs.setup.areas_list[tmpnums .== 1]
+		# Compare observed range_as_areanums to full states_list
+		TF = [range_as_areanums] .== inputs.setup.states_list
+		if (sum(TF) != 1)
+			txt = paste0(["STOP ERROR: An observed range in your geography file, from tipname '", geog_df[i,:tipnames], "', is not found in the list of states in inputs.setup.states_list. Printing range_as_areanums, then inputs.setup.states_list"])
+			print(txt)
+			print("\nrange_as_areanums (this is the observed range that was not found):\n")
+			print(range_as_areanums)
+			print("\nstates_list:\n")
+			print(inputs.setup.states_list)
+			error(txt)
+		end
+	
+		# Yay, a single match to the states_list was found!
+		# Convert to a state index number
+		observed_statenums[i] = statenums[TF][1]
+	end
+
+	# Go through the geography file tips, match each one to the correct node of trdf,
+	# then update the tip likelihoods at that node.
+
+	for i in 1:nrow(geog_df)
+		spname = geog_df[i,:tipnames]
+		TF = spname .== inputs.trdf[!,:nodeName]
+		nodeNum = trdf_nodenums[TF][1]
+	
+		# Input likelihoods of 1 for the observed state, 0 otherwise
+		inputs.res.likes_at_each_nodeIndex_branchTop[nodeNum] .= 0.0         # zero out
+		inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum] .= 0.0     # zero out
+		inputs.res.likes_at_each_nodeIndex_branchTop[nodeNum][inputs.setup.observed_statenums[i]] = 1.0
+		inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum][inputs.setup.observed_statenums[i]] = 1.0
+		inputs.res.sumLikes_at_node_at_branchTop[nodeNum] = 1.0
+	end
 
 
 end # end of module
