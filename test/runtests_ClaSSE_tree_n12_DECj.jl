@@ -272,17 +272,6 @@ function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	# Get the Q, C
 	res = inputs.res
 	trdf = inputs.trdf
-	# Re-set the node states for new downpass
-	TF = trdf[:,:nodeType] .== "tip"
-	res.node_state[TF] .= "ready_for_branchOp"
-	res.node_state[TF .== false] .= "not_ready"
-	res.node_Lparent_state[TF] .= "NA"
-	res.node_Lparent_state[TF .== false] .= "not_ready"
-	res.node_Rparent_state[TF] .= "NA"
-	res.node_Rparent_state[TF .== false] .= "not_ready"
-	
-	
-	trdf=inputs.trdf
 	
 	# DON'T take p_Ds_v5 from inputs, because that nukes the sol_Es that you modified!
 	#p_Ds_v5=inputs.p_Ds_v5
@@ -325,16 +314,16 @@ function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	return(NaN)
 end # END function func_to_optimize(pars, parnames)
 
-func = x -> func_to_optimize(x, parnames, inputs; returnval="lnL")
+func = x -> func_to_optimize(x, parnames, inputs, p_Ds_v5; returnval="lnL")
 
 pars = [0.3, 0.2]
 parnames = ["d", "e"]
-lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
+lnL = func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 func(pars)
 
 pars = [0.03, 0.02]
 parnames = ["d", "e"]
-lnL = func_to_optimize(pars, parnames, inputs; returnval="lnL")
+lnL = func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 func(pars)
 
 
@@ -342,7 +331,7 @@ pars = [0.3, 0.2]
 parnames = ["d", "e"]
 lower = [0.0, 0.0]
 upper = [5.0, 5.0]
-func = x -> func_to_optimize(x, parnames, inputs; returnval="lnL")
+func = x -> func_to_optimize(x, parnames, inputs, p_Ds_v5; returnval="lnL")
 MLres = optimize(func, lower, upper, pars)#, Fminbox(LBFGS()))
 
 p_Ds_v5.params.Qij_vals .= 0.1
