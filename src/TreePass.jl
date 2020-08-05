@@ -1442,7 +1442,7 @@ function nodeOp(current_nodeIndex, res; nodeOp_function=nodeOp_average_likes)
 	print(txt)
 	print("\n")
 	return(error(txt))
-end
+end # END function nodeOp(current_nodeIndex, res; nodeOp_function=nodeOp_average_likes)
 
 
 # Node operation, combining probabilities from above (assumed to be fast)
@@ -1503,9 +1503,9 @@ function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 		#sum_likes_at_node = 1.0
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex] = (nodeData_at_top .+ 0.0)
 		res.likes_at_each_nodeIndex_branchTop[current_nodeIndex]
-		print("\n\ncurrent_nodeIndex:")
-		print(current_nodeIndex)
-		print("\n")
+# 		print("\n\ncurrent_nodeIndex:")
+# 		print(current_nodeIndex)
+# 		print("\n")
 		res.normlikes_at_each_nodeIndex_branchTop[current_nodeIndex] = ((nodeData_at_top .+ 0.0) ./ sum_likes_at_node)
 		
 		res.sumLikes_at_node_at_branchTop[current_nodeIndex] = sum_likes_at_node + 0.0
@@ -1546,7 +1546,7 @@ function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 	print(txt)
 	print("\n")
 	return(error(txt))
-end
+end # END function nodeOp_ClaSSE_v5!(current_nodeIndex, res; p_Ds_v5)
 
 
 
@@ -1764,7 +1764,7 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 
 			# Spawn a branch operation, and a true-false of whether they are fetched
 			res.calc_spawn_start[current_nodeIndex] = Dates.now()
-			print(join(["\nbranchOp on current_nodeIndex=", string(current_nodeIndex)], ""))
+			#print(join(["\nbranchOp on current_nodeIndex=", string(current_nodeIndex)], ""))
 #			if (parallel_TF == true)
 #				push!(tasks, @spawn branchOp(current_nodeIndex, res, num_iterations=num_iterations))
 #			else
@@ -1895,15 +1895,10 @@ function iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf, p_Ds_v5, solver_op
 	rootstates_lnL = log(sum(root_stateprobs .* d_root_orig))
 	Julia_total_lnLs1 = Julia_sum_lq + rootstates_lnL
 	
-	print("\n")
-	print(d_root_orig)
-	print("\n")
-	
-	
 	if return_lnLs == true
-		txt = paste0(["d=", p_Ds_v5.params.Qij_vals[1], ",	e=", p_Ds_v5.params.Qij_vals[length(p_Ds_v5.params.Qij_vals)], ",	Julia_sum_lq=", round(Julia_sum_lq; digits=3), ", rootstates_lnLB=", round(rootstates_lnL; digits=3), ",	Julia_total_lnLs1B=", Julia_total_lnLs1])
-		print(txt) 
-		print("\n")
+		#txt = paste0(["d=", p_Ds_v5.params.Qij_vals[1], ",	e=", p_Ds_v5.params.Qij_vals[length(p_Ds_v5.params.Qij_vals)], ",	Julia_sum_lq=", round(Julia_sum_lq; digits=3), ", rootstates_lnLB=", round(rootstates_lnL; digits=3), ",	Julia_total_lnLs1B=", Julia_total_lnLs1])
+		#print(txt) 
+		#print("\n")
 		return(total_calctime_in_sec, iteration_number, Julia_sum_lq, rootstates_lnL, Julia_total_lnLs1)
 	else
 		return(total_calctime_in_sec, iteration_number)
