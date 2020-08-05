@@ -41,7 +41,7 @@ function re()
 	end
 	end
 end
-
+ 
 
 # getwd
 function getwd()
@@ -467,6 +467,6 @@ function lagrange_to_tip(inputs, geog_df)
 		inputs.res.normlikes_at_each_nodeIndex_branchTop[nodeNum][inputs.setup.observed_statenums[i]] = 1.0
 		inputs.res.sumLikes_at_node_at_branchTop[nodeNum] = 1.0
 	end
-
+end # END function lagrange_to_tip(inputs, geog_df)
 
 end # end of module
