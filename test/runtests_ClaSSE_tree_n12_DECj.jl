@@ -300,9 +300,9 @@ function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
 
 	
-	#txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lqA=", round(Julia_sum_lqA; digits=3), ", rootstates_lnLA=", round(rootstates_lnLA; digits=3), ",	Julia_total_lnLs1A=", Julia_total_lnLs1A])
-	#print(txt) 
-	#print("\n")
+	txt = paste0(["pars[1]=", pars[1], ", pars[2]=", pars[2], ",	Julia_sum_lqA=", round(Julia_sum_lqA; digits=3), ", rootstates_lnLA=", round(rootstates_lnLA; digits=3), ",	Julia_total_lnLs1A=", Julia_total_lnLs1A])
+	print(txt) 
+	print("\n")
 	
 	if returnval == "lnL"
 		return(-Julia_total_lnLs1A)

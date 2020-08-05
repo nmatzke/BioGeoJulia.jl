@@ -1280,9 +1280,9 @@ nodeOp_Cmat = (tmpDs; tmp1, tmp2, p_Ds_v5) -> begin
 	Carray_jvals = p.p_indices.Carray_jvals
 	Carray_kvals = p.p_indices.Carray_kvals
 	
-	print("\n")
-	print("\n")
-	print("Running nodeOp_Cmat:\n\n")
+# 	print("\n")
+# 	print("\n")
+# 	print("Running nodeOp_Cmat:\n\n")
 	
 	# Calculate likelihoods of states just before speciation
   @inbounds for i in 1:n

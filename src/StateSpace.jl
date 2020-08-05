@@ -13,7 +13,7 @@ using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
 
-export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, prtC, prtCi, prtQ, prtQi, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, setup_DEC_Cmat, update_Cijk_vals
+export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, prtC, prtCi, prtQ, prtQi, prtCp, prtQp, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, setup_DEC_Cmat, update_Cijk_vals
 
 
 
@@ -90,6 +90,26 @@ end
 """
 function prtQi(inputs)
 	Qdf = DataFrame(event=inputs.p_Ds_v5.p_indices.Qarray_event_types, i=inputs.p_Ds_v5.p_indices.Qarray_ivals, j=inputs.p_Ds_v5.p_indices.Qarray_jvals, val=inputs.p_Ds_v5.params.Qij_vals)
+	return Qdf
+end
+
+
+
+"""
+# Print a p_Ds_v5 Carray to a data.frame
+"""
+function prtCp(p_Ds_v5)
+	Cdf = DataFrame(event=p_Ds_v5.p_indices.Carray_event_types, i=p_Ds_v5.p_indices.Carray_ivals, j=p_Ds_v5.p_indices.Carray_jvals, k=p_Ds_v5.p_indices.Carray_kvals, wt=p_Ds_v5.params.Cijk_weights, val=p_Ds_v5.params.Cijk_vals)
+	return Cdf
+end
+
+
+
+"""
+# Print a p_Ds_v5 Qarray to a data.frame
+"""
+function prtQp(p_Ds_v5)
+	Qdf = DataFrame(event=p_Ds_v5.p_indices.Qarray_event_types, i=p_Ds_v5.p_indices.Qarray_ivals, j=p_Ds_v5.p_indices.Qarray_jvals, val=p_Ds_v5.params.Qij_vals)
 	return Qdf
 end
 
