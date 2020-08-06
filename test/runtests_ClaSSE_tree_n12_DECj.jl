@@ -268,6 +268,45 @@ parnames = ["d", "e", "y", "s", "v", "j"]
 # Set inputs to starting values
 Rnames(p_Ds_v5)
 
+# Yule birthRate
+birthRate = 0.3288164
+
+prtQp(p_Ds_v5)
+prtCp(p_Ds_v5)
+Qdf = prtQi(inputs)
+Cdf = prtCi(inputs)
+
+for i in 1:length(parnames)
+	# Update the Q values
+	TF1 = parnames[i] .== Qdf[:,:event]
+	Qdf[:,:val][TF1] .= pars[i]
+	p_Ds_v5.params.Qij_vals[TF1] .= pars[i]
+	#print(sum(TF1))
+	
+	# Update the C values
+	TF2 = parnames[i] .== Cdf[:,:event]
+	Cdf[:,:val][TF2] .= pars[i]
+	p_Ds_v5.params.Cijk_weights[TF2] .= pars[i]
+	#print(sum(TF2))
+end
+
+# Convert the Cijk_weights to birthRates
+
+# for each possible ancestral state
+num_possible_ancestral_states = length(p_Ds_v5.p_TFs.Ci_sub_i)
+sum_of_weights_per_ancstate = collect(repeat([0.0], num_possible_ancestral_states))
+for i in 1:num_possible_ancestral_states
+	sum_of_weights_per_ancstate[i] = sum(p_Ds_v5.params.Cijk_weights[p_Ds_v5.p_TFs.Ci_eq_i[i]])
+	# Convert to rates
+	p_Ds_v5.params.Cijk_vals[p_Ds_v5.p_TFs.Ci_eq_i[i]] = birthRate .* p_Ds_v5.params.Cijk_weights[p_Ds_v5.p_TFs.Ci_eq_i[i]] ./ sum_of_weights_per_ancstate[i]
+end # end for-loop
+sum_of_weights_per_ancstate
+
+prtQp(p_Ds_v5)
+prtCp(p_Ds_v5)
+
+
+
 function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	# Get the Q, C
 	res = inputs.res
@@ -284,9 +323,9 @@ function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	# (this will only work for simple cases where no formula is needed)
 	for i in 1:length(parnames)
 		# Update the Q values
-		TF1 = parnames[i] .== Qdf[:,:event]
-		Qdf[:,:val][TF1] .= pars[i]
-		p_Ds_v5.params.Qij_vals[TF1] .= pars[i]
+# 		TF1 = parnames[i] .== Qdf[:,:event]
+# 		Qdf[:,:val][TF1] .= pars[i]
+# 		p_Ds_v5.params.Qij_vals[TF1] .= pars[i]
 		#print(sum(TF1))
 		
 		# Update the C values
@@ -295,6 +334,29 @@ function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 		p_Ds_v5.params.Cijk_vals[TF2] .= pars[i]
 		#print(sum(TF2))
 	end
+	
+	# Update the Qmat
+	Qmat = (Qarray_ivals=p_Ds_v5.p_indices.Qarray_ivals, Qarray_jvals=p_Ds_v5.p_indices.Qarray_jvals, Qij_vals=p_Ds_v5.params.Qij_vals, Qarray_event_types=p_Ds_v5.p_indices.Qarray_event_types)
+	
+	areas_list = inputs.setup.areas_list[:]
+	states_list = inputs.setup.states_list[:]
+	
+	dmat = reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list)))
+	d_val = 0.0
+	TF = parnames .== "d"
+	d_val = pars[TF][1]
+	dmat[:] = dmat .* d_val
+	amat = deepcopy(dmat)
+
+	elist=repeat([1.0], length(areas_list))
+	e_val = 0.0
+	TF = parnames .== "e"
+	e_val = pars[TF][1]
+	elist[:] = elist .* e_val
+	
+	# Update
+	Qmat2 = update_Qij_vals(Qmat, areas_list, states_list, dmat, elist, amat)
+	p_Ds_v5.params.Qij_vals[:] = Qmat2.Qij_vals
 	
 	#res2 = deepcopy(res)
 	(total_calctime_in_sec, iteration_number, Julia_sum_lqA, rootstates_lnLA, Julia_total_lnLs1A) = iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solver_options=inputs.solver_options, max_iterations=10^6, return_lnLs=true)
@@ -313,6 +375,8 @@ function func_to_optimize(pars, parnames, inputs, p_Ds_v5; returnval="lnL")
 	# Shouldn't get here
 	return(NaN)
 end # END function func_to_optimize(pars, parnames)
+
+
 
 func = x -> func_to_optimize(x, parnames, inputs, p_Ds_v5; returnval="lnL")
 
@@ -339,6 +403,7 @@ iterative_downpass_nonparallel_ClaSSE_v5!(res; trdf=trdf, p_Ds_v5=p_Ds_v5, solve
 
 end # END @testset "runtests_BiSSE_tree_n3" begin
 
-
-
+# Update Qmat
+Qmat = (Qarray_ivals=p_Ds_v5.p_indices.Qarray_ivals, Qarray_jvals=p_Ds_v5.p_indices.Qarray_jvals, Qij_vals=p_Ds_v5.params.Qij_vals, Qarray_event_types=p_Ds_v5.p_indices.Qarray_event_types)
+Qmat2 = update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))), elist=repeat([1.0], length(areas_list)), amat=dmat )
 
