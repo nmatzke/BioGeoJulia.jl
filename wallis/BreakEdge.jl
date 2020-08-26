@@ -92,8 +92,67 @@ end
 
 """
 Find function definitions for:
-    setEdge!
-    setNode!
+    setEdge!   --> Found in PhyloNetworks.auxillary.jl
+    setNode!   --> Found in PhyloNetworks.auxillary.jl
+    getParent  --> getParents (with an s) found in PhyloNetworks.manipulateNet.jl
+                   singular getParents found in PhyloNetworks.auxillary.jl
+    removeEdge! --> Found in PhyloNetworks.auxillary.jl
+    removeNode! --> Found in PhyloNetworks.auxillary.jl
+    pushEdge --> Found in PhyloNetworks.auxillary.jl 
+    pushNode --> Found in PhyloNetworks.auxillary.jl
+
+    etc etc etc. all are undefined when run alone?
+    WHYYYYY
+
+See if Nick knows on Friday?
 
 We know what they MEAN, but I cant figure out where it's trying to pull an Int64 from?
 """
+
+# Walking through breakedge function
+
+edge = net.edge[4]
+net
+
+using PhyloNetworks
+
+@inline function getParents(node::Node)
+    parents = Node[]
+    for e in node.edge
+            if node == getChild(e)
+                push!(parents, getParent(e))
+            end
+    end
+    return parents
+end
+
+# I end up with "Node not defined?"
+# It will not let me initialize a blank array? Node[], x[], nada works?
+# Julia...what's going on girl?
+
+pn = getParents(edge) # parent node
+# new child edge = old edge, same hybrid attribute
+
+removeEdge!(pn,edge)
+removeNode!(pn,edge)
+max_edge = maximum(e.number for e in net.edge)
+max_node = maximum(n.number for n in net.node)
+newedge = Edge(max_edge+1) # create new parent (tree) edge
+newnode = Node(max_node+1,false,false,[edge,newedge]) # tree node
+setNode!(edge,newnode) # newnode comes 2nd, and parent node along 'edge'
+edge.isChild1 = true
+setNode!(newedge,newnode) # newnode comes 1st in newedge, but child node
+newedge.isChild1 = true
+setEdge!(pn,newedge)
+setNode!(newedge,pn) # pn comes 2nd in newedge
+if edge.length == -1.0
+    newedge.length = -1.0
+else
+    edge.length /= 2
+    newedge.length = edge.length
+end
+newedge.containRoot = edge.containRoot
+pushEdge!(net,newedge)
+pushNode!(net,newnode)
+return newnode, newedge
+
