@@ -58,3 +58,42 @@ net.edge[4] # original edge 4 now goes from node 11 (new) to 3
 writeTopology(net)
 
 """
+
+"""
+Lets have a look at PhyloNetwork's Code for Phylonetwork.breakedge!
+"""
+
+function breakedge!(edge::Edge, net::HybridNetwork)
+    pn = getParent(edge) # parent node
+    # new child edge = old edge, same hybrid attribute
+    removeEdge!(pn,edge)
+    removeNode!(pn,edge)
+    max_edge = maximum(e.number for e in net.edge)
+    max_node = maximum(n.number for n in net.node)
+    newedge = Edge(max_edge+1) # create new parent (tree) edge
+    newnode = Node(max_node+1,false,false,[edge,newedge]) # tree node
+    setNode!(edge,newnode) # newnode comes 2nd, and parent node along 'edge'
+    edge.isChild1 = true
+    setNode!(newedge,newnode) # newnode comes 1st in newedge, but child node
+    newedge.isChild1 = true
+    setEdge!(pn,newedge)
+    setNode!(newedge,pn) # pn comes 2nd in newedge
+    if edge.length == -1.0
+        newedge.length = -1.0
+    else
+        edge.length /= 2
+        newedge.length = edge.length
+    end
+    newedge.containRoot = edge.containRoot
+    pushEdge!(net,newedge)
+    pushNode!(net,newnode)
+    return newnode, newedge
+end
+
+"""
+Find function definitions for:
+    setEdge!
+    setNode!
+
+We know what they MEAN, but I cant figure out where it's trying to pull an Int64 from?
+"""
