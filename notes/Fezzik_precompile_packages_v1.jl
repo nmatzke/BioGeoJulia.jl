@@ -16,7 +16,7 @@ Fezzik.auto_trace()
 using Fezzik
 using Pkg
 
-# The last 2 seem to be needed on Julia 1.4
+# The last 2 seem to need blacklisting on Julia 1.4 (kept the same on Julia 1.5)
 Fezzik.blacklist("BioGeoJulia")
 Fezzik.blacklist("AbstractPlotting")
 Fezzik.blacklist("Interact")
@@ -37,8 +37,9 @@ using Random					# for MersenneTwister()
 using Dates						# for e.g. DateTime, Dates.now()
 using Statistics			# for e.g. mean()
 using RCall       # for df_to_Rdata, reval, g = globalEnv
-	
+
 # For SSE stuff
+using Sundials        # for CVODE_BDF(linear_solver=:GMRES)
 using OrdinaryDiffEq
 using DiffEqDevTools
 using ODEInterfaceDiffEq
@@ -51,6 +52,15 @@ using PhyloNetworks		# for phylogenetic trees
 Pkg.resolve()					# Resolve package dependencies
 
 Fezzik.brute_build_julia()
+
+# Restart:
+# remove itself from the startup.jl and deletes previous traces
+using Fezzik
+Fezzik.auto_trace(false)
+exit()
+
+# Then go edit ~/.julia/config/startup.jl
+
 # Activating environment at `~/.julia/environments/v1.3/Project.toml`
 # [ArrayInterface] already loaded
 # [RecursiveArrayTools] already loaded
