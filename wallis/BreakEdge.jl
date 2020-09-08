@@ -31,11 +31,22 @@ import .ModelLikes
 
 
 
-readTopology("(((chimp:1,human:1):1,gorilla:2):1,orang:3);")
-length(tr.node)
-tr.edge[2]
+test = readTopology("(((chimp:1,human:1):1,gorilla:2):1,orang:3);")
+length(test.node)
+test.edge[2]
 
-newnode, newedge = PhyloNetworks.breakedge!(tr.edge[2], tr)
+newnode, newedge = PhyloNetworks.breakedge!(test.edge[2], test)
+length(test.node)
+writeTopology(test)
+
+in_params = (birthRate=0.2, deathRate=0.1, d_val=0.0, e_val=0.0, a_val=0.0, j_val=0.0)
+numareas = 2
+n = 4
+
+numareas=2
+tr=readTopology("((chimp:1,human:1):1,gorilla:2);")
+inputs = ModelLikes.setup_DEC_SSE(numareas, test; root_age_mult=1.5, max_range_size=NaN, include_null_range=false, in_params=in_params)
+(setup, res, trdf, solver_options, p_Ds_v5, Es_tspan) = inputs
 
 # getting and issue here. 
 # Error reads: ERROR: BoundsError: attempt to access Int64
@@ -89,6 +100,8 @@ function breakedge!(edge::Edge, net::HybridNetwork)
     pushNode!(net,newnode)
     return newnode, newedge
 end
+
+
 
 """
 Find function definitions for:
