@@ -1,3 +1,7 @@
+
+#######################################################
+# SKIP the Fezzik block, if you have already used it
+#######################################################
 # FezzikAutoGenStart
 # to remove remove entire block
 try
@@ -27,13 +31,21 @@ end
 
 
 
+#######################################################
+# PASTE THE BELOW INTO YOUR startup.jl
+#######################################################
 
 
-# 
+# Nick Matzke startup, 2020-08-30
+# No active Fezzik, since compiled sysimg is already done!
 print("\n")
 print("Your '~/.julia/config/startup.jl' file is running some commands...")
 print("\n")
 
+
+print("If you want to run some basic BioGeoJulia commands, try:\n")
+print("""include("/GitHub/BioGeoJulia.jl/notes/startup_basic_tests_v1.jl")""")
+print("\n\n")
 
 # Perhaps useful for Revise, but couldn't get Revise() to work on my Mac
 print("Adding package developing directories to LOAD_PATH (JULIA_LOAD_PATH externall)...")
@@ -108,13 +120,14 @@ print("PhyloNetworks...\n")
 using PhyloNetworks
 
 
-print("Unloading and re-loading BioGeoJulia...\n")
+print("Loading BioGeoJulia...\n")
 
+# DON'T DO THIS:
 #Pkg.rm("BioGeoJulia")
-#Pkg.rm(PackageSpec(name="BioGeoJulia", uuid="7876af07-990d-54b4-ab0e-23690620f79a"))
 #Pkg.add(PackageSpec(path="/GitHub/BioGeoJulia.jl"))
+#Pkg.add(PackageSpec(url="https://github.com/nmatzke/BioGeoJulia.jl"))
 
-# Activate BioGeoJulia
+# DON'T ADD BioGeoJulia, INSTEAD DO:
 if isfile("Project.toml") && isfile("Manifest.toml")
     Pkg.activate(".")
 end
@@ -134,4 +147,7 @@ print("\n")
 print("...done loading slow packages.\n")
 print("\n")
 
+print("If you want to run some basic BioGeoJulia commands, try:\n")
+print("""include("/GitHub/BioGeoJulia.jl/notes/startup_basic_tests_v1.jl")""")
+print("\n\n")
 

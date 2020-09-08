@@ -1,4 +1,9 @@
 module SSEs
+__precompile__(false)  # will cause using / import to load it directly into the 
+                       # current process and skip the precompile and caching. 
+                       # This also thereby prevents the module from being 
+                       # imported by any other precompiled module.
+                       # https://docs.julialang.org/en/v1/manual/modules/
 using DataFrames  # for e.g. DataFram()
 export parameterized_ClaSSE, parameterized_ClaSSE_Es, parameterized_ClaSSE_Ds, parameterized_ClaSSE_v5, parameterized_ClaSSE_Es_v5, parameterized_ClaSSE_Ds_v5
 

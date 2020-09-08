@@ -4,6 +4,11 @@
 #######################################################
 
 module ModelLikes
+__precompile__(false)  # will cause using / import to load it directly into the 
+                       # current process and skip the precompile and caching. 
+                       # This also thereby prevents the module from being 
+                       # imported by any other precompiled module.
+                       # https://docs.julialang.org/en/v1/manual/modules/
 
 print("\n\nStarting module 'ModelLikes'...loading dependencies...\n")
 using BenchmarkTools # for @time

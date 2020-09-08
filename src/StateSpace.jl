@@ -1,4 +1,10 @@
 module StateSpace
+__precompile__(false)  # will cause using / import to load it directly into the 
+                       # current process and skip the precompile and caching. 
+                       # This also thereby prevents the module from being 
+                       # imported by any other precompiled module.
+                       # https://docs.julialang.org/en/v1/manual/modules/
+
 using BioGeoJulia.TrUtils # for e.g. flat2
 using Combinatorics  # for e.g. combinations()
 using DataFrames     # for e.g. DataFrame()
