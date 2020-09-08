@@ -195,10 +195,10 @@ end
 
 
 function initialize_edgematrix(tr)
-	#ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
-  #decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
-	ancNodeIndex = collect(repeat([0], 1+length(tr.edge)))
-  decNodeIndex = collect(repeat([0], 1+length(tr.edge)))
+	ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+  decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+#	ancNodeIndex = collect(repeat([0], 1+length(tr.edge)))
+#  decNodeIndex = collect(repeat([0], 1+length(tr.edge)))
   edgematrix = hcat(ancNodeIndex,decNodeIndex)
   return(edgematrix)
 end
