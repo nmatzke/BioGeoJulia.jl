@@ -42,26 +42,66 @@ get_nodenumbers_above_node(tr, tr.root, indexNum_table=indexNum_table)
 """
 
 function get_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, iterNum; indexNum_table)
+  # If it's *not* a leaf, get the descendant edge(s)
   if (tr.node[rootnodenum].leaf != true)
-  	# Left descendant edge
-  	one_edge = tr.node[rootnodenum].edge[1]
-  	anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
-  	left_dec_PNnumber = anc_decPNnumbers[2]
-		left_dec_nodeIndex = get_nodeIndex_from_PNnumber(left_dec_PNnumber, indexNum_table=indexNum_table)
-		
-  	one_edge = tr.node[rootnodenum].edge[2]
-  	anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
-  	right_dec_PNnumber = anc_decPNnumbers[2]
-		right_dec_nodeIndex = get_nodeIndex_from_PNnumber(right_dec_PNnumber, indexNum_table=indexNum_table)
+  	# * A typical internal node will be attached to 3 edges
+  	#   (left descendant, right descendant, ancestor edge)
+  	# * A root node will be attached to 2 edges (left, right descendant edges
+  	# * A degree-2 (mid-branch) node will have 1 descendant edge
   	
-  	# Then, iterate through left and right clades
-  	#println(rootnodenum)
-  	nodeIndex_array[iterNum] = rootnodenum
-  	#print(nodeIndex_array)
-  	iterNum = iterNum + 1
-  	(nodeIndex_array, iterNum) = get_nodenumbers_above_node(tr, right_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
-  	(nodeIndex_array, iterNum) = get_nodenumbers_above_node(tr, left_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
-  	return (nodeIndex_array, iterNum)
+  	# Is the current node a typical internal node?
+  	typicalTF = length(tr.node[rootnodenum].edge) == 3
+  	
+  	# Is the current node the root?
+  	root_PNnumber = tr.node[tr.root].number  # PhyloNetworks node number of root
+  	# rootnodenum = current node being examined
+  	current_PNnumber = tr.node[rootnodenum].number
+  	rootTF = root_PNnumber == current_PNnumber
+		
+		# If typical or root, proceed
+		typical_or_root_TF = typicalTF || rootTF
+  	if (typical_or_root_TF == true)
+			# Left descendant edge
+			one_edge = tr.node[rootnodenum].edge[1]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			left_dec_PNnumber = anc_decPNnumbers[2]
+			left_dec_nodeIndex = get_nodeIndex_from_PNnumber(left_dec_PNnumber, indexNum_table=indexNum_table)
+		
+			# Right descendant edge
+			one_edge = tr.node[rootnodenum].edge[2]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			right_dec_PNnumber = anc_decPNnumbers[2]
+			right_dec_nodeIndex = get_nodeIndex_from_PNnumber(right_dec_PNnumber, indexNum_table=indexNum_table)
+		
+			# Then, iterate through left and right clades
+			#println(rootnodenum)
+			nodeIndex_array[iterNum] = rootnodenum
+			#print(nodeIndex_array)
+			iterNum = iterNum + 1
+			(nodeIndex_array, iterNum) = get_nodenumbers_above_node(tr, right_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			(nodeIndex_array, iterNum) = get_nodenumbers_above_node(tr, left_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			return (nodeIndex_array, iterNum)
+  	end # END if (typical_or_root_TF == true)
+
+		# If the node has 2 edges (and we've shown it's not the root or a tip),
+		# then we know it's a 2-degree mid-branch node
+		if (length(tr.node[rootnodenum].edge) == 2)
+			# Descendant edge
+			one_edge = tr.node[rootnodenum].edge[1]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			dec_PNnumber = anc_decPNnumbers[2]
+			dec_nodeIndex = get_nodeIndex_from_PNnumber(dec_PNnumber, indexNum_table=indexNum_table)
+			
+			# Ancestor edge not needed
+			
+			# Then, iterate through single descendant clade
+			#println(rootnodenum)
+			iterNum = iterNum + 1
+			nodeIndex_array[iterNum] = rootnodenum
+			(nodeIndex_array, iterNum) = get_nodenumbers_above_node(tr, dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			return (nodeIndex_array, iterNum)
+		end # END if (length(tr.node[rootnodenum].edge) == 2)
+
   else
   	#println(rootnodenum)
   	nodeIndex_array[iterNum] = rootnodenum
@@ -69,31 +109,76 @@ function get_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, iterNum; i
   	iterNum = iterNum + 1
   	return (nodeIndex_array, iterNum)
   end
+	
+	# Error check
+	txt = ["ERROR in get_nodenumbers_above_node(): You shouldn't be able to get to the last line of this function."]
+	error(join(txt, ""))
 end
 
 
 function get_postorder_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, iterNum; indexNum_table)
+  
+  # If it's *not* a leaf, get the descendant edge(s)
   if (tr.node[rootnodenum].leaf != true)
-  	# Left descendant edge
-  	one_edge = tr.node[rootnodenum].edge[1]
-  	anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
-  	left_dec_PNnumber = anc_decPNnumbers[2]
-		left_dec_nodeIndex = get_nodeIndex_from_PNnumber(left_dec_PNnumber, indexNum_table=indexNum_table)
-		
-  	one_edge = tr.node[rootnodenum].edge[2]
-  	anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
-  	right_dec_PNnumber = anc_decPNnumbers[2]
-		right_dec_nodeIndex = get_nodeIndex_from_PNnumber(right_dec_PNnumber, indexNum_table=indexNum_table)
+  	# * A typical internal node will be attached to 3 edges
+  	#   (left descendant, right descendant, ancestor edge)
+  	# * A root node will be attached to 2 edges (left, right descendant edges
+  	# * A degree-2 (mid-branch) node will have 1 descendant edge
   	
-  	# Then, iterate through left and right clades
-  	#println(rootnodenum)
-  	iterNum = iterNum + 1
-  	nodeIndex_array[iterNum] = rootnodenum
-  	(nodeIndex_array, iterNum) = get_postorder_nodenumbers_above_node(tr, right_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
-  	(nodeIndex_array, iterNum) = get_postorder_nodenumbers_above_node(tr, left_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
-  	#print(nodeIndex_array)
-
-  	return (nodeIndex_array, iterNum)
+  	# Is the current node a typical internal node?
+  	typicalTF = length(tr.node[rootnodenum].edge) == 3
+  	
+  	# Is the current node the root?
+  	root_PNnumber = tr.node[tr.root].number  # PhyloNetworks node number of root
+  	# rootnodenum = current node being examined
+  	current_PNnumber = tr.node[rootnodenum].number
+  	rootTF = root_PNnumber == current_PNnumber
+		
+		# If typical or root, proceed
+		typical_or_root_TF = typicalTF || rootTF
+  	if (typical_or_root_TF == true)
+			# Left descendant edge
+			one_edge = tr.node[rootnodenum].edge[1]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			left_dec_PNnumber = anc_decPNnumbers[2]
+			left_dec_nodeIndex = get_nodeIndex_from_PNnumber(left_dec_PNnumber, indexNum_table=indexNum_table)
+		
+			# Right descendant edge
+			one_edge = tr.node[rootnodenum].edge[2]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			right_dec_PNnumber = anc_decPNnumbers[2]
+			right_dec_nodeIndex = get_nodeIndex_from_PNnumber(right_dec_PNnumber, indexNum_table=indexNum_table)
+		
+			# Then, iterate through left and right clades
+			#println(rootnodenum)
+			iterNum = iterNum + 1
+			nodeIndex_array[iterNum] = rootnodenum
+			(nodeIndex_array, iterNum) = get_postorder_nodenumbers_above_node(tr, right_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			(nodeIndex_array, iterNum) = get_postorder_nodenumbers_above_node(tr, left_dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			#print(nodeIndex_array)
+			return (nodeIndex_array, iterNum)
+  	end # END if (typical_or_root_TF == true)
+		
+		# If the node has 2 edges (and we've shown it's not the root or a tip),
+		# then we know it's a 2-degree mid-branch node
+		if (length(tr.node[rootnodenum].edge) == 2)
+			# Descendant edge
+			one_edge = tr.node[rootnodenum].edge[1]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			dec_PNnumber = anc_decPNnumbers[2]
+			dec_nodeIndex = get_nodeIndex_from_PNnumber(dec_PNnumber, indexNum_table=indexNum_table)
+			
+			# Ancestor edge not needed
+			
+			# Then, iterate through single descendant clade
+			#println(rootnodenum)
+			iterNum = iterNum + 1
+			nodeIndex_array[iterNum] = rootnodenum
+			(nodeIndex_array, iterNum) = get_postorder_nodenumbers_above_node(tr, dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			return (nodeIndex_array, iterNum)
+		end # END if (length(tr.node[rootnodenum].edge) == 2)
+	
+	
   else
   	#println(rootnodenum)
   	iterNum = iterNum + 1
@@ -101,12 +186,19 @@ function get_postorder_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, 
   	#print(nodeIndex_array)
   	return (nodeIndex_array, iterNum)
   end
+
+	# Error check
+	txt = ["ERROR in get_postorder_nodenumbers_above_node(): You shouldn't be able to get to the last line of this function."]
+	error(join(txt, ""))
+
 end
 
 
 function initialize_edgematrix(tr)
-	ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
-  decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+	#ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+  #decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+	ancNodeIndex = collect(repeat([0], 1+length(tr.edge)))
+  decNodeIndex = collect(repeat([0], 1+length(tr.edge)))
   edgematrix = hcat(ancNodeIndex,decNodeIndex)
   return(edgematrix)
 end
