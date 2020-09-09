@@ -1,4 +1,4 @@
-module TreePass
+module TreePassO
 __precompile__(false)  # will cause using / import to load it directly into the 
                        # current process and skip the precompile and caching. 
                        # This also thereby prevents the module from being 
@@ -264,11 +264,36 @@ function get_postorder_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, 
 end # END get_postorder_nodenumbers_above_node
 
 
+"""
+using DataFrames
+using PhyloNetworks
+
+# For Nick's editing (ignore)
+include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
+
+#######################################################
+# Typical bifurcating (binary) tree
+#######################################################
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr
+
+TreePassO.initialize_edgematrix(tr)
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
+
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+
+TreePassO.initialize_edgematrix(tr)
+"""
 function initialize_edgematrix(tr)
 	ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
   decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
-#	ancNodeIndex = collect(repeat([0], 1+length(tr.edge)))
-#  decNodeIndex = collect(repeat([0], 1+length(tr.edge)))
   edgematrix = hcat(ancNodeIndex,decNodeIndex)
   return(edgematrix)
 end
@@ -289,7 +314,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -378,7 +402,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -414,7 +437,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -455,7 +477,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -485,7 +506,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -519,7 +539,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -602,7 +621,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
@@ -641,7 +659,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -762,7 +779,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -881,7 +897,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -977,7 +992,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -1027,7 +1041,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
@@ -1041,29 +1054,13 @@ function get_node_heights(tr)
 	edge_df = get_NodeIndex_df_by_tree_edges(tr, indexNum_table=indexNum_table)
 	cumulative_height_at_each_node = collect(repeat([0.0], length(tr.node)))
 	
-	print("\nuppass_nodeIndexes:\n")
-	print(uppass_nodeIndexes)
-	print("\n")
-	print("\nedge_df:\n")
-	print(edge_df)
-	
 	# Iterate up through the nodes from the root
 	for i in 1:length(uppass_nodeIndexes)
-		print("\n")
-		print("\n")
-		print(i)
-		
 		nodeIndex = uppass_nodeIndexes[i]
 		if (nodeIndex == tr.root)
 			cumulative_height_at_each_node[nodeIndex] = 0.0
 		else
-			print("\nedge_df[:,:edge_decNodeIndex]:\n")
-			print(edge_df[:,:edge_decNodeIndex])
-			print("\nnodeIndex:\n")
-			print(nodeIndex)
 			ancTF = edge_df[:,:edge_decNodeIndex] .== nodeIndex
-			print("\nancTF:\n")
-			print(ancTF)
 			anc_nodeIndex = edge_df[:,:edge_ancNodeIndex][ancTF][1]
 			# Get previous age
 			previous_height_above_root = cumulative_height_at_each_node[anc_nodeIndex]
@@ -1081,7 +1078,6 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
 include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
