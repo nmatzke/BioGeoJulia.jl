@@ -74,6 +74,12 @@ function get_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, iterNum; i
   	#   (left descendant, right descendant, ancestor edge)
   	# * A root node will be attached to 2 edges (left, right descendant edges
   	# * A degree-2 (mid-branch) node will have 1 descendant edge
+
+  	if (length(tr.node[rootnodenum].edge) > 3)
+  		txt = join(["STOP ERROR in get_nodenumbers_above_node(): tr.node[rootnodenum=", string(rootnodenum), "] has more than 3 edges. Probably this is a multifurcating node, which is not allowed."])
+  		error(txt)
+  	end
+
   	
   	# Is the current node a typical internal node?
   	typicalTF = length(tr.node[rootnodenum].edge) == 3
@@ -127,6 +133,7 @@ function get_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, iterNum; i
 			nodeIndex_array[iterNum] = rootnodenum
 			iterNum = iterNum + 1
 			(nodeIndex_array, iterNum) = get_nodenumbers_above_node(tr, dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			return (nodeIndex_array, iterNum)
 		end # END if (typical_or_root_TF == true)
   else
   	# Leaf node:
@@ -193,6 +200,11 @@ function get_postorder_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, 
   	#   (left descendant, right descendant, ancestor edge)
   	# * A root node will be attached to 2 edges (left, right descendant edges
   	# * A degree-2 (mid-branch) node will have 1 descendant edge
+
+  	if (length(tr.node[rootnodenum].edge) > 3)
+  		txt = join(["STOP ERROR in get_postorder_nodenumbers_above_node(): tr.node[rootnodenum=", string(rootnodenum), "] has more than 3 edges. Probably this is a multifurcating node, which is not allowed."])
+  		error(txt)
+  	end
   	
   	# Is the current node a typical internal node?
   	typicalTF = length(tr.node[rootnodenum].edge) == 3
@@ -247,6 +259,7 @@ function get_postorder_nodenumbers_above_node(tr, rootnodenum, nodeIndex_array, 
 			nodeIndex_array[iterNum] = rootnodenum
 			iterNum = iterNum + 1
 			(nodeIndex_array, iterNum) = get_postorder_nodenumbers_above_node(tr, dec_nodeIndex, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+			return (nodeIndex_array, iterNum)
 		end # END if (typical_or_root_TF == true)
   else
   	# Leaf node:
@@ -265,10 +278,10 @@ end # END get_postorder_nodenumbers_above_node
 
 
 function initialize_edgematrix(tr)
-	ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
-  decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
-#	ancNodeIndex = collect(repeat([0], 1+length(tr.edge)))
-#  decNodeIndex = collect(repeat([0], 1+length(tr.edge)))
+	#ancNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+  #decNodeIndex = collect(repeat([0], 2*(tr.numNodes-tr.numTaxa)))
+  ancNodeIndex = collect(repeat([0], length(tr.edge)))
+	decNodeIndex = collect(repeat([0], length(tr.edge)))
   edgematrix = hcat(ancNodeIndex,decNodeIndex)
   return(edgematrix)
 end
@@ -289,9 +302,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 great_ape_newick_string = "(((human:6,(chimp1:0.5,bonobo:0.5):5.5):1,gorilla:7):5,orangutan:12);"
@@ -325,37 +337,78 @@ get_LR_downpass_edgematrix(tr)
 
 """
 
-function get_pruningwise_postorder_edgematrix(tr, rootnodenum, iterNum=0; edgematrix=initialize_edgematrix(tr), indexNum_table=get_nodeIndex_PNnumber(tr))
+function get_pruningwise_postorder_edgematrix(tr, rootnodenum, iterNum=1; edgematrix=initialize_edgematrix(tr), indexNum_table=get_nodeIndex_PNnumber(tr))
   if (tr.node[rootnodenum].leaf != true)
-  	# Left descendant edge
-  	one_edge = tr.node[rootnodenum].edge[1]
-  	anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
-  	left_anc_PNnumber = anc_decPNnumbers[1]
-  	left_dec_PNnumber = anc_decPNnumbers[2]
-		left_anc_nodeIndex = get_nodeIndex_from_PNnumber(left_anc_PNnumber, indexNum_table=indexNum_table)
-		left_dec_nodeIndex = get_nodeIndex_from_PNnumber(left_dec_PNnumber, indexNum_table=indexNum_table)
+  	# * A typical internal node will be attached to 3 edges
+  	#   (left descendant, right descendant, ancestor edge)
+  	# * A root node will be attached to 2 edges (left, right descendant edges
+  	# * A degree-2 (mid-branch) node will have 1 descendant edge
+  	
+  	if (length(tr.node[rootnodenum].edge) > 3)
+  		txt = join(["STOP ERROR in get_pruningwise_postorder_edgematrix(): tr.node[rootnodenum=", string(rootnodenum), "] has more than 3 edges. Probably this is a multifurcating node, which is not allowed."])
+  		error(txt)
+  	end
+  	
+  	
+  	# Is the current node a typical internal node?
+  	typicalTF = length(tr.node[rootnodenum].edge) == 3
+  	
+  	# Is the current node the root?
+  	root_PNnumber = tr.node[tr.root].number  # PhyloNetworks node number of root
+  	# rootnodenum = current node being examined
+  	current_PNnumber = tr.node[rootnodenum].number
+  	rootTF = root_PNnumber == current_PNnumber
 		
-  	one_edge = tr.node[rootnodenum].edge[2]
-  	anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
-  	right_anc_PNnumber = anc_decPNnumbers[1]
-  	right_dec_PNnumber = anc_decPNnumbers[2]
-		right_anc_nodeIndex = get_nodeIndex_from_PNnumber(right_anc_PNnumber, indexNum_table=indexNum_table)
-		right_dec_nodeIndex = get_nodeIndex_from_PNnumber(right_dec_PNnumber, indexNum_table=indexNum_table)
-  	
-  	# Then, iterate through left and right clades
-  	#println(rootnodenum)
-  	iterNum = iterNum + 1
-  	edgematrix[iterNum,1] = right_anc_nodeIndex
-  	edgematrix[iterNum,2] = right_dec_nodeIndex
-  	iterNum = iterNum + 1
-  	edgematrix[iterNum,1] = left_anc_nodeIndex
-  	edgematrix[iterNum,2] = left_dec_nodeIndex
-  	
-  	(edgematrix, iterNum) = get_pruningwise_postorder_edgematrix(tr, right_dec_nodeIndex, iterNum, edgematrix=edgematrix, indexNum_table=indexNum_table)
-  	(edgematrix, iterNum) = get_pruningwise_postorder_edgematrix(tr, left_dec_nodeIndex, iterNum, edgematrix=edgematrix, indexNum_table=indexNum_table)
-  	#print(nodeIndex_array)
+		# If typical or root, proceed
+		typical_or_root_TF = typicalTF || rootTF
+  	if (typical_or_root_TF == true)
+			# Left descendant edge
+			one_edge = tr.node[rootnodenum].edge[1]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			left_anc_PNnumber = anc_decPNnumbers[1]
+			left_dec_PNnumber = anc_decPNnumbers[2]
+			left_anc_nodeIndex = get_nodeIndex_from_PNnumber(left_anc_PNnumber, indexNum_table=indexNum_table)
+			left_dec_nodeIndex = get_nodeIndex_from_PNnumber(left_dec_PNnumber, indexNum_table=indexNum_table)
+		
+			# Right descendant edge
+			one_edge = tr.node[rootnodenum].edge[2]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			right_anc_PNnumber = anc_decPNnumbers[1]
+			right_dec_PNnumber = anc_decPNnumbers[2]
+			right_anc_nodeIndex = get_nodeIndex_from_PNnumber(right_anc_PNnumber, indexNum_table=indexNum_table)
+			right_dec_nodeIndex = get_nodeIndex_from_PNnumber(right_dec_PNnumber, indexNum_table=indexNum_table)
+		
+			# Then, iterate through left and right clades
+			#println(rootnodenum)
+			edgematrix[iterNum,1] = right_anc_nodeIndex
+			edgematrix[iterNum,2] = right_dec_nodeIndex
+			iterNum = iterNum + 1
+			edgematrix[iterNum,1] = left_anc_nodeIndex
+			edgematrix[iterNum,2] = left_dec_nodeIndex
+			iterNum = iterNum + 1
+		
+			(edgematrix, iterNum) = get_pruningwise_postorder_edgematrix(tr, right_dec_nodeIndex, iterNum, edgematrix=edgematrix, indexNum_table=indexNum_table)
+			(edgematrix, iterNum) = get_pruningwise_postorder_edgematrix(tr, left_dec_nodeIndex, iterNum, edgematrix=edgematrix, indexNum_table=indexNum_table)
+			#print(nodeIndex_array)
+			return (edgematrix, iterNum)
+		else
+			# Single descendant edge
+			one_edge = tr.node[rootnodenum].edge[1]
+			anc_decPNnumbers = get_NodeIndexes_from_edge(one_edge)
+			anc_PNnumber = anc_decPNnumbers[1]
+			dec_PNnumber = anc_decPNnumbers[2]
+			anc_nodeIndex = get_nodeIndex_from_PNnumber(anc_PNnumber, indexNum_table=indexNum_table)
+			dec_nodeIndex = get_nodeIndex_from_PNnumber(dec_PNnumber, indexNum_table=indexNum_table)
 
-  	return (edgematrix, iterNum)
+			# Then, iterate through the single descendant clade
+			#println(rootnodenum)
+			edgematrix[iterNum,1] = anc_nodeIndex
+			edgematrix[iterNum,2] = dec_nodeIndex
+			iterNum = iterNum + 1
+			
+			(edgematrix, iterNum) = get_pruningwise_postorder_edgematrix(tr, dec_nodeIndex, iterNum, edgematrix=edgematrix, indexNum_table=indexNum_table)
+			return (edgematrix, iterNum)
+		end # END if (typical_or_root_TF == true)
   else
   	#println(rootnodenum)
   	#iterNum = iterNum + 1
@@ -365,7 +418,7 @@ function get_pruningwise_postorder_edgematrix(tr, rootnodenum, iterNum=0; edgema
   end
 	
 	# Shouldn't get here
-	return ("get_pruningwise_postorder_edgematrix(): Shouldn't get here!")
+	error("get_pruningwise_postorder_edgematrix(): Shouldn't get here!")
 end
 
 
@@ -378,9 +431,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -414,9 +466,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -435,7 +486,7 @@ downpass_edgematrix
 """
 function get_LR_downpass_edgematrix(tr)
 	rootnodenum = tr.root
-	iterNum = 0
+	iterNum = 1
 	edgematrix = initialize_edgematrix(tr)
 	indexNum_table = get_nodeIndex_PNnumber(tr)
 
@@ -455,9 +506,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 #great_ape_newick_string = "(((human:6,(chimp1:0.5,bonobo:0.5):5.5):1,gorilla:7):5,orangutan:12);"
@@ -485,9 +535,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 #great_ape_newick_string = "(((human:6,(chimp1:0.5,bonobo:0.5):5.5):1,gorilla:7):5,orangutan:12);"
@@ -519,9 +568,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -602,8 +650,7 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
+#using PhyloPlots
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -641,9 +688,7 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -659,9 +704,52 @@ indexNum_table
 rootnodenum = tr.root
 trdf = prt(tr, rootnodenum)
 trdf
+
+
+using DataFrames
+using PhyloNetworks
+
+# For Nick's editing (ignore)
+include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
+
+#######################################################
+# Typical bifurcating (binary) tree
+#######################################################
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr
+
+nodeIndex_array = collect(repeat([0], tr.numNodes))
+
+iterNum = 1
+
+indexNum_table = get_nodeIndex_PNnumber(tr)
+indexNum_table
+
+TreePassO.get_postorder_nodenumbers_above_node(tr, tr.root, nodeIndex_array, iterNum, indexNum_table=indexNum_table)
+
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
+
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+
+nodeIndex_array = collect(repeat([0], tr.numNodes))
+
+iterNum = 1
+
+indexNum_table = get_nodeIndex_PNnumber(tr)
+indexNum_table
+
+TreePassO.get_postorder_nodenumbers_above_node(tr, tr.root, nodeIndex_array, iterNum, indexNum_table=indexNum_table )
+
 """
 # Return a DataFrame with the edge numbers
-function prt(tr, rootnodenum, get_taxa_by_node=true)
+function prt(tr, rootnodenum=tr.root, get_taxa_by_node=true)
 	#using DataFrames
 	numnodes = length(tr.node)
 	# number of digits for internal node numbers
@@ -710,16 +798,43 @@ function prt(tr, rootnodenum, get_taxa_by_node=true)
 			ancNodeIndex[i] = -999
 		end
 		
+		# Tip node
+		if (tr.node[nodeIndex].leaf == true)
+			# Tip node
+			leftNodeIndex[i] = -999
+			rightNodeIndex[i] = -999
+			nodeType[i] = "tip"
+			nodeName[i] = tr.node[nodeIndex].name
+		end
+		
 		# Left and right descendant nodeIndexes
 		TF_edgerows_descend_from_decNodeIndex = edge_df[:,:edge_ancNodeIndex] .== nodeIndex
-		if (sum(TF_edgerows_descend_from_decNodeIndex) > 0)
+		
+		# Direct-ancestor node
+		if ((sum(TF_edgerows_descend_from_decNodeIndex) == 1) && (tr.node[nodeIndex].leaf == false))
+			leftNodeIndex[i] = edge_df[TF_edgerows_descend_from_decNodeIndex,:edge_decNodeIndex][1]
+			rightNodeIndex[i] = -99999 # No right descendant, as it's a direct ancestor
+			nodeType[i] = "direct"  # da = direct ancestor node
+
+			# Node names
+			tmp_nodeName = tr.node[nodeIndex].name
+			if (tmp_nodeName == "")
+				internal_nodeIndex_as_string = lpad(string(nodeIndex), numdigits, "0")
+				nodeName[i] = join(["da", internal_nodeIndex_as_string], "")
+			else
+				nodeName[i] = tmp_nodeName
+			end
+		end # END if (sum(TF_edgerows_descend_from_decNodeIndex) == 1)
+		
+		# Bifurcating node
+		if (sum(TF_edgerows_descend_from_decNodeIndex) == 2)
 			# Internal node
 			leftNodeIndex[i] = edge_df[TF_edgerows_descend_from_decNodeIndex,:edge_decNodeIndex][1]
 			rightNodeIndex[i] = edge_df[TF_edgerows_descend_from_decNodeIndex,:edge_decNodeIndex][2]
-			nodeType[i] = "internal"
+			nodeType[i] = "intern"
 			if (nodeIndex == tr.root)
 				nodeType[i] = "root"
-			end
+			end # END if (nodeIndex == tr.root)
 			
 			# Node names
 			tmp_nodeName = tr.node[nodeIndex].name
@@ -729,13 +844,7 @@ function prt(tr, rootnodenum, get_taxa_by_node=true)
 			else
 				nodeName[i] = tmp_nodeName
 			end
-		else
-			# Tip node
-			leftNodeIndex[i] = -999
-			rightNodeIndex[i] = -999
-			nodeType[i] = "tip"
-			nodeName[i] = tr.node[nodeIndex].name
-		end
+		end # END if (sum(TF_edgerows_descend_from_decNodeIndex) == 2)
 	end # END for i in 1:Rnrow(trdf)
 	
 	# Add the fields
@@ -753,7 +862,7 @@ function prt(tr, rootnodenum, get_taxa_by_node=true)
 	end
 	
 	return(trdf)
-end
+end # END function prt(tr, rootnodenum=tr.root, get_taxa_by_node=true)
 
 
 
@@ -762,9 +871,9 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
+include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -788,12 +897,49 @@ headLR(trdf)
 
 downpass_edgematrix = get_LR_downpass_edgematrix(tr)
 taxa = get_taxa_descending_from_each_node(tr, trdf, downpass_edgematrix=get_LR_downpass_edgematrix(tr))
+
+
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+#include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
+
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
+
+downpass_edgematrix = get_LR_downpass_edgematrix(tr)
+taxa = get_taxa_descending_from_each_node(tr, trdf, downpass_edgematrix=get_LR_downpass_edgematrix(tr))
+
 """
 
 function get_taxa_descending_from_each_node(tr, trdf; downpass_edgematrix=get_LR_downpass_edgematrix(tr))
 	# Get sizes
 	numnodes = length(tr.node)
-	numIndices = length(sort(unique(flat2(downpass_edgematrix))))
+	node_indices_in_downpass_edgematrix_tmp = flat2(downpass_edgematrix)
+	node_indices_in_downpass_edgematrix = node_indices_in_downpass_edgematrix_tmp[node_indices_in_downpass_edgematrix_tmp .!== 0]
+	numIndices = length(sort(unique(node_indices_in_downpass_edgematrix)))
+	
+	# Remove 0s from edge matrix, as they constitute "fake" right branches
+	
+	
 	
 	# Error check
 	if (numnodes != numIndices)
@@ -808,55 +954,85 @@ function get_taxa_descending_from_each_node(tr, trdf; downpass_edgematrix=get_LR
 	
 	# Step through the downpass_edgematrix, in pairs
 	edgematrix_rows_to_visit = collect(1:2:Rnrow(downpass_edgematrix))
-	for (iter,i) in enumerate(edgematrix_rows_to_visit)
+	
+	numrows_in_downpass_edgematrix = Rnrow(downpass_edgematrix)
+	i = 1
+	while i <= numrows_in_downpass_edgematrix
 		j = i+1
-		nodeIndex_left = downpass_edgematrix[i,2]
-		nodeIndex_right = downpass_edgematrix[j,2]
 		nodeIndex_ancL = downpass_edgematrix[i,1]
 		nodeIndex_ancR = downpass_edgematrix[j,1]
+		
+		# If direct ancestor node
+		if (nodeIndex_ancL != nodeIndex_ancR)
+			nodeIndex_left = downpass_edgematrix[i,2]
+			nodeIndex_right = -99999
+			nodeIndex_anc = nodeIndex_ancL
+			
+			# Get the taxa
+			tmp_taxa = [""]
+			if (tr.node[nodeIndex_left].leaf == true)
+				taxa[nodeIndex_left] = tr.node[nodeIndex_left].name
+				tmp_taxa[1] = tr.node[nodeIndex_left].name
+			else
+				tmp_taxa[1] = taxa[nodeIndex_left]
+			end
+
+			# Put the taxa in the ancestral node
+			ancNodeIndex_of_Left = nodeIndex_ancL
+			ancNodeIndex = ancNodeIndex_of_Left
+			taxa_unordered = flat2(split.(tmp_taxa, ","))
+			taxa_ordered = sort(taxa_unordered)
+			taxa_at_ancNode = join(taxa_ordered, ",")
+			taxa[ancNodeIndex] = taxa_at_ancNode
+		
+			# Advance i by just 1 (because this was a node with a single descendant)
+			i = i+1
+		end # END if (nodeIndex_ancL != nodeIndex_ancR) # (end direct ancestor node)
+
+		# Bifurcating node, 2 adjacent edges
 		if (nodeIndex_ancL == nodeIndex_ancR)
 			nodeIndex_anc = nodeIndex_ancL
-		else
-			txt = ["Error in get_taxa_descending_from_each_node(): in downpass_edgematrix, at i=", string(i), ", j=", string(j), ", the nodeIndex_anc's don't match! Printing these rows of downpass_edgematrix."]
-			msg = paste0(txt)
-			println(msg)
-			print(downpass_edgematrix[i:j,:])
-			error(msg)
-		end
+			nodeIndex_left = downpass_edgematrix[i,2]
+			nodeIndex_right = downpass_edgematrix[j,2]
+
+			tmp_taxa = collect(repeat([""], 2))
+			if (tr.node[nodeIndex_left].leaf == true)
+				taxa[nodeIndex_left] = tr.node[nodeIndex_left].name
+				tmp_taxa[1] = tr.node[nodeIndex_left].name
+			else
+				tmp_taxa[1] = taxa[nodeIndex_left]
+			end
+			if (tr.node[nodeIndex_right].leaf == true)
+				taxa[nodeIndex_right] = tr.node[nodeIndex_right].name
+				tmp_taxa[2] = tr.node[nodeIndex_right].name
+			else
+				tmp_taxa[2] = taxa[nodeIndex_right]
+			end
 		
-		tmp_taxa = collect(repeat([""], 2))
-		if (tr.node[nodeIndex_left].leaf == true)
-			taxa[nodeIndex_left] = tr.node[nodeIndex_left].name
-			tmp_taxa[1] = tr.node[nodeIndex_left].name
-		else
-			tmp_taxa[1] = taxa[nodeIndex_left]
-		end
-		if (tr.node[nodeIndex_right].leaf == true)
-			taxa[nodeIndex_right] = tr.node[nodeIndex_right].name
-			tmp_taxa[2] = tr.node[nodeIndex_right].name
-		else
-			tmp_taxa[2] = taxa[nodeIndex_right]
-		end
-		
-		# Join the two lists and put in the ancestral node
-		ancNodeIndex_of_Left = nodeIndex_ancL
-		ancNodeIndex_of_Right = nodeIndex_ancR
-		if (ancNodeIndex_of_Left != ancNodeIndex_of_Right)
-			txt = ["ERROR in get_taxa_descending_from_each_node(): ancNodeIndex_of_Left must match ancNodeIndex_of_Right in trdf, but doesn't.\nAncestor of nodeIndex_left ", string(nodeIndex_left), " is ", string(ancNodeIndex_of_Left), ", but\nancestor of nodeIndex_right ", string(nodeIndex_right), " is ", string(ancNodeIndex_of_Right), "\n"]
-			msg = join(txt, "")
-			println(msg)
-			error(msg)
-		end
-		# No error, so ancNodeIndex was found:
-		ancNodeIndex = ancNodeIndex_of_Left
-		taxa_unordered = flat2(split.(tmp_taxa, ","))
-		taxa_ordered = sort(taxa_unordered)
-		taxa_at_ancNode = join(taxa_ordered, ",")
-		taxa[ancNodeIndex] = taxa_at_ancNode
-	end
+			# Join the two lists and put in the ancestral node
+			ancNodeIndex_of_Left = nodeIndex_ancL
+			ancNodeIndex_of_Right = nodeIndex_ancR
+			if (ancNodeIndex_of_Left != ancNodeIndex_of_Right)
+				txt = ["ERROR in get_taxa_descending_from_each_node(): ancNodeIndex_of_Left must match ancNodeIndex_of_Right in trdf, but doesn't.\nAncestor of nodeIndex_left ", string(nodeIndex_left), " is ", string(ancNodeIndex_of_Left), ", but\nancestor of nodeIndex_right ", string(nodeIndex_right), " is ", string(ancNodeIndex_of_Right), "\n"]
+				msg = join(txt, "")
+				println(msg)
+				error(msg)
+			end
+			# No error, so ancNodeIndex was found:
+			ancNodeIndex = ancNodeIndex_of_Left
+			taxa_unordered = flat2(split.(tmp_taxa, ","))
+			taxa_ordered = sort(taxa_unordered)
+			taxa_at_ancNode = join(taxa_ordered, ",")
+			taxa[ancNodeIndex] = taxa_at_ancNode
+			
+			# Advance i by 2 (because this was a node with 2 descendants)
+			i = i+2
+		end # END if (nodeIndex_ancL == nodeIndex_ancR) # (bifurcating node)
+	end # END while
+	
 	
 	return(taxa)
-end
+end # END function get_taxa_descending_from_each_node
 
 
 
@@ -867,6 +1043,79 @@ end
 
 
 # Is the node a tip?
+"""
+#######################################################
+# Standard bifurcating tree
+#######################################################
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
+
+downpass_edgematrix = get_LR_downpass_edgematrix(tr)
+taxa = get_taxa_descending_from_each_node(tr, trdf, downpass_edgematrix=get_LR_downpass_edgematrix(tr))
+
+# Make a trdf, a DataFrame holding all of the key tree information
+cumulative_height_at_each_node = get_node_heights(tr)
+node_age = get_node_ages(tr)
+
+nodeIndex = 1
+isTip_TF(tr, nodeIndex)
+nodeIndex = 5
+isTip_TF(tr, nodeIndex)
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
+
+downpass_edgematrix = get_LR_downpass_edgematrix(tr)
+taxa = get_taxa_descending_from_each_node(tr, trdf, downpass_edgematrix=get_LR_downpass_edgematrix(tr))
+
+# Make a trdf, a DataFrame holding all of the key tree information
+cumulative_height_at_each_node = get_node_heights(tr)
+node_age = get_node_ages(tr)
+
+nodeIndex = 1
+isTip_TF(tr, nodeIndex)
+nodeIndex = 3
+isTip_TF(tr, nodeIndex)
+"""
+
 function isTip_TF(tr, nodeIndex)
 	# Returns true if it's a tip (a "leaf"), false if not
 	return(tr.node[nodeIndex].leaf)
@@ -881,9 +1130,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -977,14 +1225,66 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
 tr
 tr.root
+
+#######################################################
+# Standard bifurcating tree
+#######################################################
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+indexNum_table
+
+edge_df = get_NodeIndex_df_by_tree_edges(tr, indexNum_table=indexNum_table)
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
 
 # Get a table with the index numbers of the nodes
 indexNum_table = get_nodeIndex_PNnumber(tr)
@@ -1027,9 +1327,8 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 # Make a trdf, a DataFrame holding all of the key tree information
 cumulative_height_at_each_node = get_node_heights(tr)
@@ -1041,29 +1340,29 @@ function get_node_heights(tr)
 	edge_df = get_NodeIndex_df_by_tree_edges(tr, indexNum_table=indexNum_table)
 	cumulative_height_at_each_node = collect(repeat([0.0], length(tr.node)))
 	
-	print("\nuppass_nodeIndexes:\n")
-	print(uppass_nodeIndexes)
-	print("\n")
-	print("\nedge_df:\n")
-	print(edge_df)
+	#print("\nuppass_nodeIndexes:\n")
+	#print(uppass_nodeIndexes)
+	#print("\n")
+	#print("\nedge_df:\n")
+	#print(edge_df)
 	
 	# Iterate up through the nodes from the root
 	for i in 1:length(uppass_nodeIndexes)
-		print("\n")
-		print("\n")
-		print(i)
+		#print("\n")
+		#print("\n")
+		#print(i)
 		
 		nodeIndex = uppass_nodeIndexes[i]
 		if (nodeIndex == tr.root)
 			cumulative_height_at_each_node[nodeIndex] = 0.0
 		else
-			print("\nedge_df[:,:edge_decNodeIndex]:\n")
-			print(edge_df[:,:edge_decNodeIndex])
-			print("\nnodeIndex:\n")
-			print(nodeIndex)
+			#print("\nedge_df[:,:edge_decNodeIndex]:\n")
+			#print(edge_df[:,:edge_decNodeIndex])
+			#print("\nnodeIndex:\n")
+			#print(nodeIndex)
 			ancTF = edge_df[:,:edge_decNodeIndex] .== nodeIndex
-			print("\nancTF:\n")
-			print(ancTF)
+			#print("\nancTF:\n")
+			#print(ancTF)
 			anc_nodeIndex = edge_df[:,:edge_ancNodeIndex][ancTF][1]
 			# Get previous age
 			previous_height_above_root = cumulative_height_at_each_node[anc_nodeIndex]
@@ -1073,7 +1372,7 @@ function get_node_heights(tr)
 		end
 	end
 	return(cumulative_height_at_each_node)
-end
+end # END function get_node_heights(tr)
 
 
 
@@ -1081,13 +1380,69 @@ end
 """
 using DataFrames
 using PhyloNetworks
-using PhyloPlots
+#using PhyloPlots
 
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
+#######################################################
+# Standard bifurcating tree
+#######################################################
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
+
+downpass_edgematrix = get_LR_downpass_edgematrix(tr)
+taxa = get_taxa_descending_from_each_node(tr, trdf, downpass_edgematrix=get_LR_downpass_edgematrix(tr))
 
 # Make a trdf, a DataFrame holding all of the key tree information
 cumulative_height_at_each_node = get_node_heights(tr)
 node_age = get_node_ages(tr)
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+
+# Get the number (index I think!) of the root node, make a DataFrame of the 
+# nodeIndex and PNnumber
+rootnodenum = tr.root
+
+# Get trdf WITHOUT "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, false)
+
+# Not all columns print now that trdf is big, let's print just the left and right
+# Get trdf WITH "taxa" field (species descending from each node)
+trdf = prt(tr, rootnodenum, true);
+headLR(trdf)
+
+downpass_edgematrix = get_LR_downpass_edgematrix(tr)
+taxa = get_taxa_descending_from_each_node(tr, trdf, downpass_edgematrix=get_LR_downpass_edgematrix(tr))
+
+# Make a trdf, a DataFrame holding all of the key tree information
+cumulative_height_at_each_node = get_node_heights(tr)
+node_age = get_node_ages(tr)
+
 """
 function get_node_ages(tr)
 	cumulative_height_at_each_node = get_node_heights(tr)
@@ -1262,7 +1617,6 @@ end
 # Load a simple tree, see a simple list of nodeIndexes
 using DataFrames
 using PhyloNetworks
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)
@@ -1354,7 +1708,6 @@ end
 # Load a simple tree, see a simple list of nodeIndexes
 using DataFrames
 using PhyloNetworks
-include("/drives/Dropbox/_njm/__julia/julia4Rppl_v1.jl")
 
 great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 tr = readTopology(great_ape_newick_string)

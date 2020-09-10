@@ -16,8 +16,8 @@ using BioGeoJulia.SSEs
 
 #great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
 great_ape_newick_string = "((chimp:1,human:1):1,gorilla:2);"
-tr = readTopology(great_ape_newick_string)
-tr
+tro = readTopology(great_ape_newick_string)
+tro
 # HybridNetwork, Rooted Network
 # 4 edges
 # 5 nodes: 3 tips, 0 hybrid nodes, 2 internal tree nodes.
@@ -26,8 +26,8 @@ tr
 
 
 
-rootnodenum = tr.root
-trdf = prt(tr, rootnodenum)
+rootnodenum = tro.root
+trdf = prt(tro, rootnodenum)
 trdf
 
 
@@ -35,13 +35,13 @@ trdf
 
 
 
-length(tr.node)
+length(tro.node)
 # 5
 
-tr.edge[1]
+tro.edge[1]
 
 
-newnode, newedge = PhyloNetworks.breakedge!(tr.edge[1], tr);
+newnode, newedge = PhyloNetworks.breakedge!(tro.edge[1], tro);
 
 newnode
 # PhyloNetworks.Node:
@@ -58,31 +58,31 @@ newedge # new edge 5 goes from node -3 and 4 (new)
 length(tr.node) # one more than before
 # 6
 
-writeTopology(tr) # note extra pair of parentheses around chimp
+writeTopology(tro) # note extra pair of parentheses around chimp
 "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
 
 
 
 
-tr = readTopology(great_ape_newick_string)
-tr2 = readTopology("((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);")
+tro = readTopology(great_ape_newick_string)
+tr = readTopology("((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);")
 
 
+tro
 tr
-tr2
 
 # Node numbers
+tro.node
 tr.node
-tr2.node
 
 # Edge numbers
+tro.edge
 tr.edge
-tr2.edge
 
-prt(tr, tr.root)
+prt(tro, tr.root)
 # Works
 
-prt(tr2, tr2.root)
+prt(tr, tr.root)
 # Error in prt which means to me that:
 
 # 1. We need to add the edge numbers to the prt table
