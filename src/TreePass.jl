@@ -676,6 +676,81 @@ end
 
 # Go from a PhyloNetwork Node Number (PNnumber) to the node index 
 # (i.e., the index of that node in the list of nodes)
+"""
+using DataFrames
+using PhyloNetworks
+
+
+great_ape_newick_string = "(((human:6,chimpanzee:6):1,gorilla:7):5,orangutan:12);"
+tr = readTopology(great_ape_newick_string)
+tr
+tr.root
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+indexNum_table
+
+PNnumber = 3;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+PNnumber = -2;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+PNnumber = -4;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+
+using DataFrames
+using PhyloNetworks
+
+#######################################################
+# Typical bifurcating (binary) tree
+#######################################################
+great_ape_newick_string = "((human:1.0,chimp:0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+
+# Get a table with the index numbers of the nodes
+indexNum_table = get_nodeIndex_PNnumber(tr)
+indexNum_table
+
+PNnumber = 3;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+PNnumber = -2;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+PNnumber = -3;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+# Node doesn't exist:
+# PNnumber = -4;
+# get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+
+
+#######################################################
+# Tree with a 2-degree node inside a branch
+#######################################################
+great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
+tr = readTopology(great_ape_newick_string)
+tr
+
+nodeIndex_array = collect(repeat([0], tr.numNodes))
+
+indexNum_table = get_nodeIndex_PNnumber(tr)
+indexNum_table
+
+PNnumber = 3;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+PNnumber = -2;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+PNnumber = -4;
+get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
+
+"""
 function get_nodeIndex_from_PNnumber(PNnumber; indexNum_table)
 	TF01 = indexNum_table[:,2] .== PNnumber
 	# Adding the [1] returns a scalar
@@ -709,9 +784,6 @@ trdf
 using DataFrames
 using PhyloNetworks
 
-# For Nick's editing (ignore)
-include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
-
 #######################################################
 # Typical bifurcating (binary) tree
 #######################################################
@@ -732,8 +804,6 @@ TreePassO.get_postorder_nodenumbers_above_node(tr, tr.root, nodeIndex_array, ite
 #######################################################
 # Tree with a 2-degree node inside a branch
 #######################################################
-include("/GitHub/BioGeoJulia.jl/notes/TreePassO.jl")
-
 great_ape_newick_string = "((human:1.0,(chimp:0.5):0.5):1.0,gorilla:2.0);"
 tr = readTopology(great_ape_newick_string)
 tr
