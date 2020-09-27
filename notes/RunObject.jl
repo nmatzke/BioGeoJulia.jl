@@ -217,6 +217,7 @@ mutable struct AllRegimes
 	# Text versions of the areas_list and states_list
 	area_names::Array{String,1}
 	ranges_list::Array{String,1} # Ranges are list of areas collapse to a string, e.g. "ABC"
+	geog_df::DataFrame
 	
 	# Tree details etc.
 	tr::HybridNetwork # Tree with possible ith included direct ancestors)
