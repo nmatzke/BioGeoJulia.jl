@@ -27,7 +27,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello4, default_BGB_params, Metadata, Settings, AllRegimes, Regime, Regimes, construct_RunObject
+export say_hello4, default_BGB_params, Metadata, Settings, AllRegimes, Regime, Regimes, RunObject, construct_RunObject
 
 #######################################################
 # Goal: Set up the run object for BioGeoJulia.
