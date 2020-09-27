@@ -449,7 +449,7 @@ uppass_edgematrix
 
 function get_LR_uppass_edgematrix(tr)
 	rootnodenum = tr.root
-	iterNum = 0
+	iterNum = 1
 	edgematrix = initialize_edgematrix(tr)
 	indexNum_table = get_nodeIndex_PNnumber(tr)
 
