@@ -27,7 +27,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello4, default_BGB_params, Metadata, Settings, AllRegimes, Regime, Regimes, RunObject, construct_RunObject
+export say_hello4, default_BGB_params, Metadata, Settings, AllRegimes, Regime, Regimes, RunObj, construct_RunObj
 
 #######################################################
 # Goal: Set up the run object for BioGeoJulia.
@@ -267,7 +267,7 @@ struct Regimes
 end
 
 # Structure for ro: the RunObject
-struct RunObject
+struct RunObj
 	# Meta: description of the run, input files, etc.
 	meta::Metadata
 	settings::Settings
@@ -288,7 +288,7 @@ trdf = prt(tr)
 
 ro = construct_RunObject(trfn, lgdata_fn)
 """
-function construct_RunObject(trfn, lgdata_fn)
+function construct_RunObj(trfn, lgdata_fn)
 	# Read the files
 	geog_df = Parsers.getranges_from_LagrangePHYLIP(lgdata_fn)
 	tr = readTopology(trfn)
@@ -391,7 +391,7 @@ function construct_RunObject(trfn, lgdata_fn)
 	#######################################################
 	# OK, now, finally, output the RunObject
 	#######################################################
-	ro = RunObject(meta, settings, gl, reg)
+	ro = RunObj(meta, settings, gl, reg)
 	
 	return(ro)	
 end
