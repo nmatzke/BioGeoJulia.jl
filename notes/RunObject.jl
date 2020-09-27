@@ -27,7 +27,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export say_hello4, Metadata, Settings, AllRegimes, Regime, Regimes, default_BGB_params
+export say_hello4, default_BGB_params, Metadata, Settings, AllRegimes, Regime, Regimes, construct_RunObject
 
 #######################################################
 # Goal: Set up the run object for BioGeoJulia.
@@ -179,7 +179,7 @@ mutable struct Metadata
 	# calc_likes_down_regimes(reg1, reg2) -- convert likelihoods between regimes during downpass
 	#add_two::userfunc
 
-end # END struct RunObject
+end # END struct Metadata
 
 # Structure for ro.settings 
 mutable struct Settings
@@ -228,7 +228,7 @@ mutable struct AllRegimes
 	ttl_lnl::Float64
 
 
-end # END struct RunObject
+end # END struct AllRegimes
 
 
 # Structure for a single Regime
