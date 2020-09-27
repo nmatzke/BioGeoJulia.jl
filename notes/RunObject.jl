@@ -377,7 +377,7 @@ function construct_RunObj(trfn, lgdata_fn)
 	root_lnl = 0.0
 	ttl_lnl = 0.0
 	
-	gl = AllRegimes(areas_list=areas_list, states_list=states_list, area_names=area_names, ranges_list=ranges_list, geog_df=geog_df, tr=tr, trdf=trdf, pardf=pardf, res=res, branch_lnl=branch_lnl, root_lnl=root_lnl, ttl_lnl=ttl_lnl)
+	gl = AllRegimes(areas_list, states_list, area_names, ranges_list, geog_df, tr, trdf, pardf, res, branch_lnl, root_lnl, ttl_lnl)
 	
 	#######################################################
 	# Regimes
