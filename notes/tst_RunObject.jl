@@ -14,6 +14,26 @@ include("tst_RunObject.jl")
 """
 
 module Tst_RunObject
+	using BenchmarkTools # for @time
+	using InvertedIndices # for Not
+	using LSODA           # for lsoda()
+	using Sundials        # for CVODE_BDF(linear_solver=:GMRES)
+	using DifferentialEquations
+	using Distributed
+	using Random					# for MersenneTwister()
+	using Dates						# for e.g. DateTime, Dates.now()
+	using PhyloNetworks
+	#using Plots						# for plot
+	using DataFrames          # for DataFrame()
+	using BioGeoJulia.TrUtils # for flat2() (similar to unlist)
+	using BioGeoJulia.StateSpace
+	using BioGeoJulia.TreePass
+	using BioGeoJulia.SSEs
+	
+	cd("/GitHub/BioGeoJulia.jl/notes/")
+	include("Parsers.jl")
+	import .Parsers
+
 	include("RunObject.jl")
 	import .RunObject
 
@@ -32,7 +52,7 @@ module Tst_RunObject
 	tr = readTopology(trfn)
 	trdf = prt(tr)
 
-	ro = RunObject.construct_RunObject(trfn, lgdata_fn)
+	ro = RunObject.construct_RunObj(trfn, lgdata_fn)
 
 	
 end # End of module

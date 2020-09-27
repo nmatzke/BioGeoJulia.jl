@@ -26,6 +26,10 @@ using BioGeoJulia.StateSpace
 using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
+include("/GitHub/BioGeoJulia.jl/notes/Parsers.jl")
+import .Parsers
+
+
 # (1) List all function names here:
 export say_hello4, default_BGB_params, Metadata, Settings, AllRegimes, Regime, Regimes, RunObj, construct_RunObj
 
