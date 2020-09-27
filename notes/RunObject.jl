@@ -367,6 +367,9 @@ function construct_RunObj(trfn, lgdata_fn)
 	# trdf = trdf
 	# tiplikes::Array{Float64,2} # tip likelihoods on all possible states # Might be updated
 	
+	# Parameters df
+	pardf = default_BGB_params()
+	
 	# Results:
 	n = length(states_list)
 	res = construct_Res(tr, n)
