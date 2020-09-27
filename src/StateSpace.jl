@@ -19,7 +19,7 @@ using Convex				 # for Convex.entropy(), maximize()
 using SCS						 # for SCSSolve, solve (maximize(entropy()))
 
 
-export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, prtC, prtCi, prtQ, prtQi, prtCp, prtQp, numstates_from_numareas, areas_list_to_states_list, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, setup_DEC_Cmat, update_Cijk_vals
+export CparamsStructure, default_Cparams, sumy, sums, sumv, sumj, prtC, prtCi, prtQ, prtQi, prtCp, prtQp, numstates_from_numareas, areas_list_to_states_list, states_list_to_txt, get_default_inputs, run_model, setup_MuSSE, setup_DEC_DEmat, update_Qij_vals, setup_DEC_Cmat, relative_probabilities_of_subsets, relative_probabilities_of_vicariants, discrete_maxent_distrib_of_smaller_daughter_ranges, array_in_array, is_event_vicariance, maxent01_defaults, setup_DEC_Cmat, update_Cijk_vals
 
 
 
@@ -346,8 +346,31 @@ function areas_list_to_states_list(areas_list=collect(1:3), maxareas=3, include_
 end
 
 
+"""
+# Get text list of ranges
 
-
+areas_list = collect(1:3)
+area_names = ["A", "B", "C"]
+states_list = areas_list_to_states_list(areas_list, 1, false)
+states_list_to_txt(states_list, area_names; delim="")
+states_list = areas_list_to_states_list(areas_list, 1, true)
+states_list_to_txt(states_list, area_names; delim="")
+states_list = areas_list_to_states_list(areas_list, 3, false)
+states_list_to_txt(states_list, area_names; delim="")
+states_list = areas_list_to_states_list(areas_list, 3, true)
+states_list_to_txt(states_list, area_names; delim="")
+"""
+function states_list_to_txt(states_list, area_names; delim="")
+	ranges_list = collect(repeat([""], length(states_list)))
+	for i in 1:length(ranges_list)
+		areas_in_this_state = area_names[states_list[i]]
+		if (length(areas_in_this_state) == 0)
+			areas_in_this_state = "_"
+		end
+		ranges_list[i] = join(areas_in_this_state, delim)
+	end # END for i in 1:length(ranges_list)
+	return(ranges_list)
+end # function states_list_to_txt(states_list, area_names)
 
 
 #######################################################
@@ -679,7 +702,9 @@ function setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_eve
 						# Add to arrays
 						# Forward event
 						index += 1
-						Qarray_event_types[index] = "a"
+						Qarray_event_types[index] = B
+						
+						
 						Qarray_ivals[index] = statenum_ival
 						Qarray_jvals[index] = statenum_jval
 						Qij_vals[index] = amat[starting_areanum,ending_areanum]

@@ -167,7 +167,6 @@ function getranges_from_LagrangePHYLIP(lgdata_fn; block_allQs=true)
 	new_names = Rrbind(["tipnames"], areas_list)
 	geog_df = rename(geog_df, new_names)
 
-	geog_df[!,:K]
 	geog_df[!,:tipnames]
 
 	return geog_df

@@ -917,6 +917,9 @@ function prt(tr, rootnodenum=tr.root, get_taxa_by_node=true)
 		end # END if (sum(TF_edgerows_descend_from_decNodeIndex) == 2)
 	end # END for i in 1:Rnrow(trdf)
 	
+	# Add a field, reg, to hold the regimes
+	reg = collect(repeat([1], numnodes))
+	
 	# Add the fields
 	trdf[!,:brlen] = brlen
 	trdf[!,:ancNodeIndex] = ancNodeIndex
@@ -924,6 +927,7 @@ function prt(tr, rootnodenum=tr.root, get_taxa_by_node=true)
 	trdf[!,:rightNodeIndex] = rightNodeIndex
 	trdf[!,:nodeName] = nodeName
 	trdf[!,:nodeType] = nodeType
+	trdf[!,:reg] = reg
 	
 	if get_taxa_by_node == true
 		downpass_edgematrix = get_LR_downpass_edgematrix(tr)
