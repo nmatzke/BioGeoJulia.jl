@@ -53,6 +53,10 @@ module Tst_RunObject
 	trdf = prt(tr)
 
 	ro = RunObject.construct_RunObj(trfn, lgdata_fn)
-
+	Rnames(ro)
+	Rnames(ro.meta)
+	Rnames(ro.settings)
+	Rnames(ro.gl)
+	Rnames(ro.reg)
 	
 end # End of module
