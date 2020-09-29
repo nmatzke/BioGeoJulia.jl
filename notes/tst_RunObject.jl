@@ -59,4 +59,22 @@ module Tst_RunObject
 	Rnames(ro.gl)
 	Rnames(ro.reg)
 	
+	
+	#######################################################
+	# Now, calculate a likelihood
+	#######################################################
+	# 1. Set up a model (Qmat and Cmat tables)
+	#
+	# 2. Update the Qmat and Cmat rates with update function
+	#
+	# 3. Calculate the likelihood
+	#    a. Es interpolator
+	#    b. As interpolator (records instantaneous flow of Ds)
+	#    c. Gflow interpolator
+	#    d. Calc downpass
+	#    e. Root state and final lnLs
+	########################################################
+	
+	
+	
 end # End of module

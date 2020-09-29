@@ -211,6 +211,8 @@ end # END struct Settings
 mutable struct AllRegimes
 	# Areas and states can be Int numbers, letters, or other strings
 	# Mostly we use Int numbers for processing; text for display
+	numareas::Int64			# Number of areas (total across all regimes)
+	numstates::Int64		# Number of areas (total across all regimes)
 	areas_list::Array{Int64,1}           # 1D array; a list of all possible areas across all regimes
 	states_list::Array{Array{Any,1},1}   # 1D array of 1D arrays; a list of all possible states across all regimes
 	
@@ -372,13 +374,14 @@ function construct_RunObj(trfn, lgdata_fn)
 	pardf = default_BGB_params()
 	
 	# Results:
-	n = length(states_list)
+	numareas = length(areas_list)
+	numstates = n = length(states_list)
 	res = construct_Res(tr, n)
 	branch_lnl = 0.0
 	root_lnl = 0.0
 	ttl_lnl = 0.0
 	
-	gl = AllRegimes(areas_list, states_list, area_names, ranges_list, geog_df, tr, trdf, pardf, res, branch_lnl, root_lnl, ttl_lnl)
+	gl = AllRegimes(numareas, numstates, areas_list, states_list, area_names, ranges_list, geog_df, tr, trdf, pardf, res, branch_lnl, root_lnl, ttl_lnl)
 	
 	#######################################################
 	# Regimes
