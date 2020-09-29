@@ -57,11 +57,11 @@ module Tst_RunObject
 	Rnames(ro.meta)
 	Rnames(ro.settings)
 	Rnames(ro.gl)
-	Rnames(ro.reg)
+	Rnames(ro.regs)
 	
 	
 	#######################################################
-	# Now, calculate a likelihood
+	# Now, calculate a likelihood (assuming 1 global regime)
 	#######################################################
 	# 1. Set up a model (Qmat and Cmat tables)
 	#
@@ -74,7 +74,21 @@ module Tst_RunObject
 	#    d. Calc downpass
 	#    e. Root state and final lnLs
 	########################################################
+	numareas = ro.gl.numareas
+	numstates = ro.gl.numstates
+	areas_list = ro.gl.areas_list
+	states_list = ro.gl.states_list
 	
+	amat = reshape(collect(1:(numareas^2)), (numareas,numareas))
+	dmat = reshape(collect(1:(numareas^2)), (numareas,numareas)) ./ 100
+	elist = repeat([0.123], numstates)
+	allowed_event_types=["d","e"]
+
+	Qarray = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
+	Q = prtQ(Qarray)
+	Carray = setup_DEC_Cmat(areas_list, states_list)
+	C = prtC(Carray)
+	Crow_weightvals = Carray.row_weightvals # has length numstates
 	
 	
 end # End of module

@@ -249,6 +249,7 @@ mutable struct Regime
 	states::Array{Array{Int64,1},1}   # 1D array of 1D arrays; a list of all possible states in this regime
 	Qdf::DataFrame
 	Cdf::DataFrame
+	Crow_weightvals::Array{Float64,1}    # 1D array of areas in this regime
 	mu::Array{Float64,1}     # 1D array of floats with per-area extinction rates for this regime
 end
 
@@ -262,6 +263,7 @@ function construct_Regime()
 	states = [[0]]
 	Qdf = DataFrame([])
 	Cdf = DataFrame([])
+	C_row_weightvals = [0.0]
 	mu = [0.0]
 	
 	reg = Regime(name, top, bot, desc, model, areas, states, Qdf, Cdf, mu)
@@ -269,7 +271,7 @@ function construct_Regime()
 end
 
 # Structure for ref: Regimes
-struct Regimes
+mutable struct Regimes
 	reg::Array{Regime,1}
 end
 
@@ -396,13 +398,13 @@ function construct_RunObj(trfn, lgdata_fn)
 			append!(tmp_regimes, construct_Regime())
 		end
 	end
-	reg = Regimes(tmp_regimes)
+	regs = Regimes(tmp_regimes)
 	
 	
 	#######################################################
 	# OK, now, finally, output the RunObject
 	#######################################################
-	ro = RunObj(meta, settings, gl, reg)
+	ro = RunObj(meta, settings, gl, regs)
 	
 	return(ro)	
 end
