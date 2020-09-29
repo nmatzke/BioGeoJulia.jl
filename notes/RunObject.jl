@@ -271,7 +271,8 @@ end
 
 # Structure for ref: Regimes
 mutable struct Regimes
-	regs::Array{Regime,1}
+	ra::Array{Regime,1}  # ra = Regimes Array
+	num_regimes::Float64
 end
 
 
@@ -399,8 +400,8 @@ function construct_RunObj(trfn, lgdata_fn)
 			append!(tmp_regimes, tmp_regime)
 		end
 	end
-	regs = Regimes(tmp_regimes)
-	
+	num_regimes = length(tmp_regimes)
+	regs = Regimes(tmp_regimes, num_regimes)
 	
 	#######################################################
 	# OK, now, finally, output the RunObject
