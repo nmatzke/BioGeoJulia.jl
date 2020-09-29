@@ -88,7 +88,7 @@ module Tst_RunObject
 	Q = prtQ(Qarray)
 	Carray = setup_DEC_Cmat(areas_list, states_list)
 	C = prtC(Carray)
-	Crow_weightvals = Carray.row_weightvals # has length numstates
+	C_row_weightvals = Carray.row_weightvals # has length numstates
 	
 	
 end # End of module

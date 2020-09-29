@@ -266,7 +266,7 @@ function construct_Regime()
 	C_row_weightvals = [0.0]
 	mu = [0.0]
 	
-	reg = Regime(name, top, bot, desc, model, areas, states, Qdf, Cdf, mu)
+	reg = Regime(name, top, bot, desc, model, areas, states, Qdf, Cdf, C_row_weightvals, mu)
 	return(reg)
 end
 
