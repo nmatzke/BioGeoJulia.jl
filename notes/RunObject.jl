@@ -281,7 +281,7 @@ struct RunObj
 	meta::Metadata
 	settings::Settings
 	gl::AllRegimes
-	reg::Regimes
+	regs::Regimes
 end # END struct RunObject
 
 
@@ -407,7 +407,7 @@ function construct_RunObj(trfn, lgdata_fn)
 	ro = RunObj(meta, settings, gl, regs)
 	
 	return(ro)	
-end
+end # END function construct_RunObj(trfn, lgdata_fn)
 
 
 
