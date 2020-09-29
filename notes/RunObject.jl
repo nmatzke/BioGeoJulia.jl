@@ -266,14 +266,14 @@ function construct_Regime()
 	C_row_weightvals = [0.0]
 	mu = [0.0]
 	
-	reg = Regime(name, top, bot, desc, model, areas, states, Qdf, Cdf, C_row_weightvals, mu)
-	return(reg)
+	return(Regime(name, top, bot, desc, model, areas, states, Qdf, Cdf, C_row_weightvals, mu))
 end
 
 # Structure for ref: Regimes
 mutable struct Regimes
-	reg::Array{Regime,1}
+	regs::Array{Regime,1}
 end
+
 
 # Structure for ro: the RunObject
 struct RunObj
@@ -390,12 +390,13 @@ function construct_RunObj(trfn, lgdata_fn)
 	#######################################################
 	regime_nums = sort(unique(trdf[!,:reg]))
 	num_regimes = length(regime_nums)
-	tmp_regimes = [construct_Regime()]
+	tmp_regimes = [RunObject.construct_Regime()]
 	
 	# Build up the list of regimes
 	if (num_regimes > 1)
 		for i in 2:num_regimes
-			append!(tmp_regimes, construct_Regime())
+			tmp_regime = [RunObject.construct_Regime()]
+			append!(tmp_regimes, tmp_regime)
 		end
 	end
 	regs = Regimes(tmp_regimes)
