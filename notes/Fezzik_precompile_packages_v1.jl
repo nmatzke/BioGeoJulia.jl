@@ -6,7 +6,7 @@
 # FIRST TIME:
 # "enables automatic tracing of compiler activity through adding itself to the startup.jl file."
 using Pkg
-Pkg.add(PackageSpec(url="https://github.com/TsurHerman/Fezzik"))
+#Pkg.add(PackageSpec(url="https://github.com/TsurHerman/Fezzik"))
 using Fezzik
 Fezzik.auto_trace()
 # NOTE: To clear old Fezziks, use Fezzik.revert()
@@ -35,6 +35,11 @@ using Combinatorics  # for e.g. combinations()
 using DataFrames     # for e.g. DataFrame()
 using Random					# for MersenneTwister()
 using Dates						# for e.g. DateTime, Dates.now()
+
+using FixedPointNumbers  # for Statistics
+using GeometryTypes  # for Plots
+using GeometryBasics  # for Plots
+
 using Statistics			# for e.g. mean()
 using RCall       # for df_to_Rdata, reval, g = globalEnv
 

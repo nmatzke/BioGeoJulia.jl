@@ -165,7 +165,7 @@ function getranges_from_LagrangePHYLIP(lgdata_fn; block_allQs=true)
 	sp_areas3_Matrix = Rcbind(sp_names, sp_areas2_Matrix)
 	geog_df = convert(DataFrame, sp_areas3_Matrix)
 	new_names = Rrbind(["tipnames"], areas_list)
-	geog_df = rename(geog_df, new_names)
+	geog_df = DataFrames.rename(geog_df, new_names)
 
 	geog_df[!,:tipnames]
 
