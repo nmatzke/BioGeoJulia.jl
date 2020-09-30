@@ -828,6 +828,12 @@ end # end setup_DEC_DEmat()
 
 """
 # Update Qij_vals
+# Takes dmat, amat, elist as inputs
+# dmat is d * various dispersal multipliers
+# amat is a * various dispersal multipliers
+# elist is "e" for each area
+
+# Update Qij_vals
 numareas = 3
 areas_list = collect(1:numareas)
 states_list = areas_list_to_states_list(areas_list, 3, true)
@@ -866,12 +872,19 @@ function update_Qij_vals(Qmat, areas_list, states_list, dmat=reshape(repeat([1.0
 	range_sizes = length.(states_list)
 	#areas_list = sort(unique(flat2(states_list)))
 	numareas = length(areas_list)
-
-	Qarray_ivals = Qmat.Qarray_ivals
-	Qarray_jvals = Qmat.Qarray_jvals
-	Qij_vals = Qmat.Qij_vals
-	Qarray_event_types = Qmat.Qarray_event_types
-
+	
+	if (Rclass(Qmat) == "DataFrame")
+		Qarray_ivals = Qmat[!,:i]
+		Qarray_jvals = Qmat[!,:j]
+		Qij_vals = Qmat[!,:val]
+		Qarray_event_types = Qmat[!,:event]
+	else
+		Qarray_ivals = Qmat.Qarray_ivals
+		Qarray_jvals = Qmat.Qarray_jvals
+		Qij_vals = Qmat.Qij_vals
+		Qarray_event_types = Qmat.Qarray_event_types
+	end
+	
 	# Update the "d" events (anagenetic range expansion)
 	TF = Qarray_event_types .== "d"
 	if (sum(TF) > 0)
@@ -1145,11 +1158,12 @@ function discrete_maxent_distrib_of_smaller_daughter_ranges(total_numareas=6, ma
 	# This solution updates p (look in p.values)
 	problem = maximize(Convex.entropy(p), 0 <= p, p <= 1, sum(p) == 1, feature_constraints)
 	
-	# worked 2020-09-29
-	sol = Convex.solve!(problem, SCS.SCSSolver(verbose=0))
+	# worked 2020-09-29 at work, failed 2020-09-30 at home
+	#sol = Convex.solve!(problem, SCS.SCSSolver(verbose=0))
 	
 	# worked e.g. July 2020 (version issue I guess)
-	#sol = Convex.solve!(problem, SCS.Optimizer(verbose=0))
+	# worked at home 2020-09-30
+	sol = Convex.solve!(problem, SCS.Optimizer(verbose=0))
 	maxent_result = abs.(round.(p.value; digits=3))
 	return maxent_result
 end
@@ -1589,15 +1603,33 @@ end # end setup_DEC_Cmat()
 #######################################################
 # Update the Cijk_vals
 #######################################################
-function update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))) )
+function update_Cijk_vals(Carray, areas_list, states_list, maxent01, Cparams=default_Cparams(), dmat=reshape(repeat([1.0], (length(areas_list)^2)), (length(areas_list),length(areas_list))); row_weightvals=null )
 
-	Carray_ivals = Carray.Carray_ivals;
-	Carray_jvals = Carray.Carray_jvals;
-	Carray_kvals = Carray.Carray_kvals;
-	Carray_event_types = Carray.Carray_event_types;
-	Cijk_weights = Carray.Cijk_weights;
-	Cijk_vals = Carray.Cijk_vals;
-	row_weightvals = Carray.row_weightvals
+	if (Rclass(Carray) == "DataFrame")
+		if (row_weightvals == null)
+			txt = "STOP ERROR in update_Cijk_vals(): Input 'Carray' is a DataFrame, so row_weightvals cannot be null."
+			println("\n")
+			println(txt)
+			println("\n")
+			error(txt)
+		end
+		Carray_ivals = Carray[!,:i]
+		Carray_jvals = Carray[!,:j]
+		Carray_kvals = Carray[!,:k]
+		Cijk_weights = Carray[!,:wt]
+		Cijk_vals = Carray[!,:val]
+		row_weightvals = row_weightvals
+	else
+		Carray_ivals = Carray.Carray_ivals;
+		Carray_jvals = Carray.Carray_jvals;
+		Carray_kvals = Carray.Carray_kvals;
+		Carray_event_types = Carray.Carray_event_types;
+		Cijk_weights = Carray.Cijk_weights;
+		Cijk_vals = Carray.Cijk_vals;
+		row_weightvals = Carray.row_weightvals
+	end # END if (Rclass(Carray) == "DataFrame")
+
+
 
 	numstates = length(states_list)
 	

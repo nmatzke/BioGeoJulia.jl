@@ -303,8 +303,10 @@ function construct_RunObj(trfn, lgdata_fn)
 	geog_df = Parsers.getranges_from_LagrangePHYLIP(lgdata_fn)
 	tr = readTopology(trfn)
 	trdf = prt(tr)
-	
-	area_names = names(geog_df)[names(geog_df) .!= "tipnames"]
+
+	# Text versions of the areas_list
+	tmpnames = string.(names(geog_df))
+	area_names = tmpnames[tmpnames .!= "tipnames"]
 	numareas = length(area_names)
 	root_age = trdf[tr.root,:node_age]
 	
@@ -334,7 +336,7 @@ function construct_RunObj(trfn, lgdata_fn)
 	dists5_fn = ""
 	dists6_fn = ""
 	
-	meta = Metadata(run_num, run_name, run_desc, run_dir, trfn, geogfn, timesfn, distsfn, envdistsfn, dispersal_multipliers_fn, area_of_areas_fn, detects_fn, controls_fn, dists2_fn, dists3_fn, dists4_fn, dists5_fn, dists6_fn)
+	meta = RunObject.Metadata(run_num, run_name, run_desc, run_dir, trfn, geogfn, timesfn, distsfn, envdistsfn, dispersal_multipliers_fn, area_of_areas_fn, detects_fn, controls_fn, dists2_fn, dists3_fn, dists4_fn, dists5_fn, dists6_fn)
 	
 
 	#############################################
@@ -354,7 +356,7 @@ function construct_RunObj(trfn, lgdata_fn)
 	abstol = 1e-9
 	reltol = 1e-9
 
-	settings = Settings(time_tops, time_bot_Es, time_bot_Ds, max_range_size, include_null_range, solver, save_everystep, abstol, reltol)
+	settings = RunObject.Settings(time_tops, time_bot_Es, time_bot_Ds, max_range_size, include_null_range, solver, save_everystep, abstol, reltol)
 	
 	
 	
@@ -365,7 +367,8 @@ function construct_RunObj(trfn, lgdata_fn)
 	areas_list = collect(1:numareas)
 	states_list = areas_list_to_states_list(areas_list, max_range_size, include_null_range)
 	# Text versions of the areas_list and states_list
-	area_names = names(geog_df)[names(geog_df) .!= "tipnames"]
+	tmpnames = string.(names(geog_df))
+	area_names = tmpnames[tmpnames .!= "tipnames"]
 	ranges_list = states_list_to_txt(states_list, area_names; delim="")
 	
 	# Tree details etc.
@@ -374,7 +377,7 @@ function construct_RunObj(trfn, lgdata_fn)
 	# tiplikes::Array{Float64,2} # tip likelihoods on all possible states # Might be updated
 	
 	# Parameters df
-	pardf = default_BGB_params()
+	pardf = RunObject.default_BGB_params()
 	
 	# Results:
 	numareas = length(areas_list)
@@ -384,7 +387,7 @@ function construct_RunObj(trfn, lgdata_fn)
 	root_lnl = 0.0
 	ttl_lnl = 0.0
 	
-	gl = AllRegimes(numareas, numstates, areas_list, states_list, area_names, ranges_list, geog_df, tr, trdf, pardf, res, branch_lnl, root_lnl, ttl_lnl)
+	gl = RunObject.AllRegimes(numareas, numstates, areas_list, states_list, area_names, ranges_list, geog_df, tr, trdf, pardf, res, branch_lnl, root_lnl, ttl_lnl)
 	
 	#######################################################
 	# Regimes

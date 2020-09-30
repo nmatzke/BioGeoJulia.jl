@@ -85,10 +85,13 @@ module Tst_RunObject
 	allowed_event_types=["d","e"]
 
 	Qarray = setup_DEC_DEmat(areas_list, states_list, dmat, elist, amat; allowed_event_types=["d","e"])
-	Q = prtQ(Qarray)
+	Qdf = prtQ(Qarray)
 	Carray = setup_DEC_Cmat(areas_list, states_list)
-	C = prtC(Carray)
+	Cdf = prtC(Carray)
 	C_row_weightvals = Carray.row_weightvals # has length numstates
+	
+	
+	
 	
 	
 end # End of module
