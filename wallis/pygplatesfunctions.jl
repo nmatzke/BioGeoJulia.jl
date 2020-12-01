@@ -109,7 +109,7 @@ function distance_given(df, time, land1, land2)
     end
 
     if (length(q) == 0)
-        txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). Pairing land1:\n ", land1, "\n or land2: \n", land2, ", \n has not been found within dataframe \n", df])
+        txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). Pairing land1:\n ", land1, "\n or land2: \n", land2, ", \n has not been found within dataframe\n", df, ".\n Please check spelling and compared landmasses. If using function 'distance_given', please check dataframe timestamps; if time intervals tkaen from original pygplates do not have your needed timestamp, please us function 'distance_interp'. If using function 'distance_interp', please ensure time intervals go PAST the requested timestamp. Thank you! "])
         error(txt)
     end
 
@@ -178,6 +178,7 @@ function distance_given(df, time, land1, land2)
 
     paste0(distance_km)
     return distance_km
+
 end
 
 function distance_interp(df, time, land1, land2)
@@ -193,8 +194,6 @@ function distance_interp(df, time, land1, land2)
         error(txt)
     end
 
-    
-
     for timecheck in List_of_times
         if time - timecheck <= 0
             time_low = q1[timecheck-1]
@@ -203,8 +202,8 @@ function distance_interp(df, time, land1, land2)
         end
     end
     
-    distance_high = distance(df, time_high, land1, land2)
-    distance_low = distance(df, time_low, land1, land2)
+    dist_high = distance_given(df, time_high, land1, land2)
+    dist_low = distance_given(df, time_low, land1, land2)
     
     t2b_high = abs(time - time_high)
     t2b_low = abs(time - time_low)
@@ -213,8 +212,8 @@ function distance_interp(df, time, land1, land2)
     weight_high = (t2bsum - t2b_high)/t2bsum
     weight_low = (t2bsum - t2b_low)/t2bsum
     
-    weight_dist_high = weight_high * distance_high
-    weight_dist_low = weight_low * distance_low
+    weight_dist_high = weight_high * dist_high
+    weight_dist_low = weight_low * dist_low
     
     distance_km =  weight_dist_high + weight_dist_low
 
