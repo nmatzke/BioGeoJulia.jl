@@ -4,7 +4,7 @@
 
 module pygplatesfunctions
 __precompile__(false)  # will cause using / import to load it directly into the 
-                       # current process and skip the precompile and caching. 
+                       # current process  skip the precompile  caching. 
                        # This also thereby prevents the module from being 
                        # imported by any other precompiled module.
                        # https://docs.julialang.org/en/v1/manual/modules/
@@ -28,7 +28,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export sayhello4, txtdf_read, csvdf_read, location_used, land_last_touch, distance_given, distance_interp
+export sayhello4, txtdf_read, csvdf_read, location_used, land_last_touch, distance_given, distance_interp, land_begin
 
 
 """
@@ -64,6 +64,17 @@ say_hello4() = println("Hello dude4!")
 say_hello4()
 
 
+function test_error(x)
+    #blahblahblah
+    y = x - 1
+
+    if x == 0
+        txt = "hmm"
+        error("testing error ", x, " didn't work")
+    end
+    return y
+end
+
 # df = readtable("Desktop/School/Rhacophoridae/Gplates/output.csv")
 # time = 55
 # land1 = "India"
@@ -98,6 +109,135 @@ end
 
 """
 
+"""
+    distance_given(df, time, land1, land2)
+
+Provides the distance at a given time point, provided that the time point requested is
+along the interval originally outputted from pygplates into the dataframe. Allows the 
+user to quickly access distance already recorded within their dataframe. 
+
+For interpolated distances at time points not previously recorded, please use 'distance_interp'
+
+* `df` - dataframe created by pygplates output created by Wallis Bland
+contains variables: 'Reconstruction_Time_Ma', 'Land1', 'Land2', 'Closest_Distance_Ma',
+'Point1_Lat', 'Point1_Lon', 'Point2_Lat', 'Point2_Lon'
+
+* `time` - timepoint for distance requested. Within distance_given, this timepoint should be
+within the original dataframe.
+
+* `land1` - first landmass chosen for distance comparison. Ensure this is within "string" format.
+
+* `land2` - second landmass chosed for distance comparison. Ensure this is within "string" format
+
+NOTE: Lands 1 and 2 do not need to line up with Land1 or 2 within the dataframe in this function, as it will search both!
+
+# Examples
+```julia-repl
+julia> test_df = DataFrame(Reconstruction_Time_Ma=[0, 10, 20, 30, 40, 50, 60, 0, 10, 20, 30, 40, 50, 60], Land1=["India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India"], Land2=["Asia", "Asia", "Asia", "Asia", "Asia", "Asia", "Asia", "Madagascar", "Madagascar", "Madagascar", "Madagascar", "Madagascar", "Madagascar","Madagascar"], Closest_Distance_km=[0, 1000, 2000, 3500, 4100, 4900, "NA", 0, 1000, 2000, 3500, 4100, 4900, "NA"], Point1_Lat=[1,2,3,4,5,6,"NA",1,2,3,4,5,6,"NA"], Point1_Lon=[1,2,3,4,5,6,"NA",1,2,3,4,5,6,"NA"], Point2_Lat=[1,2,3,4,5,6,7,1,2,3,4,5,6,"NA"], Point2_Lon=[1,2,3,4,5,6,7,1,2,3,4,5,6,"NA"])
+
+14×8 DataFrame
+ Row │ Reconstruction_Time_Ma  Land1   Land2       Closest_Distance_km  Point1_Lat  Point1_Lon  Point2_Lat  Point2_Lon 
+     │ Int64                   String  String      Any                  Any         Any         Any         Any        
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │                      0  India   Asia        0                    1           1           1           1
+   2 │                     10  India   Asia        1000                 2           2           2           2
+   3 │                     20  India   Asia        2000                 3           3           3           3
+   4 │                     30  India   Asia        3500                 4           4           4           4
+   5 │                     40  India   Asia        4100                 5           5           5           5
+   6 │                     50  India   Asia        4900                 6           6           6           6
+   7 │                     60  India   Asia        NA                   NA          NA          7           7
+   8 │                      0  India   Madagascar  0                    1           1           1           1
+   9 │                     10  India   Madagascar  1000                 2           2           2           2
+  10 │                     20  India   Madagascar  2000                 3           3           3           3
+  11 │                     30  India   Madagascar  3500                 4           4           4           4
+  12 │                     40  India   Madagascar  4100                 5           5           5           5
+  13 │                     50  India   Madagascar  4900                 6           6           6           6
+  14 │                     60  India   Madagascar  NA                   NA          NA          NA          NA
+
+
+julia> distance_given(test_df, 40, "India", "Asia")
+DataValue{Any}(4100)
+
+julia> distance_given(test_df, 40, "Asia", "India")
+DataValue{Any}(4100)
+
+
+# POTENTIAL ERRORS:
+
+* TTIMESTAMP NOT WITHIN TABLE
+    Variables potentially identified, but time stamp not within the written intervals of the dataframe. Use function pygplatesfunctions.distance_interp() instead.
+
+    julia> distance_given(test_df, 44, "Asia", "India")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given().
+     Pairing: 'Asia' and 'India' has not been found within given dataframe at this timestamp.
+     Please check spelling of compared landmasses.
+     If using function distance_given(), please check dataframe timestamps.
+ 	    if time intervals taken from original pygplates do not have your needed timestamp, please us function pygplatesfunctions.distance_interp() 
+     If using function distance_interp(), please ensure time intervals within dataframe go PAST the requested timestamp. Thank you! 
+
+
+
+* INCORRECT VARIABLES / MISSPELLINGS
+    In this case the variable was either spelt wrong or for some other reason Variable was never printed within the given dataframe.
+
+    julia> distance_given(test_df, 40, "Asia", "Indai")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given().
+     Pairing: 'Asia' and 'Indai' has not been found within given dataframe at this timestamp.
+     Please check spelling of compared landmasses.
+     If using function distance_given(), please check dataframe timestamps.
+        if time intervals taken from original pygplates do not have your needed timestamp, please us function pygplatesfunctions.distance_interp() 
+     If using function distance_interp(), please ensure time intervals within dataframe go PAST the requested timestamp. Thank you! 
+
+
+
+* INCORRECT PAIRING
+    Lands exist within the dataframe, but were never compared distance wise 
+    If original pygplates code was run correctly, this SHOULD NOT OCCUR. More likely need to check spelling
+
+    julia> distance_given(test_df, 40, "Asia", "Madagascar")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given().
+     Pairing: 'Asia' and 'Madagascar' has not been found within given dataframe at this timestamp.
+     Please check spelling of compared landmasses.
+     If using function distance_given(), please check dataframe timestamps.
+        if time intervals taken from original pygplates do not have your needed timestamp, please us function pygplatesfunctions.distance_interp() 
+     If using function distance_interp(), please ensure time intervals within dataframe go PAST the requested timestamp. Thank you! 
+
+
+
+* BOTH LANDS MISSING POLYGONS
+    Variables identified, but polygons for original gplates gpml file for BOTH landmasses were nvever identified at that timestamp
+
+    julia> distance_given(test_df, 60, "India", "Madagascar")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given(). Both landmasses, 'India' and 'Madagascar', 
+     do not have polygons at this timestamp (time=60).
+     Please use land_begin to find the earliest timestamp with polygons present. If land_begin returns an earlier timestamp, please check gplates file.
+
+
+
+* SINGLE LAND MISSING POLYGONS
+    Variables identified, but polygons from original gplates gpml file were never identified at that timestamp.
+    Note below, whether India is land 1 or 2, it is noted that that is the one missing polygons
+
+
+    julia> distance_given(test_df, 60, "India", "Asia") 
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given(). The landmass, 'India', 
+     does not have a polygon at this timestamp (time=60).
+     Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.
+
+    
+    julia> distance_given(test_df, 60, "Asia", "India")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given(). The landmass, 'India', 
+     does not have a polygon at this timestamp (time=60).
+     Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.
+```
+"""
+
+# Hey Nick! A question here! mshould land1  land2 be input as strings when someone uses the fuction?
+# i.e: distance_given(df, 40, "India", "Asia") ??
+
+
+# or should I enter them as "land1", "land2" within this definition of the function?
+
 
 
 function distance_given(df, time, land1, land2)
@@ -108,13 +248,12 @@ function distance_given(df, time, land1, land2)
         @collect
     end
 
-    if (length(q) == 0)
-        txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). Pairing land1:\n ", land1, "\n or land2: \n", land2, ", \n has not been found within dataframe\n", df, ".\n Please check spelling and compared landmasses. If using function 'distance_given', please check dataframe timestamps; if time intervals tkaen from original pygplates do not have your needed timestamp, please us function 'distance_interp'. If using function 'distance_interp', please ensure time intervals go PAST the requested timestamp. Thank you! "])
-        error(txt)
+    if length(q) == 0
+        error("STOP ERROR in pygplatesfunctions.distance_given().\n Pairing: '", land1, "' and '", land2, "' has not been found within given dataframe at this timestamp.\n Please check spelling of compared landmasses.\n If using function distance_given(), please check dataframe timestamps.\n \t if time intervals taken from original pygplates do not have your needed timestamp, please us function pygplatesfunctions.distance_interp() \n If using function distance_interp(), please ensure time intervals within dataframe go PAST the requested timestamp. Thank you! ")
     end
 
 
-    if (q[1] == "NA")
+    if q[1] == "NA"
         q1 = @from i in df begin
             @where i.Reconstruction_Time_Ma == time && i.Land1 == land1 && i.Land2 == land2
             @select i.Point1_Lat
@@ -127,7 +266,7 @@ function distance_given(df, time, land1, land2)
             @collect
         end
         
-        if (length(q1) == 0)
+        if length(q1) == 0
             q3 = @from i in df begin
                 @where i.Reconstruction_Time_Ma == time && i.Land1 == land2 && i.Land2 == land1
                 @select i.Point1_Lat
@@ -139,47 +278,93 @@ function distance_given(df, time, land1, land2)
                 @select i.Point2_Lat
                 @collect
             end
+
+            if q4[1]=="NA" && q3[1]!="NA"
+                error("STOP ERROR in pygplatesfunctions.distance_given(). The landmass, '", land1, "',\n does not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.")
+            end # end error check
+
+            if q3[1]=="NA" && q4[1]!="NA"
+                error("STOP ERROR in pygplatesfunctions.distance_given(). The landmass, '", land2, "',\n does not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.")
+            end # end error check
+
+            if q3[1]=="NA" && q4[1]=="NA"
+                error("STOP ERROR in pygplatesfunctions.distance_given(). Both landmasses, '", land1, "' and '", land2, "',\n do not have polygons at this timestamp\n (time=", time, ").\n Please use land_begin to find the earliest timestamp with polygons present. If land_begin returns an earlier timestamp, please check gplates file.")
+            end
         end
 
 
-        if (q1[1]=="NA" && q2[1]!="NA")
-            txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). The landmass, \n ", land1, ", \ndoes not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns and earlier timestamp, please check gplates file"])
-            error(txt)
+        if q1[1]=="NA" && q2[1]!="NA"
+            error("STOP ERROR in pygplatesfunctions.distance_given(). The landmass, '", land1, "',\n does not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.")
         end # end error check
 
-        if (q2[1]=="NA" && q1[1]!="NA")
-            txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). The landmass, \n ", land2, ", \ndoes not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns and earlier timestamp, please check gplates file"])
-            error(txt)
+        if q2[1]=="NA" && q1[1]!="NA"
+            error("STOP ERROR in pygplatesfunctions.distance_given(). The landmass, '", land2, "',\n does not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.")
         end # end error check
 
-        if (q1[1]=="NA" && q2[1]=="NA")
-            txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). The both landmasses,\n ", land1, "\n and \n", land2, ", \ndo not have a polygons at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with polygons present. If land_begin returns and earlier timestamp, please check gplates file"])
-            error(txt)
+        if q1[1]=="NA" && q2[1]=="NA"
+            error("STOP ERROR in pygplatesfunctions.distance_given(). Both landmasses, '", land1, "' and '", land2, "',\n do not have polygons at this timestamp \n (time=", time, ").\n Please use land_begin to find the earliest timestamp with polygons present. If land_begin returns an earlier timestamp, please check gplates file.")
         end
 
-        if (q4[1]=="NA" && q3[1]!="NA")
-            txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). The landmass, \n ", land1, ", \ndoes not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns and earlier timestamp, please check gplates file"])
-            error(txt)
-        end # end error check
-
-        if (q3[1]=="NA" && q4[1]!="NA")
-            txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). The landmass, \n ", land2, ", \ndoes not have a polygon at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns and earlier timestamp, please check gplates file"])
-            error(txt)
-        end # end error check
-
-        if (q3[1]=="NA" && q4[1]=="NA")
-            txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). The both landmasses,\n ", land1, "\n and \n", land2, ", \ndo not have a polygons at this timestamp (time=", time, ").\n Please use land_begin to find the earliest timestamp with polygons present. If land_begin returns and earlier timestamp, please check gplates file"])
-            error(txt)
-        end
     end 
 
 
     distance_km = q[1]
-
-    paste0(distance_km)
     return distance_km
 
 end
+
+
+"""
+    distance_interp(df, time, land1, land2)
+
+Provides the distance at a given time point, to be used when timepoint requested is
+not within the dataframe.
+
+To pull up distance timestamps already recorded within the dataframe, a faster function 
+would be distance_given
+
+* `df` - dataframe created by pygplates output created by Wallis Bland
+contains variables: 'Reconstruction_Time_Ma', 'Land1', 'Land2', 'Closest_Distance_Ma',
+'Point1_Lat', 'Point1_Lon', 'Point2_Lat', 'Point2_Lon'
+
+* `time` - timepoint for distance requested. May be any given time as long as the recorded
+timespan within the dataframe is extends beyond requested timepoint.
+
+* `land1` - first landmass chosen for distance comparison. Ensure this is within 'string' format
+
+* `land2` - second landmass chosed for distance comparison. Ensure this is within 'string' format
+
+Process: Takes the two closest timestamps recorded in dataframe  produces a weighed average
+
+# Examples
+```julia-repl
+
+
+julia> test_df = DataFrame(Reconstruction_Time_Ma=[0, 10, 20, 30, 40, 50, 60, 0, 10, 20, 30, 40, 50, 60], Land1=["India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India"], Land2=["Asia", "Asia", "Asia", "Asia", "Asia", "Asia", "Asia", "Madagascar", "Madagascar", "Madagascar", "Madagascar", "Madagascar", "Madagascar","Madagascar"], Closest_Distance_km=[0, 1000, 2000, 3500, 4100, 4900, "NA", 0, 1000, 2000, 3500, 4100, 4900, "NA"], Point1_Lat=[1,2,3,4,5,6,"NA",1,2,3,4,5,6,"NA"], Point1_Lon=[1,2,3,4,5,6,"NA",1,2,3,4,5,6,"NA"], Point2_Lat=[1,2,3,4,5,6,7,1,2,3,4,5,6,"NA"], Point2_Lon=[1,2,3,4,5,6,7,1,2,3,4,5,6,"NA"])
+
+14×8 DataFrame
+ Row │ Reconstruction_Time_Ma  Land1   Land2       Closest_Distance_km  Point1_Lat  Point1_Lon  Point2_Lat  Point2_Lon 
+     │ Int64                   String  String      Any                  Any         Any         Any         Any        
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │                      0  India   Asia        0                    1           1           1           1
+   2 │                     10  India   Asia        1000                 2           2           2           2
+   3 │                     20  India   Asia        2000                 3           3           3           3
+   4 │                     30  India   Asia        3500                 4           4           4           4
+   5 │                     40  India   Asia        4100                 5           5           5           5
+   6 │                     50  India   Asia        4900                 6           6           6           6
+   7 │                     60  India   Asia        NA                   NA          NA          7           7
+   8 │                      0  India   Madagascar  0                    1           1           1           1
+   9 │                     10  India   Madagascar  1000                 2           2           2           2
+  10 │                     20  India   Madagascar  2000                 3           3           3           3
+  11 │                     30  India   Madagascar  3500                 4           4           4           4
+  12 │                     40  India   Madagascar  4100                 5           5           5           5
+  13 │                     50  India   Madagascar  4900                 6           6           6           6
+  14 │                     60  India   Madagascar  NA                   NA          NA          NA          NA
+
+julia> distance_km = distance_interp(test_df, 44, "India", "Asia")
+
+"""
+
 
 function distance_interp(df, time, land1, land2)
     #blahblahblah
@@ -190,16 +375,24 @@ function distance_interp(df, time, land1, land2)
     end
 
     if (length(List_of_times) == 0)
-        txt = paste0(["STOP ERROR in pygplatesfunctions.distance(). Pairing land1:\n ", land1, "\n or land2: \n", land2, ", \n has not been found within dataframe \n", df])
-        error(txt)
+        error("STOP ERROR in pygplatesfunctions.distance_interp(). Pairing land1:\n ", land1, "\n or land2: \n", land2, ", \n has not been found within given dataframe")
     end
 
+    i = 1
+    global time_low, time_high
     for timecheck in List_of_times
-        if time - timecheck <= 0
-            time_low = q1[timecheck-1]
-            time_high = q1[timecheck]
+
+        if (timecheck == "NA")
+            error("List_of_times has returned NA")
+        end
+
+        if (44 - timecheck <= 0)
+            time_low = List_of_times[i-1]
+            time_high = List_of_times[i]
+
             break
         end
+        i = i+1
     end
     
     dist_high = distance_given(df, time_high, land1, land2)
@@ -216,14 +409,12 @@ function distance_interp(df, time, land1, land2)
     weight_dist_low = weight_low * dist_low
     
     distance_km =  weight_dist_high + weight_dist_low
-
-    print(distance_km)
     return distance_km
 
 end
+
+
 """
-
-
 take the two closest timestamps
 
 by tens, you want 44
@@ -244,7 +435,7 @@ time to borders: 4 & 6 (time_high_save - time & time - time_low_save)
 
 weights: ((sum of d2b) - d2b)/(sum of d2b)
 weights by original border distance
-and then sum those
+ then sum those
 
 
 
@@ -359,7 +550,7 @@ function land_last_touch(df, land1, land2)
 
     
     if (length(areas_list) != numareas)
-        txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). In your input file,\n'", lgdata_fn, "',\nthe given number of areas in line 1 (numareas=", numareas, ") does not equal the length of the areas_list (", parts2, ").\nPlease correct your input geography file and retry. Have a nice day."])
+        txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). In your input file,\n'", lgdata_fn, "',\nthe given number of areas in line 1 (numareas=", numareas, ") does not equal the length of the areas_list (", parts2, ").\nPlease correct your input geography file  retry. Have a nice day."])
         error(txt)
     end # end error check
 
@@ -439,7 +630,7 @@ function txtdf_read(pygp_data; block_allQs=true)
 
 			# Check that the given number matches the actual number of areas
 			if (length(areas_list) != numareas)
-				txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). In your input file,\n'", lgdata_fn, "',\nthe given number of areas in line 1 (numareas=", numareas, ") does not equal the length of the areas_list (", parts2, ").\nPlease correct your input geography file and retry. Have a nice day."])
+				txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). In your input file,\n'", lgdata_fn, "',\nthe given number of areas in line 1 (numareas=", numareas, ") does not equal the length of the areas_list (", parts2, ").\nPlease correct your input geography file  retry. Have a nice day."])
 				error(txt)
 			end # end error check
 	 
@@ -451,13 +642,13 @@ function txtdf_read(pygp_data; block_allQs=true)
 			continue # Go to next round of for-loop without finishing this one
 		end # END if (i == 1)
 
-		# All of the other lines, fill in sp_names and sp_areas
+		# All of the other lines, fill in sp_names  sp_areas
 		words = strip.(split(line))
 		compare = compare + 1
 	
 		# Error check
 		if (spnum > numtaxa)
-			txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). While reading in species #", spnum, ", you exceeded the limit declared in the first line of your input geography file, where numtaxa=", numtaxa, " species. Please correct your input geography file and retry. Have a nice day."])
+			txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). While reading in species #", spnum, ", you exceeded the limit declared in the first line of your input geography file, where numtaxa=", numtaxa, " species. Please correct your input geography file  retry. Have a nice day."])
 			error(txt)
 		end
 
@@ -474,7 +665,7 @@ function txtdf_read(pygp_data; block_allQs=true)
 
 	# Error check
 	if (spnum != numtaxa)
-		txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). While reading in species, only ", spnum, " taxa were read in, however the first line of your input geography file declared there would be numtaxa=", numtaxa, " species. Please correct your input geography file and retry. Have a nice day."])
+		txt = paste0(["STOP ERROR in getranges_from_LagrangePHYLIP(). While reading in species, only ", spnum, " taxa were read in, however the first line of your input geography file declared there would be numtaxa=", numtaxa, " species. Please correct your input geography file  retry. Have a nice day."])
 		error(txt)
 	end
 
@@ -506,7 +697,7 @@ function tipranges_to_tiplikes(inputs, geog_df)
 	
 	# Check if the number of areas in the geography file matches the number in the geog_df
 	if (inputs.setup.numareas != numareas)
-		txt = paste0(["STOP ERROR in tipranges_to_tiplikes(): inputs.setup.numareas=", numareas, ", but the number of areas in geog_df is ", numareas, ". Please fix and re-run."])
+		txt = paste0(["STOP ERROR in tipranges_to_tiplikes(): inputs.setup.numareas=", numareas, ", but the number of areas in geog_df is ", numareas, ". Please fix  re-run."])
 		error(txt)
 	end
 	
