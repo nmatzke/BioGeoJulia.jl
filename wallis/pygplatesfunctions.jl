@@ -28,7 +28,7 @@ using BioGeoJulia.TreePass
 using BioGeoJulia.SSEs
 
 # (1) List all function names here:
-export sayhello4, txtdf_read, csvdf_read, location_used, land_last_touch, distance_given, distance_interp, land_begin
+export sayhello4, txtdf_read, csvdf_read, location_used, land_last_touch, distance_given, distance_interp, oldest_polygon
 
 
 """
@@ -93,7 +93,7 @@ To test queries:
 
 df = DataFrame(name=["John", "Sally", "Roger", "Alice"], age=[54., 34., 79., 41.], children=[0, 2, 4, 5], adult=["Alice", "Bob", "Charlie", "John"])
 
-q3 = @from i in df begin
+q = @from i in df begin
     @where i.age > 40 && i.children > 0
     @select i.name
     @collect
@@ -241,7 +241,7 @@ DataValue{Any}(4100)
 
 
 function distance_given(df, time, land1, land2)
-    #blah blah blah
+    
     q = @from i in df begin
         @where i.Reconstruction_Time_Ma == time && ((i.Land1 == land1 && i.Land2 == land2) || (i.Land2 == land1 && i.Land1 == land2))
         @select i.Closest_Distance_km
@@ -334,6 +334,8 @@ timespan within the dataframe is extends beyond requested timepoint.
 
 * `land2` - second landmass chosed for distance comparison. Ensure this is within 'string' format
 
+NOTE: Lands 1 and 2 do not need to line up with Land1 or 2 within the dataframe in this function, as it will search both!
+
 Process: Takes the two closest timestamps recorded in dataframe  produces a weighed average
 
 # Examples
@@ -363,35 +365,103 @@ julia> test_df = DataFrame(Reconstruction_Time_Ma=[0, 10, 20, 30, 40, 50, 60, 0,
 
 julia> distance_km = distance_interp(test_df, 44, "India", "Asia")
 
+DataValue{Float64}(4420.0)
+
+
+# POTENTIAL ERRORS
+
+* INCORRECT VARIABLES / MISSPELLINGS
+    In this case the variable was either spelt wrong or for some other reason Variable was never printed within the given dataframe.
+
+    julia> distance_interp(test_df, 44, "Asia", "Indai")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_interp().
+     Pairing: 'Asia' and 'Indai' has not been found within given dataframe at this timestamp.
+
+
+
+* INCORRECT PAIRING
+    Lands exist within the dataframe, but were never compared distance wise 
+    If original pygplates code was run correctly, this SHOULD NOT OCCUR. More likely need to check spelling
+
+    julia> distance_interp(test_df, 44, "Asia", "Madagascar")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_interp().
+     Pairing: 'Asia' and 'Madagascar' has not been found within given dataframe.
+
+
+
+* TIME INVALID
+    If the timestamp requested is beyond the reconstructed years (in example our further back year is 60, we requested 64)
+    there is no higher time for the interpolator to use as a weighted average. 
+    Return to pygplates python code to change the output years to cover the correct range.
+
+    julia> distance_km = distance_interp(test_df, 64, "India", "Asia")
+    ERROR: STOP ERROR in pygplatesfunctions.distance_interp().
+     Timestamp: 64 is beyond the reconstructed time in the given dataframe
+
+
+
+* NAs within Outputs
+    These errors will appear as errors within the pygrplatesfunction.distance_given() code.
+    When the selected higher and lower time are sent through the distance_given function to retrieve the distances for
+    the weighted average, they will return an error stating which land has failed at which time stamp.
+
+    This is most likely to occur if there are missing polygons within outputs, especially when polygons appear and disappear.
+    Polygon location and 'closest distance' can be set to 0s before they appear. However that is up to the user to decide.
+
+    julia> distance_interp(test_df, 56, "India", "Asia") 
+    ERROR: STOP ERROR in pygplatesfunctions.distance_given(). The landmass, 'India', 
+     does not have a polygon at this timestamp (time=60).
+     Please use land_begin to find the earliest timestamp with a polygon present. If land_begin returns an earlier timestamp, please check gplates file.
+    
+
+```
 """
 
 
+# HEY SHOULD THIS SKIP ONES THAT HAVE NA DISTANCES?
+
 function distance_interp(df, time, land1, land2)
-    #blahblahblah
+    
     List_of_times = @from i in df begin
         @where ((i.Land1 == land1 && i.Land2 == land2) || (i.Land2 == land1 && i.Land1 == land2))
         @select i.Reconstruction_Time_Ma
         @collect
     end
 
+
+    # should this actually be
+    """
+    List_of_times = @from i in df begin
+        @where i.Closest_Distance_km != "NA" && ((i.Land1 == land1 && i.Land2 == land2) || (i.Land2 == land1 && i.Land1 == land2))
+        @select i.Reconstruction_Time_Ma
+        @collect
+    end
+
+    """
+
     if (length(List_of_times) == 0)
-        error("STOP ERROR in pygplatesfunctions.distance_interp(). Pairing land1:\n ", land1, "\n or land2: \n", land2, ", \n has not been found within given dataframe")
+        error("STOP ERROR in pygplatesfunctions.distance_interp().\n Pairing '", land1, "' and '", land2, "' has not been found within given dataframe")
+    end
+
+    if time - last(List_of_times) > 0
+        error("STOP ERROR in pygplatesfunctions.distance_interp().\n Timestamp: ", time, " (mya) is beyond the reconstructed time in the given dataframe")
     end
 
     i = 1
     global time_low, time_high
     for timecheck in List_of_times
 
-        if (timecheck == "NA")
-            error("List_of_times has returned NA")
+        if timecheck == "NA"
+            continue
         end
 
-        if (44 - timecheck <= 0)
+        if (time - timecheck <= 0)
             time_low = List_of_times[i-1]
             time_high = List_of_times[i]
 
             break
         end
+        
         i = i+1
     end
     
@@ -437,9 +507,6 @@ weights: ((sum of d2b) - d2b)/(sum of d2b)
 weights by original border distance
  then sum those
 
-
-
-
 we want 44
 
 q1 = @from i in df begin
@@ -478,10 +545,6 @@ for i in q1
         time_high_save = time_high
     end
 end
-"""
-
-
-"""
 
 List_of_times = @from i in df begin
     @where i.Land1 == land1 && i.Land2 == land2
@@ -512,34 +575,94 @@ weight_dist_low = weight_low * distance_low
 
 distance_km =  weight_dist_high + weight_dist_low
 
+"""
+
+"""
+    oldest_polygon(df, land)
+
+Provides the last timestamp in which a polygon can be found. Some gpml files have polygons that disappear and reappear!
+
+* `df` - dataframe created by pygplates output created by Wallis Bland
+contains variables: 'Reconstruction_Time_Ma', 'Land1', 'Land2', 'Closest_Distance_Ma',
+'Point1_Lat', 'Point1_Lon', 'Point2_Lat', 'Point2_Lon'
+
+* `time` - timepoint for distance requested. May be any given time as long as the recorded
+timespan within the dataframe is extends beyond requested timepoint.
+
+* `land1` - first landmass chosen for distance comparison. Ensure this is within 'string' format
+
+* `land2` - second landmass chosed for distance comparison. Ensure this is within 'string' format
 
 
+# Examples
+```julia-repl
 
 
-Add errors:
+julia> test_df = DataFrame(Reconstruction_Time_Ma=[0, 10, 20, 30, 40, 50, 60, 0, 10, 20, 30, 40, 50, 60], Land1=["India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India", "India"], Land2=["Asia", "Asia", "Asia", "Asia", "Asia", "Asia", "Asia", "Madagascar", "Madagascar", "Madagascar", "Madagascar", "Madagascar", "Madagascar","Madagascar"], Closest_Distance_km=[0, 1000, 2000, 3500, 4100, 4900, "NA", 0, 1000, 2000, 3500, 4100, 4900, "NA"], Point1_Lat=[1,2,3,4,5,6,"NA",1,2,3,4,5,6,"NA"], Point1_Lon=[1,2,3,4,5,6,"NA",1,2,3,4,5,6,"NA"], Point2_Lat=[1,2,3,4,5,6,7,1,2,3,4,5,6,"NA"], Point2_Lon=[1,2,3,4,5,6,7,1,2,3,4,5,6,"NA"])
 
+14×8 DataFrame
+ Row │ Reconstruction_Time_Ma  Land1   Land2       Closest_Distance_km  Point1_Lat  Point1_Lon  Point2_Lat  Point2_Lon 
+     │ Int64                   String  String      Any                  Any         Any         Any         Any        
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │                      0  India   Asia        0                    1           1           1           1
+   2 │                     10  India   Asia        1000                 2           2           2           2
+   3 │                     20  India   Asia        2000                 3           3           3           3
+   4 │                     30  India   Asia        3500                 4           4           4           4
+   5 │                     40  India   Asia        4100                 5           5           5           5
+   6 │                     50  India   Asia        4900                 6           6           6           6
+   7 │                     60  India   Asia        NA                   NA          NA          7           7
+   8 │                      0  India   Madagascar  0                    1           1           1           1
+   9 │                     10  India   Madagascar  1000                 2           2           2           2
+  10 │                     20  India   Madagascar  2000                 3           3           3           3
+  11 │                     30  India   Madagascar  3500                 4           4           4           4
+  12 │                     40  India   Madagascar  4100                 5           5           5           5
+  13 │                     50  India   Madagascar  4900                 6           6           6           6
+  14 │                     60  India   Madagascar  NA                   NA          NA          NA          NA
+
+  julia> oldest_polygon(test_df, "Asia")
+  oldest_time_stamp_with_polygon = 60
+
+  julia> oldest_polygon(test_df, "India")
+  oldest_time_stamp_with_polygon = 50
+
+  julia> oldest_polygon(test_df, "Indai")
+  ERROR: STOP ERROR in pygplatesfunctions.oldest_polygon.
+   Landmass 'Indai' either does not exist in dataframe or does not contain any polygons.
 
 """
 
 
+function oldest_polygon(df, land)
+    
+    List_of_times = @from i in df begin
+        @where i.Point1_Lat != "NA" && i.Land1 == land
+        @select i.Reconstruction_Time_Ma
+        @collect
+    end
 
-function land_begin()
-    # blah blha blah
+    if length(List_of_times) == 0
+        List_of_times = @from i in df begin
+            @where i.Point2_Lat != "NA" && i.Land2 == land
+            @select i.Reconstruction_Time_Ma
+            @collect
+        end
+    end
+
+    if length(List_of_times) == 0
+        error("STOP ERROR in pygplatesfunctions.oldest_polygon.\n Landmass '", land, "' either does not exist in dataframe or does not contain any polygons.")
+    end
+
+    global oldest_time_stamp_with_polygon
+    oldest_time_stamp_with_polygon = last(List_of_times)
+    print("oldest_time_stamp_with_polygon = ", oldest_time_stamp_with_polygon)
 
 end
 
 
-q3 = @from i in df begin
-    @where i.age > 40 && i.children > 0
-    @select i.name
-    @collect
-    @select i.children
-    @collect
-end
+
 
 function land_last_touch(df, land1, land2)
-    distance = 0
-    
+    distance = 0    
     
     q = @from i in df begin
         @where i.Closest_Distance_km == 0 && i.Land1 == land1 && i.Land2 == land2
