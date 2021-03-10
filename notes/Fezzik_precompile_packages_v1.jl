@@ -51,6 +51,7 @@ using ODEInterfaceDiffEq
 using ODE
 
 # Large and slow...
+using GR							# dependency for plots
 using Plots						# basic plots
 using DifferentialEquations # for ODEProblem (THE SLOWEST ONE)
 using PhyloNetworks		# for phylogenetic trees
